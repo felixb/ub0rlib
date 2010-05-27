@@ -21,7 +21,7 @@ package de.ub0r.android.lib;
  * &nbsp; New method encode(byte[],int) added.<br>
  * &nbsp; New method decode(String) added.<br>
  */
-final class Base64Coder {
+public final class Base64Coder {
 
 	/** Mapping table from 6-bit nibbles to Base64 characters. */
 	private static char[] map1 = new char[64];
@@ -59,7 +59,7 @@ final class Base64Coder {
 	 *            a String to be encoded.
 	 * @return A String with the Base64 encoded data.
 	 */
-	static String encodeString(final String s) {
+	public static String encodeString(final String s) {
 		return new String(encode(s.getBytes()));
 	}
 
@@ -71,7 +71,7 @@ final class Base64Coder {
 	 *            an array containing the data bytes to be encoded.
 	 * @return A character array with the Base64 encoded data.
 	 */
-	static char[] encode(final byte[] in) {
+	public static char[] encode(final byte[] in) {
 		return encode(in, in.length);
 	}
 
@@ -85,7 +85,7 @@ final class Base64Coder {
 	 *            number of bytes to process in <code>in</code>.
 	 * @return A character array with the Base64 encoded data.
 	 */
-	static char[] encode(final byte[] in, final int iLen) {
+	public static char[] encode(final byte[] in, final int iLen) {
 		int oDataLen = (iLen * 4 + 2) / 3; // output length without padding
 		int oLen = ((iLen + 2) / 3) * 4; // output length including padding
 		char[] out = new char[oLen];
@@ -116,7 +116,7 @@ final class Base64Coder {
 	 *            a Base64 String to be decoded.
 	 * @return A String containing the decoded data.
 	 */
-	static String decodeString(final String s) {
+	public static String decodeString(final String s) {
 		return new String(decode(s));
 	}
 
@@ -127,7 +127,7 @@ final class Base64Coder {
 	 *            a Base64 String to be decoded.
 	 * @return An array containing the decoded data bytes.
 	 */
-	static byte[] decode(final String s) {
+	public static byte[] decode(final String s) {
 		return decode(s.toCharArray());
 	}
 
@@ -139,7 +139,7 @@ final class Base64Coder {
 	 *            a character array containing the Base64 encoded data.
 	 * @return An array containing the decoded data bytes.
 	 */
-	static byte[] decode(final char[] in) {
+	public static byte[] decode(final char[] in) {
 		int iLen = in.length;
 		if (iLen % 4 != 0) {
 			throw new IllegalArgumentException(
