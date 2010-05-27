@@ -94,6 +94,20 @@ public abstract class ContactsWrapper {
 	}
 
 	/**
+	 * Get {@link Uri} for filter contacts by address.
+	 * 
+	 * @return {@link Uri}
+	 */
+	public abstract Uri getUriFilter();
+
+	/**
+	 * Get projection for filter contacts by address.
+	 * 
+	 * @return projection
+	 */
+	public abstract String[] getProjectionFilter();
+
+	/**
 	 * Load ContactPhoto from database.
 	 * 
 	 * @param context
@@ -130,6 +144,24 @@ public abstract class ContactsWrapper {
 			final String number);
 
 	/**
+	 * Get a {@link Cursor} with <id,name,number> for a given number.
+	 * 
+	 * @param cr
+	 *            {@link ContentResolver}
+	 * @param uri
+	 *            {@link Uri} to get the contact from
+	 * @return a {@link Cursor} matching the number
+	 */
+	public abstract Cursor getContact(final ContentResolver cr, final Uri uri);
+
+	/**
+	 * Pick a Contact's phone.
+	 * 
+	 * @return {@link Intent}
+	 */
+	public abstract Intent getPickPhoneIntent();
+
+	/**
 	 * Insert or pick a Contact to add this address to.
 	 * 
 	 * @param address
@@ -137,4 +169,41 @@ public abstract class ContactsWrapper {
 	 * @return {@link Intent}
 	 */
 	public abstract Intent getInsertPickIntent(final String address);
+
+	/**
+	 * Get a Name for a given number.
+	 * 
+	 * @param cr
+	 *            {@link ContentResolver}
+	 * @param number
+	 *            number to look for
+	 * @return name matching the number
+	 */
+	public final String getNameForNumber(final ContentResolver cr,
+			final String number) {
+		final Cursor c = this.getContact(cr, number);
+		if (c != null) {
+			return c.getString(FILTER_INDEX_NAME);
+		}
+		return null;
+	}
+
+	/**
+	 * Get "Name <Number>" from {@link Uri}.
+	 * 
+	 * @param cr
+	 *            {@link ContentResolver}
+	 * @param uri
+	 *            {@link Uri}
+	 * @return "Name <Number>"
+	 */
+	public final String getNameAndNumber(final ContentResolver cr, // .
+			final Uri uri) {
+		final Cursor c = this.getContact(cr, uri);
+		if (c != null) {
+			return c.getString(FILTER_INDEX_NAME) + " <"
+					+ c.getString(FILTER_INDEX_NUMBER) + ">";
+		}
+		return null;
+	}
 }

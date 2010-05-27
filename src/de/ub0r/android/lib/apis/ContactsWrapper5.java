@@ -85,6 +85,9 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	@Override
 	public Cursor getContact(final ContentResolver cr, // .
 			final String number) {
+		if (number == null || number.length() == 0) {
+			return null;
+		}
 		Uri uri = Uri.withAppendedPath(
 				ContactsContract.CommonDataKinds.Phone.CONTENT_FILTER_URI,
 				number);
@@ -111,6 +114,57 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Cursor getContact(final ContentResolver cr, // .
+			final Uri uri) {
+		// FIXME: this is broken in android os; issue #8255
+		Log.d(TAG, "query: " + uri);
+		Cursor c = cr.query(uri, PROJECTION_FILTER, null, null, null);
+		if (c != null && c.moveToFirst()) {
+			return c;
+		}
+		return null;
+	}
+
+	/** {@link Uri} for persons, content filter. */
+	private static final Uri API5_URI_CONTENT_FILTER = // .
+	ContactsContract.CommonDataKinds.Phone.CONTENT_FILTER_URI;
+
+	/** Projection for persons query, filter. */
+	private static final String[] API5_PROJECTION_FILTER = // .
+	new String[] { ContactsContract.Data.CONTACT_ID,
+			ContactsContract.Data.DISPLAY_NAME,
+			ContactsContract.CommonDataKinds.Phone.NUMBER };
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Uri getUriFilter() {
+		return API5_URI_CONTENT_FILTER;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String[] getProjectionFilter() {
+		return API5_PROJECTION_FILTER;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Intent getPickPhoneIntent() {
+		final Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+		i.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
+		return i;
 	}
 
 	/**

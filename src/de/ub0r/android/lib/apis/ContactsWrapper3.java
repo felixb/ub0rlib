@@ -28,6 +28,7 @@ import android.net.Uri;
 import android.provider.Contacts;
 import android.provider.Contacts.People;
 import android.provider.Contacts.PeopleColumns;
+import android.provider.Contacts.Phones;
 import android.provider.Contacts.PhonesColumns;
 import android.provider.Contacts.People.Extensions;
 import de.ub0r.android.lib.Log;
@@ -42,6 +43,10 @@ import de.ub0r.android.lib.R;
 public final class ContactsWrapper3 extends ContactsWrapper {
 	/** Tag for output. */
 	private static final String TAG = "cw3";
+
+	/** {@link Uri} for persons, content filter. */
+	private static final Uri URI_CONTENT_FILTER = // .
+	Contacts.Phones.CONTENT_FILTER_URL;
 
 	/** Projection for persons query, filter. */
 	private static final String[] PROJECTION_FILTER = // .
@@ -81,6 +86,9 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 	@Override
 	public Cursor getContact(final ContentResolver cr, // .
 			final String number) {
+		if (number == null || number.length() == 0) {
+			return null;
+		}
 		final Uri uri = Uri.withAppendedPath(
 				Contacts.Phones.CONTENT_FILTER_URL, number);
 		Log.d(TAG, "query: " + uri);
@@ -92,6 +100,49 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 			return c;
 		}
 		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Cursor getContact(final ContentResolver cr, // .
+			final Uri uri) {
+		Log.d(TAG, "query: " + uri);
+		Cursor c = cr.query(uri, PROJECTION_FILTER, null, null, null);
+		if (c.moveToFirst()) {
+			Log.d(TAG, "id: " + c.getString(FILTER_INDEX_ID));
+			Log.d(TAG, "name: " + c.getString(FILTER_INDEX_NAME));
+			Log.d(TAG, "number: " + c.getString(FILTER_INDEX_NUMBER));
+			return c;
+		}
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Uri getUriFilter() {
+		return URI_CONTENT_FILTER;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String[] getProjectionFilter() {
+		return PROJECTION_FILTER;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Intent getPickPhoneIntent() {
+		final Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+		i.setType(Phones.CONTENT_ITEM_TYPE);
+		return i;
 	}
 
 	/**
