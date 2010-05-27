@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2010 Felix Bechstein, The Android Open Source Project
  * 
- * This file is part of SMSdroid.
+ * This file is part of ub0rlib.
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
