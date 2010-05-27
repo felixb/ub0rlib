@@ -43,6 +43,8 @@ public abstract class ContactsWrapper {
 	public static final int FILTER_INDEX_NAME = 1;
 	/** Index of number. */
 	public static final int FILTER_INDEX_NUMBER = 2;
+	/** Index of type. */
+	public static final int FILTER_INDEX_TYPE = 3;
 
 	/**
 	 * Static singleton instance of {@link ContactsWrapper} holding the
@@ -98,14 +100,37 @@ public abstract class ContactsWrapper {
 	 * 
 	 * @return {@link Uri}
 	 */
-	public abstract Uri getUriFilter();
+	public abstract Uri getContentUri();
 
 	/**
 	 * Get projection for filter contacts by address.
 	 * 
 	 * @return projection
 	 */
-	public abstract String[] getProjectionFilter();
+	public abstract String[] getContentProjection();
+
+	/**
+	 * Get sort order for filter contacts.
+	 * 
+	 * @return sort
+	 */
+	public abstract String getContentSort();
+
+	/**
+	 * Get WHERE for filter.
+	 * 
+	 * @param filter
+	 *            filter
+	 * @return WHERE
+	 */
+	public abstract String getContentWhere(final String filter);
+
+	/**
+	 * Get {@link String} selecting mobiles only.
+	 * 
+	 * @return mobiles only {@link String}
+	 */
+	public abstract String getMobilesOnlyString();
 
 	/**
 	 * Load ContactPhoto from database.

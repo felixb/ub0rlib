@@ -24,9 +24,11 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
@@ -43,9 +45,31 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 
 	/** Projection for persons query, filter. */
 	private static final String[] PROJECTION_FILTER = // .
-	new String[] { ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY,
-			ContactsContract.PhoneLookup.DISPLAY_NAME,
-			ContactsContract.CommonDataKinds.Phone.NUMBER };
+	new String[] { ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY, // 0
+			ContactsContract.Data.DISPLAY_NAME, // 1
+			ContactsContract.CommonDataKinds.Phone.NUMBER, // 2
+			ContactsContract.CommonDataKinds.Phone.TYPE // 3
+	};
+
+	/** Projection for persons query, show. */
+	private static final String[] PROJECTION_CONTENT = // .
+	new String[] { BaseColumns._ID, // 0
+			ContactsContract.Data.DISPLAY_NAME, // 1
+			ContactsContract.CommonDataKinds.Phone.NUMBER, // 2
+			ContactsContract.CommonDataKinds.Phone.TYPE // 3
+	};
+
+	/** SQL to select mobile numbers only. */
+	private static final String MOBILES_ONLY = ") AND ("
+			+ ContactsContract.CommonDataKinds.Phone.TYPE + " = "
+			+ ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE + ")";
+
+	/** Sort Order. */
+	private static final String SORT_ORDER = // .
+	ContactsContract.CommonDataKinds.Phone.STARRED + " DESC, "
+			+ ContactsContract.CommonDataKinds.Phone.TIMES_CONTACTED
+			+ " DESC, " + ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
+			+ " ASC, " + ContactsContract.CommonDataKinds.Phone.TYPE;
 
 	/**
 	 * {@inheritDoc}
@@ -131,30 +155,49 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 		return null;
 	}
 
-	/** {@link Uri} for persons, content filter. */
-	private static final Uri API5_URI_CONTENT_FILTER = // .
-	ContactsContract.CommonDataKinds.Phone.CONTENT_FILTER_URI;
-
-	/** Projection for persons query, filter. */
-	private static final String[] API5_PROJECTION_FILTER = // .
-	new String[] { ContactsContract.Data.CONTACT_ID,
-			ContactsContract.Data.DISPLAY_NAME,
-			ContactsContract.CommonDataKinds.Phone.NUMBER };
-
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Uri getUriFilter() {
-		return API5_URI_CONTENT_FILTER;
+	public Uri getContentUri() {
+		return ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String[] getProjectionFilter() {
-		return API5_PROJECTION_FILTER;
+	public String[] getContentProjection() {
+		return PROJECTION_CONTENT;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getMobilesOnlyString() {
+		return MOBILES_ONLY;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getContentSort() {
+		return SORT_ORDER;
+	}
+
+	@Override
+	public String getContentWhere(final String filter) {
+		String f = DatabaseUtils.sqlEscapeString('%' + filter.toString() + '%');
+		StringBuilder s = new StringBuilder();
+		s.append("(" + ContactsContract.Data.DISPLAY_NAME + " LIKE ");
+		s.append(f);
+		s.append(") OR (" + ContactsContract.CommonDataKinds.Phone.DATA1
+				+ " LIKE ");
+		s.append(f);
+		s.append(")");
+		return s.toString();
 	}
 
 	/**

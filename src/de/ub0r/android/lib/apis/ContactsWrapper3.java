@@ -23,8 +23,10 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.provider.BaseColumns;
 import android.provider.Contacts;
 import android.provider.Contacts.People;
 import android.provider.Contacts.PeopleColumns;
@@ -44,14 +46,30 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 	/** Tag for output. */
 	private static final String TAG = "cw3";
 
-	/** {@link Uri} for persons, content filter. */
-	private static final Uri URI_CONTENT_FILTER = // .
-	Contacts.Phones.CONTENT_FILTER_URL;
-
 	/** Projection for persons query, filter. */
 	private static final String[] PROJECTION_FILTER = // .
-	new String[] { Extensions.PERSON_ID, PeopleColumns.DISPLAY_NAME,
-			PhonesColumns.NUMBER };
+	new String[] { Extensions.PERSON_ID, // 0
+			PeopleColumns.NAME, // 1
+			PhonesColumns.NUMBER, // 2
+			PhonesColumns.TYPE // 3
+	};
+
+	/** Projection for persons query, content. */
+	private static final String[] PROJECTION_CONTENT = // .
+	new String[] { BaseColumns._ID, // 0
+			PeopleColumns.NAME, // 1
+			PhonesColumns.NUMBER, // 2
+			PhonesColumns.TYPE // 3
+	};
+
+	/** SQL to select mobile numbers only. */
+	private static final String MOBILES_ONLY = ") AND (" + PhonesColumns.TYPE
+			+ " = " + PhonesColumns.TYPE_MOBILE + ")";
+
+	/** Sort Order. */
+	private static final String SORT_ORDER = PeopleColumns.STARRED + " DESC, "
+			+ PeopleColumns.TIMES_CONTACTED + " DESC, " + PeopleColumns.NAME
+			+ " ASC, " + PhonesColumns.TYPE;
 
 	/**
 	 * {@inheritDoc}
@@ -123,16 +141,47 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Uri getUriFilter() {
-		return URI_CONTENT_FILTER;
+	public Uri getContentUri() {
+		return Contacts.Phones.CONTENT_URI;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String[] getProjectionFilter() {
-		return PROJECTION_FILTER;
+	public String[] getContentProjection() {
+		return PROJECTION_CONTENT;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getMobilesOnlyString() {
+		return MOBILES_ONLY;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getContentSort() {
+		return SORT_ORDER;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getContentWhere(final String filter) {
+		String f = DatabaseUtils.sqlEscapeString('%' + filter.toString() + '%');
+		StringBuilder s = new StringBuilder();
+		s.append("(" + PeopleColumns.NAME + " LIKE ");
+		s.append(f);
+		s.append(") OR (" + PhonesColumns.NUMBER + " LIKE ");
+		s.append(f);
+		s.append(")");
+		return s.toString();
 	}
 
 	/**
