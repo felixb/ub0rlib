@@ -177,7 +177,7 @@ public abstract class ContactsWrapper {
 	 *            {@link Uri} to get the contact from
 	 * @return a {@link Cursor} matching the number
 	 */
-	public abstract Cursor getContact(final ContentResolver cr, final Uri uri);
+	protected abstract Cursor getContact(final ContentResolver cr, final Uri uri);
 
 	/**
 	 * Pick a Contact's phone.

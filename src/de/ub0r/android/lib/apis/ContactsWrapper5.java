@@ -144,7 +144,7 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Cursor getContact(final ContentResolver cr, // .
+	protected Cursor getContact(final ContentResolver cr, // .
 			final Uri uri) {
 		// FIXME: this is broken in android os; issue #8255
 		Log.d(TAG, "query: " + uri);
