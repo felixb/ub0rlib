@@ -2,7 +2,7 @@
 
 [ -z "$1" ] && exit -1
 
-export PATH="$(dirname $0):$PATH"
+export PATH="$PWD/$(dirname $0):$PATH"
 
 cd "$1" || exit -1
 
