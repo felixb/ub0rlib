@@ -5,8 +5,8 @@ if echo "$(basename $PWD)" | grep -q "connector" ; then
 	basename $PWD
 	n=$(fgrep app_name res/values/*.xml | cut -d\> -f2 | cut -d\< -f1 | tr ' ' '-' | tr -d ':')
 else
-	echo "bump websms"
-	n=$(fgrep app_name res/values/*.xml | cut -d\> -f2 | cut -d\< -f1 | cut -d\  -f1 | tr -d \ )
+	echo "bump app"
+	n=$(fgrep app_name res/values/*.xml | cut -d\> -f2 | cut -d\< -f1 | tr -d \ )
 fi
 
 v=${1}
