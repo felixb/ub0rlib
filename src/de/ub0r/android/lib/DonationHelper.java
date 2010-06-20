@@ -32,10 +32,12 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
@@ -83,6 +85,101 @@ public class DonationHelper extends Activity implements OnClickListener {
 	private static String imeiHash = null;
 
 	/**
+	 * Do all the IO.
+	 * 
+	 * @author flx
+	 */
+	private class InnerTask extends AsyncTask<Void, Void, Void> {
+		/** Mail address used. */
+		private String mail;
+		/** The progress dialog. */
+		private ProgressDialog dialog;
+		/** Did an error occurred? */
+		private boolean error = true;
+		/** Message to the user. */
+		private String msg = null;
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void onPreExecute() {
+			this.mail = DonationHelper.this.etPaypalId.getText().toString();
+			this.dialog = ProgressDialog.show(DonationHelper.this, "",
+					DonationHelper.this.getString(R.string.load_hash_) + "...",
+					true, false);
+			final SharedPreferences p = PreferenceManager
+					.getDefaultSharedPreferences(DonationHelper.this);
+			p.edit().putString(PREFS_DONATEMAIL, this.mail).commit();
+			DonationHelper.this.findViewById(R.id.send).setEnabled(false);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void onPostExecute(final Void result) {
+			this.dialog.dismiss();
+			if (this.msg != null) {
+				Toast
+						.makeText(DonationHelper.this, this.msg,
+								Toast.LENGTH_LONG).show();
+			}
+			if (!this.error) {
+				DonationHelper.this.finish();
+			}
+			DonationHelper.this.findViewById(R.id.send).setEnabled(true);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected Void doInBackground(final Void... params) {
+			final String url = URL + "?mail=" + Uri.encode(this.mail)
+					+ "&hash=" + getImeiHash(DonationHelper.this) + "&lang="
+					+ DonationHelper.this.getString(R.string.lang);
+			final HttpGet request = new HttpGet(url);
+			try {
+				Log.d(TAG, "url: " + url);
+				final HttpResponse response = new DefaultHttpClient()
+						.execute(request);
+				int resp = response.getStatusLine().getStatusCode();
+				if (resp != 200) {
+					this.msg = "Service is down. Retry later. Returncode: "
+							+ resp;
+					return null;
+				}
+				final BufferedReader bufferedReader = new BufferedReader(
+						new InputStreamReader(response.getEntity().getContent()),
+						BUFSIZE);
+				final String line = bufferedReader.readLine();
+				final boolean ret = checkSig(DonationHelper.this, line);
+				final SharedPreferences prefs = PreferenceManager
+						.getDefaultSharedPreferences(DonationHelper.this);
+				prefs.edit().putBoolean(PREFS_HIDEADS, ret).commit();
+
+				int text = R.string.sig_loaded;
+				if (!ret) {
+					text = R.string.sig_failed;
+				}
+				this.msg = DonationHelper.this.getString(text);
+				this.error = !ret;
+				if (this.error) {
+					this.msg += "\n" + line;
+				}
+			} catch (ClientProtocolException e) {
+				Log.e(TAG, "error loading sig", e);
+				this.msg = e.getMessage();
+			} catch (IOException e) {
+				Log.e(TAG, "error loading sig", e);
+				this.msg = e.getMessage();
+			}
+			return null;
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -112,67 +209,10 @@ public class DonationHelper extends Activity implements OnClickListener {
 						.show();
 				return;
 			}
-			final SharedPreferences p = PreferenceManager
-					.getDefaultSharedPreferences(this);
-			p.edit().putString(PREFS_DONATEMAIL,
-					this.etPaypalId.getText().toString()).commit();
-			loadImeiHash(this, this.etPaypalId.getText().toString());
+			new InnerTask().execute((Void[]) null);
 			return;
 		default:
 			return;
-		}
-	}
-
-	/**
-	 * Send a mail with user's IMEI hash.
-	 * 
-	 * @param activity
-	 *            {@link Activity}
-	 * @param paypalId
-	 *            Paypal Id
-	 */
-	public static void loadImeiHash(final Activity activity, // .
-			final String paypalId) {
-		final String url = URL + "?mail=" + Uri.encode(paypalId) + "&hash="
-				+ getImeiHash(activity) + "&lang="
-				+ activity.getString(R.string.lang);
-		final HttpGet request = new HttpGet(url);
-		try {
-			Log.d(TAG, "url: " + url);
-			final HttpResponse response = new DefaultHttpClient()
-					.execute(request);
-			int resp = response.getStatusLine().getStatusCode();
-			if (resp != 200) {
-				Toast.makeText(activity,
-						"Service is down. Retry later. Returncode: " + resp,
-						Toast.LENGTH_LONG).show();
-				return;
-			}
-			final BufferedReader bufferedReader = new BufferedReader(
-					new InputStreamReader(response.getEntity().getContent()),
-					BUFSIZE);
-			final String line = bufferedReader.readLine();
-			final boolean ret = checkSig(activity, line);
-			final SharedPreferences prefs = PreferenceManager
-					.getDefaultSharedPreferences(activity);
-			prefs.edit().putBoolean(PREFS_HIDEADS, ret).commit();
-
-			int text = R.string.sig_loaded;
-			if (!ret) {
-				text = R.string.sig_failed;
-			}
-			Toast.makeText(activity, text, Toast.LENGTH_LONG).show();
-			if (ret) {
-				activity.finish();
-			} else {
-				Toast.makeText(activity, line, Toast.LENGTH_LONG).show();
-			}
-		} catch (ClientProtocolException e) {
-			Log.e(TAG, "error loading sig", e);
-			Toast.makeText(activity, e.getMessage(), Toast.LENGTH_LONG).show();
-		} catch (IOException e) {
-			Log.e(TAG, "error loading sig", e);
-			Toast.makeText(activity, e.getMessage(), Toast.LENGTH_LONG).show();
 		}
 	}
 
