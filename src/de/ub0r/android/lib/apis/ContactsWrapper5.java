@@ -99,8 +99,13 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	 */
 	@Override
 	public Uri getContactUri(final ContentResolver cr, final String id) {
-		return Contacts.lookupContact(cr, Uri.withAppendedPath(
-				Contacts.CONTENT_LOOKUP_URI, id));
+		try {
+			return Contacts.lookupContact(cr, Uri.withAppendedPath(
+					Contacts.CONTENT_LOOKUP_URI, id));
+		} catch (IllegalArgumentException e) {
+			Log.e(TAG, "unable to get uri for id: " + id, e);
+			return null;
+		}
 	}
 
 	/**
