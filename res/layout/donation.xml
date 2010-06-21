@@ -24,8 +24,15 @@
 		<TextView android:text="@string/predonate"
 			android:layout_width="fill_parent" android:layout_height="wrap_content"
 			android:autoLink="web" />
-		<Button android:text="@string/donate_" android:id="@+id/donate"
-			android:layout_width="fill_parent" android:layout_height="wrap_content" />
+		<LinearLayout android:orientation="horizontal"
+			android:layout_width="fill_parent" android:layout_height="wrap_content">
+			<Button android:text="@string/donate_paypal_" android:id="@+id/donate_paypal"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:layout_weight="1" />
+			<Button android:text="@string/donate_market_" android:id="@+id/donate_market"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:layout_weight="1" />
+		</LinearLayout>
 
 		<TextView android:text="@string/postdonate"
 			android:layout_width="fill_parent" android:layout_height="wrap_content"
@@ -38,5 +45,10 @@
 			android:singleLine="true" />
 		<Button android:text="@string/load_hash_" android:id="@+id/send"
 			android:layout_width="fill_parent" android:layout_height="wrap_content" />
+		<CheckBox android:text="@string/accept_" android:id="@+id/accept"
+			android:layout_width="wrap_content" android:layout_height="wrap_content" />
+		<TextView android:text="@string/terms" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:autoLink="web"
+			android:paddingTop="5dip" />
 	</LinearLayout>
 </ScrollView>

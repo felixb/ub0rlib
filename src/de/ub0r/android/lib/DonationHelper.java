@@ -43,6 +43,7 @@ import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -187,7 +188,8 @@ public class DonationHelper extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.donation);
 
-		this.findViewById(R.id.donate).setOnClickListener(this);
+		this.findViewById(R.id.donate_paypal).setOnClickListener(this);
+		this.findViewById(R.id.donate_market).setOnClickListener(this);
 		this.findViewById(R.id.send).setOnClickListener(this);
 		this.etPaypalId = (EditText) this.findViewById(R.id.paypalid);
 		this.etPaypalId.setText(PreferenceManager.getDefaultSharedPreferences(
@@ -199,14 +201,38 @@ public class DonationHelper extends Activity implements OnClickListener {
 	 */
 	public final void onClick(final View v) {
 		switch (v.getId()) {
-		case R.id.donate:
-			this.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(this
-					.getString(R.string.donate_url))));
+		case R.id.donate_paypal:
+			try {
+				this.startActivity(new Intent(Intent.ACTION_VIEW, Uri
+						.parse(this.getString(R.string.donate_url))));
+			} catch (Exception e) {
+				Log.e(TAG, "error launching paypal", e);
+				Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+			}
+			return;
+		case R.id.donate_market:
+			try {
+				this
+						.startActivity(new Intent(
+								Intent.ACTION_VIEW,
+								Uri
+										.parse("market://search?q=pname:de.ub0r.android.donator")));
+			} catch (Exception e) {
+				Log.e(TAG, "error launching market", e);
+				Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+			}
 			return;
 		case R.id.send:
 			if (this.etPaypalId.getText().toString().length() == 0) {
 				Toast.makeText(this, R.string.paypal_id_, Toast.LENGTH_LONG)
 						.show();
+				return;
+			}
+			final CheckBox cb = (CheckBox) this.findViewById(R.id.accept);
+			if (!cb.isChecked()) {
+				Toast
+						.makeText(this, R.string.accept_missing,
+								Toast.LENGTH_LONG).show();
 				return;
 			}
 			new InnerTask().execute((Void[]) null);
