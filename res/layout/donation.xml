@@ -37,11 +37,11 @@
 		<TextView android:text="@string/postdonate"
 			android:layout_width="fill_parent" android:layout_height="wrap_content"
 			android:autoLink="web" android:paddingTop="10dip" />
-		<TextView android:text="@string/paypal_id_"
+		<TextView android:text="@string/donator_id_"
 			android:layout_width="fill_parent" android:layout_height="wrap_content"
 			android:autoLink="web" android:paddingTop="5dip" />
 		<EditText android:id="@+id/paypalid" android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:hint="@string/paypal_id_hint"
+			android:layout_height="wrap_content" android:hint="@string/donator_id_hint"
 			android:singleLine="true" />
 		<Button android:text="@string/load_hash_" android:id="@+id/send"
 			android:layout_width="fill_parent" android:layout_height="wrap_content" />
