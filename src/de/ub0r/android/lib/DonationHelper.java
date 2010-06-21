@@ -224,7 +224,7 @@ public class DonationHelper extends Activity implements OnClickListener {
 			return;
 		case R.id.send:
 			if (this.etPaypalId.getText().toString().length() == 0) {
-				Toast.makeText(this, R.string.paypal_id_, Toast.LENGTH_LONG)
+				Toast.makeText(this, R.string.donator_id_, Toast.LENGTH_LONG)
 						.show();
 				return;
 			}
