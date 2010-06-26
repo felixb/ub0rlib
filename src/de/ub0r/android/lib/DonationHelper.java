@@ -64,9 +64,19 @@ public class DonationHelper extends Activity implements OnClickListener {
 
 	/** Preference: paypal id. */
 	private static final String PREFS_DONATEMAIL = "donate_mail";
+	/** Preference: last check. */
+	private static final String PREFS_LASTCHECK = "donate_lastcheck";
+	/** Preference: period for next check. */
+	private static final String PREFS_PERIOD = "donate_period";
+	/** Initial period. */
+	private static final long INIT_PERIOD = 24 * 60 * 60 * 1000; // 1 day
 
 	/** URL for checking hash. */
 	private static final String URL = "http://nossl.ub0r.de/donation/";
+
+	/** Uri to market:donator. */
+	private static final Uri DONATOR_MARKET = Uri // .
+			.parse("market://search?q=pname:de.ub0r.android.donator");
 
 	/** Crypto algorithm for signing UID hashs. */
 	private static final String ALGO = "RSA";
@@ -90,29 +100,58 @@ public class DonationHelper extends Activity implements OnClickListener {
 	 * 
 	 * @author flx
 	 */
-	private class InnerTask extends AsyncTask<Void, Void, Void> {
+	private static class InnerTask extends AsyncTask<Void, Void, Void> {
 		/** Mail address used. */
 		private String mail;
 		/** The progress dialog. */
-		private ProgressDialog dialog;
+		private ProgressDialog dialog = null;
 		/** Did an error occurred? */
 		private boolean error = true;
+		/** Did an http error occurred? */
+		private boolean errorHttp = false;
 		/** Message to the user. */
 		private String msg = null;
+		/** Run in recheck mode. */
+		private final boolean doRecheck;
+		/** Instance of DonationHelper. */
+		private final DonationHelper dh;
+		/** Context. */
+		private final Context ctx;
+
+		/**
+		 * Default Constructor.
+		 * 
+		 * @param context
+		 *            {@link Context}
+		 * @param helper
+		 *            {@link DonationHelper}
+		 * @param recheck
+		 *            run in recheck mode
+		 */
+		public InnerTask(final Context context, final DonationHelper helper,
+				final boolean recheck) {
+			this.ctx = context;
+			this.dh = helper;
+			this.doRecheck = recheck;
+		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		protected void onPreExecute() {
-			this.mail = DonationHelper.this.etPaypalId.getText().toString();
-			this.dialog = ProgressDialog.show(DonationHelper.this, "",
-					DonationHelper.this.getString(R.string.load_hash_) + "...",
-					true, false);
 			final SharedPreferences p = PreferenceManager
-					.getDefaultSharedPreferences(DonationHelper.this);
-			p.edit().putString(PREFS_DONATEMAIL, this.mail).commit();
-			DonationHelper.this.findViewById(R.id.send).setEnabled(false);
+					.getDefaultSharedPreferences(this.ctx);
+			if (this.doRecheck) {
+				this.mail = p.getString(PREFS_DONATEMAIL, "no@mail.local");
+			} else {
+				this.mail = this.dh.etPaypalId.getText().toString();
+				this.dialog = ProgressDialog.show(this.dh, "", this.ctx
+						.getString(R.string.load_hash_)
+						+ "...", true, false);
+				p.edit().putString(PREFS_DONATEMAIL, this.mail).commit();
+				this.dh.findViewById(R.id.send).setEnabled(false);
+			}
 		}
 
 		/**
@@ -120,16 +159,33 @@ public class DonationHelper extends Activity implements OnClickListener {
 		 */
 		@Override
 		protected void onPostExecute(final Void result) {
-			this.dialog.dismiss();
-			if (this.msg != null) {
-				Toast
-						.makeText(DonationHelper.this, this.msg,
-								Toast.LENGTH_LONG).show();
+			if (this.dialog != null) {
+				this.dialog.dismiss();
 			}
-			if (!this.error) {
-				DonationHelper.this.finish();
+			if (this.doRecheck) {
+				final SharedPreferences p = PreferenceManager
+						.getDefaultSharedPreferences(this.ctx);
+				long period = p.getLong(PREFS_PERIOD, INIT_PERIOD) * 2;
+				long lastCheck = System.currentTimeMillis();
+				if (this.error && !this.errorHttp) {
+					p.edit().remove(PREFS_LASTCHECK).remove(PREFS_PERIOD)
+							.remove(PREFS_HIDEADS).commit();
+				} else if (!this.error) {
+					p.edit().putLong(PREFS_PERIOD, period).putLong(
+							PREFS_LASTCHECK, lastCheck).commit();
+				}
+			} else {
+				if (this.msg != null) {
+					Toast.makeText(this.ctx, this.msg, Toast.LENGTH_LONG)
+							.show();
+				}
 			}
-			DonationHelper.this.findViewById(R.id.send).setEnabled(true);
+			if (this.dh != null) {
+				if (!this.error) {
+					this.dh.finish();
+				}
+				this.dh.findViewById(R.id.send).setEnabled(true);
+			}
 		}
 
 		/**
@@ -137,34 +193,38 @@ public class DonationHelper extends Activity implements OnClickListener {
 		 */
 		@Override
 		protected Void doInBackground(final Void... params) {
-			final String url = URL + "?mail=" + Uri.encode(this.mail)
-					+ "&hash=" + getImeiHash(DonationHelper.this) + "&lang="
-					+ DonationHelper.this.getString(R.string.lang);
+			String url = URL + "?mail=" + Uri.encode(this.mail) + "&hash="
+					+ getImeiHash(this.ctx) + "&lang="
+					+ this.ctx.getString(R.string.lang);
+			if (this.doRecheck) {
+				url += "&recheck=1";
+			}
 			final HttpGet request = new HttpGet(url);
 			try {
 				Log.d(TAG, "url: " + url);
 				final HttpResponse response = new DefaultHttpClient()
 						.execute(request);
 				int resp = response.getStatusLine().getStatusCode();
-				if (resp != 200) {
+				if (resp != Utils.HTTP_OK) {
 					this.msg = "Service is down. Retry later. Returncode: "
 							+ resp;
+					this.errorHttp = true;
 					return null;
 				}
 				final BufferedReader bufferedReader = new BufferedReader(
-						new InputStreamReader(response.getEntity().getContent()),
-						BUFSIZE);
+						new InputStreamReader(// .
+								response.getEntity().getContent()), BUFSIZE);
 				final String line = bufferedReader.readLine();
-				final boolean ret = checkSig(DonationHelper.this, line);
+				final boolean ret = checkSig(this.ctx, line);
 				final SharedPreferences prefs = PreferenceManager
-						.getDefaultSharedPreferences(DonationHelper.this);
+						.getDefaultSharedPreferences(this.ctx);
 				prefs.edit().putBoolean(PREFS_HIDEADS, ret).commit();
 
 				int text = R.string.sig_loaded;
 				if (!ret) {
 					text = R.string.sig_failed;
 				}
-				this.msg = DonationHelper.this.getString(text);
+				this.msg = this.ctx.getString(text);
 				this.error = !ret;
 				if (this.error) {
 					this.msg += "\n" + line;
@@ -212,11 +272,8 @@ public class DonationHelper extends Activity implements OnClickListener {
 			return;
 		case R.id.donate_market:
 			try {
-				this
-						.startActivity(new Intent(
-								Intent.ACTION_VIEW,
-								Uri
-										.parse("market://search?q=pname:de.ub0r.android.donator")));
+				this.startActivity(new Intent(Intent.ACTION_VIEW,
+						DONATOR_MARKET));
 			} catch (Exception e) {
 				Log.e(TAG, "error launching market", e);
 				Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -235,7 +292,7 @@ public class DonationHelper extends Activity implements OnClickListener {
 								Toast.LENGTH_LONG).show();
 				return;
 			}
-			new InnerTask().execute((Void[]) null);
+			new InnerTask(this, this, false).execute((Void[]) null);
 			return;
 		default:
 			return;
@@ -296,6 +353,9 @@ public class DonationHelper extends Activity implements OnClickListener {
 		} catch (Exception e) {
 			Log.e(TAG, "error reading signatures", e);
 		}
+		if (!ret) {
+			Log.i(TAG, "sig: " + s);
+		}
 		return ret;
 	}
 
@@ -309,6 +369,19 @@ public class DonationHelper extends Activity implements OnClickListener {
 	public static boolean hideAds(final Context context) {
 		final SharedPreferences p = PreferenceManager
 				.getDefaultSharedPreferences(context);
-		return p.getBoolean(PREFS_HIDEADS, false);
+		final boolean ret = p.getBoolean(PREFS_HIDEADS, false);
+		if (ret) {
+			final long period = p.getLong(PREFS_PERIOD, INIT_PERIOD);
+			final long lastCheck = p.getLong(PREFS_LASTCHECK, 0);
+			final long nextCheck = lastCheck + period
+					- System.currentTimeMillis();
+			if (nextCheck < 0) {
+				Log.i(TAG, "recheck donation");
+				new InnerTask(context, null, true).execute((Void[]) null);
+			} else {
+				Log.d(TAG, "next recheck: " + nextCheck);
+			}
+		}
+		return ret;
 	}
 }

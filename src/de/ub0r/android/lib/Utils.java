@@ -28,6 +28,9 @@ public final class Utils {
 	/** Tag for output. */
 	private static final String TAG = "utls";
 
+	/** HTTP returncode: 200 OK. */
+	public static final int HTTP_OK = 200;
+
 	/**
 	 * Default Constructor.
 	 */
