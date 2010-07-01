@@ -232,4 +232,22 @@ public abstract class ContactsWrapper {
 		}
 		return null;
 	}
+
+	/**
+	 * Get Number from {@link Uri}.
+	 * 
+	 * @param cr
+	 *            {@link ContentResolver}
+	 * @param uri
+	 *            {@link Uri}
+	 * @return Number
+	 */
+	public final String getNumber(final ContentResolver cr, // .
+			final Uri uri) {
+		final Cursor c = this.getContact(cr, uri);
+		if (c != null) {
+			return c.getString(FILTER_INDEX_NUMBER);
+		}
+		return null;
+	}
 }
