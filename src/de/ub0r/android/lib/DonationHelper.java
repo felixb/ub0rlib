@@ -370,7 +370,7 @@ public class DonationHelper extends Activity implements OnClickListener {
 		final SharedPreferences p = PreferenceManager
 				.getDefaultSharedPreferences(context);
 		final boolean ret = p.getBoolean(PREFS_HIDEADS, false);
-		if (ret) {
+		if (ret && p.getString(PREFS_DONATEMAIL, null) != null) {
 			final long period = p.getLong(PREFS_PERIOD, INIT_PERIOD);
 			final long lastCheck = p.getLong(PREFS_LASTCHECK, 0);
 			final long nextCheck = lastCheck + period
