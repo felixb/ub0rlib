@@ -38,6 +38,15 @@ public final class Utils {
 
 	}
 
+	/**
+	 * Parse {@link Integer}.
+	 * 
+	 * @param value
+	 *            value a {@link String}
+	 * @param defValue
+	 *            default value
+	 * @return parsed {@link Integer}
+	 */
 	public static int parseInt(final String value, final int defValue) {
 		int ret = defValue;
 		if (value == null || value.length() == 0) {
@@ -47,6 +56,28 @@ public final class Utils {
 			ret = Integer.parseInt(value);
 		} catch (NumberFormatException e) {
 			Log.w(TAG, "parseInt(" + value + ") failed: " + e.toString());
+		}
+		return ret;
+	}
+
+	/**
+	 * Parse {@link Long}.
+	 * 
+	 * @param value
+	 *            value a {@link String}
+	 * @param defValue
+	 *            default value
+	 * @return parsed {@link Long}
+	 */
+	public static long parseLong(final String value, final long defValue) {
+		long ret = defValue;
+		if (value == null || value.length() == 0) {
+			return ret;
+		}
+		try {
+			ret = Long.parseLong(value);
+		} catch (NumberFormatException e) {
+			Log.w(TAG, "parseLong(" + value + ") failed: " + e.toString());
 		}
 		return ret;
 	}
