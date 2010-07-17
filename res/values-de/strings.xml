@@ -23,6 +23,7 @@
 	<string name="license">GPLv3 - siehe http://www.gnu.org/licenses/gpl-3.0.txt</string>
 	<string name="source_">Sourcescode:</string>
 	<string name="website_">Website:</string>
+	<string name="about_hint">Über diese App</string>
 	<string name="send_logs_">Logs senden</string>
 	<string name="send_logs_hint">Logs von deinem Handy an den Entwickler senden.\nBitte nur nach Aufforderung senden.</string>
 	<string name="sendlog_run_">SendLog starten</string>

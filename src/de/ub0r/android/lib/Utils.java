@@ -38,6 +38,19 @@ public final class Utils {
 
 	}
 
+	public static int parseInt(final String value, final int defValue) {
+		int ret = defValue;
+		if (value == null || value.length() == 0) {
+			return ret;
+		}
+		try {
+			ret = Integer.parseInt(value);
+		} catch (NumberFormatException e) {
+			Log.w(TAG, "parseInt(" + value + ") failed: " + e.toString());
+		}
+		return ret;
+	}
+
 	/**
 	 * Calculate MD5 Hash from String.
 	 * 
