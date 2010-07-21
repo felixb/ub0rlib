@@ -27,6 +27,7 @@ import java.security.Signature;
 import java.security.spec.X509EncodedKeySpec;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -205,7 +206,7 @@ public class DonationHelper extends Activity implements OnClickListener {
 				final HttpResponse response = new DefaultHttpClient()
 						.execute(request);
 				int resp = response.getStatusLine().getStatusCode();
-				if (resp != Utils.HTTP_OK) {
+				if (resp != HttpStatus.SC_OK) {
 					this.msg = "Service is down. Retry later. Returncode: "
 							+ resp;
 					this.errorHttp = true;
