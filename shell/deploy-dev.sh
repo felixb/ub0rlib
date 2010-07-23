@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/bash 
 
 ODIR=${PWD}
 
@@ -9,7 +9,7 @@ else
 	p=${1}
 fi
 
-export PATH="${PWD}/$(dirname $0):$PATH"
+export PATH="${ODIR}/$(dirname $0):$PATH"
 
 cd "${p}" || exit -1
 
