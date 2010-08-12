@@ -34,6 +34,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -64,7 +65,7 @@ public class DonationHelper extends Activity implements OnClickListener {
 	public static final int BUFSIZE = 512;
 
 	/** Preference: paypal id. */
-	private static final String PREFS_DONATEMAIL = "donate_mail";
+	static final String PREFS_DONATEMAIL = "donate_mail";
 	/** Preference: last check. */
 	private static final String PREFS_LASTCHECK = "donate_lastcheck";
 	/** Preference: period for next check. */
@@ -73,11 +74,19 @@ public class DonationHelper extends Activity implements OnClickListener {
 	private static final long INIT_PERIOD = 24 * 60 * 60 * 1000; // 1 day
 
 	/** URL for checking hash. */
-	private static final String URL = "http://nossl.ub0r.de/donation/";
+	public static final String URL = "http://www.4.ub0r.de/donation/";
+
+	/** Donator package. */
+	private static final String DONATOR_PACKAGE = "de.ub0r.android.donator";
+	/** Donator class. */
+	private static final String DONATOR_CLASS = DONATOR_PACKAGE + ".Main";
+	/** Dontor Broadcast. */
+	public static final String DONATOR_BROADCAST = DONATOR_PACKAGE
+			+ ".REGISTERED";
 
 	/** Uri to market:donator. */
 	private static final Uri DONATOR_MARKET = Uri // .
-			.parse("market://search?q=pname:de.ub0r.android.donator");
+			.parse("market://search?q=pname:" + DONATOR_PACKAGE);
 
 	/** Crypto algorithm for signing UID hashs. */
 	private static final String ALGO = "RSA";
@@ -146,7 +155,8 @@ public class DonationHelper extends Activity implements OnClickListener {
 			if (this.doRecheck) {
 				this.mail = p.getString(PREFS_DONATEMAIL, "no@mail.local");
 			} else {
-				this.mail = this.dh.etPaypalId.getText().toString();
+				this.mail = this.dh.etPaypalId.getText().toString().trim()
+						.toLowerCase();
 				this.dialog = ProgressDialog.show(this.dh, "", this.ctx
 						.getString(R.string.load_hash_)
 						+ "...", true, false);
@@ -253,8 +263,38 @@ public class DonationHelper extends Activity implements OnClickListener {
 		this.findViewById(R.id.donate_market).setOnClickListener(this);
 		this.findViewById(R.id.send).setOnClickListener(this);
 		this.etPaypalId = (EditText) this.findViewById(R.id.paypalid);
-		this.etPaypalId.setText(PreferenceManager.getDefaultSharedPreferences(
-				this).getString(PREFS_DONATEMAIL, ""));
+		final String mail = PreferenceManager.getDefaultSharedPreferences(this)
+				.getString(PREFS_DONATEMAIL, "");
+		this.etPaypalId.setText(mail);
+
+		if (mail == null || mail.length() == 0) {
+			final Intent intent = new Intent(Intent.ACTION_VIEW);
+			intent.setClassName(DONATOR_PACKAGE, DONATOR_CLASS);
+			try {
+				this.startActivityForResult(intent, 0);
+			} catch (ActivityNotFoundException e) {
+				Log.d(TAG, "no donator installed");
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected final void onActivityResult(final int requestCode,
+			final int resultCode, final Intent data) {
+		if (resultCode == Activity.RESULT_OK && data != null) {
+			final String mail = data.getStringExtra(Intent.EXTRA_EMAIL);
+			if (mail != null && mail.length() > 0) {
+				this.etPaypalId.setText(mail);
+				final SharedPreferences prefs = PreferenceManager
+						.getDefaultSharedPreferences(this);
+				prefs.edit().putBoolean(PREFS_HIDEADS, true).putString(
+						PREFS_DONATEMAIL, mail).commit();
+				this.finish();
+			}
+		}
 	}
 
 	/**
