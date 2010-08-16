@@ -17,18 +17,20 @@ if [ -n "$2" ] ; then
 else
 	vn=$v
 fi
+tag="${n}-${vn/ /-}"
 
 echo v    $v
 echo vn   $vn
 echo vv   $vv
 echo n    $n
-echo tag "${n}-${vn/ /-}"
+echo tag  ${tag}
 echo tagm  "$(echo ${n} | tr '-' ' ' | sed -e 's/Connector /Connector: /') v${vn}"
 
 sed -i -e "s/android:versionName=\"[^\"]*/android:versionName=\"${vn}/" AndroidManifest.xml
 sed -i -e "s/android:versionCode=\"[^\"]*/android:versionCode=\"${vv}/" AndroidManifest.xml
 vfile=$(grep -l app_version res/values/*.xml)
 sed -i -e "s/app_version\">[^<]*/app_version\">${vn}/" "${vfile}"
+sed -i -e "s/HEAD/v$v/" res/values/update.xml
 
 git diff
 
@@ -39,5 +41,5 @@ mv bin/*-debug.apk ~/public_html/h/flx/ 2> /dev/null
 echo "enter for commit+tag"
 read a
 git commit -m "bump to ${n} v${vn}" .
-git tag -a "${n}-${vn/ /-}" -m "${n} v${vn}" 
+git tag -a "${tag}" -m "${n} v${vn}" 
 
