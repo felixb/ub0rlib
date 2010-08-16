@@ -5,8 +5,8 @@ function add_logs {
 
 	for f in $(find src/ -name \*.java) ; do
 		sed \
-			-e 's:///*Log.v:Log.v:' \
-			-e 's:///*Log.d:Log.d:' \
+			-e 's:///*Log\.v:Log.v:' \
+			-e 's:///*Log\.d:Log.d:' \
 			-i $f
 	done
 }
