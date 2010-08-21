@@ -33,6 +33,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -64,6 +67,10 @@ public class DonationHelper extends Activity implements OnClickListener {
 	/** Standard buffer size. */
 	public static final int BUFSIZE = 512;
 
+	/** Id of {@link Notification}. */
+	private static final int NOTIFICATION_ID = 123457;
+	/** Preference: donator installed. */
+	static final String PREFS_DONATOR_INSTALLED = "donater_installed";
 	/** Preference: paypal id. */
 	static final String PREFS_DONATEMAIL = "donate_mail";
 	/** Preference: last check. */
@@ -422,6 +429,23 @@ public class DonationHelper extends Activity implements OnClickListener {
 			} else {
 				Log.d(TAG, "next recheck: " + nextCheck);
 			}
+		} else if (!ret && p.getBoolean(PREFS_DONATOR_INSTALLED, false)) {
+			// donator installed but not yet loaded the noads code
+			final CharSequence t = context.getString(R.string.notify_);
+			final Notification n = new Notification(
+					android.R.drawable.stat_sys_warning, t, System
+							.currentTimeMillis());
+			final Intent intent = new Intent(context, DonationHelper.class);
+			n.setLatestEventInfo(context, t, context
+					.getString(R.string.notify_text), PendingIntent
+					.getActivity(context, 0, intent,
+							PendingIntent.FLAG_CANCEL_CURRENT));
+			n.flags |= Notification.FLAG_AUTO_CANCEL;
+
+			final NotificationManager mNotificationMgr = // .
+			(NotificationManager) context
+					.getSystemService(Context.NOTIFICATION_SERVICE);
+			mNotificationMgr.notify(NOTIFICATION_ID, n);
 		}
 		return ret;
 	}

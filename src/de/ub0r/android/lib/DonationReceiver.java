@@ -37,7 +37,9 @@ public final class DonationReceiver extends BroadcastReceiver {
 		if (DonationHelper.DONATOR_BROADCAST.equals(intent.getAction())) {
 			PreferenceManager.getDefaultSharedPreferences(context).edit()
 					.putString(DonationHelper.PREFS_DONATEMAIL,
-							intent.getStringExtra(Intent.EXTRA_EMAIL)).commit();
+							intent.getStringExtra(Intent.EXTRA_EMAIL))
+					.putBoolean(DonationHelper.PREFS_DONATOR_INSTALLED, true)
+					.commit();
 		}
 	}
 }

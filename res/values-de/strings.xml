@@ -42,4 +42,6 @@
 	<string name="accept_">Bedingungen akzeptieren</string>
 	<string name="accept_missing">Bitte akzeptiere die Bedingungen bevor du die Daten sendest.</string>
 	<string name="terms">Die App sendet deine Spender ID und den MD5-Hash deiner IMEI an den Server (http://ub0r.de/donation/). Diese Daten werden auschließlich dazu benutzt deine Spende zu verifizieren.\nDie Daten werden niemals an Dritte weitergegeben.\n\nWenn dein Telefon wechseln sollte, wird der Code nicht mehr funktionieren. Bitte schreib mir eine Mail, um einen neuen Code zu bekommen.</string>
+	<string name="notify_">Vergessen die Werbung zu deaktivieren?</string>
+	<string name="notify_text">Um die Werbung abzustellen, musst du den <b>noads</b> Code laden. Klicke hier um fortzufahren.</string>
 </resources>
