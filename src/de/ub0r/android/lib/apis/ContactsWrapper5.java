@@ -32,6 +32,7 @@ import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.view.View;
 import de.ub0r.android.lib.Log;
 
 /**
@@ -46,9 +47,10 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	/** Projection for persons query, filter. */
 	private static final String[] PROJECTION_FILTER = // .
 	new String[] { ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY, // 0
-			ContactsContract.Data.DISPLAY_NAME, // 1
-			ContactsContract.CommonDataKinds.Phone.NUMBER, // 2
-			ContactsContract.CommonDataKinds.Phone.TYPE // 3
+			BaseColumns._ID, // 1
+			ContactsContract.Data.DISPLAY_NAME, // 2
+			ContactsContract.CommonDataKinds.Phone.NUMBER, // 3
+			ContactsContract.CommonDataKinds.Phone.TYPE // 4
 	};
 
 	/** Projection for persons query, show. */
@@ -102,6 +104,24 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 		try {
 			return Contacts.lookupContact(cr, Uri.withAppendedPath(
 					Contacts.CONTENT_LOOKUP_URI, id));
+		} catch (IllegalArgumentException e) {
+			Log.e(TAG, "unable to get uri for id: " + id, e);
+			return null;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Uri getLookupUri(final String id, final String rid) {
+		try {
+			final Uri uri = Uri.withAppendedPath(Contacts.CONTENT_LOOKUP_URI, id);
+			if (rid == null) {
+				return uri;
+			} else {
+				return Uri.withAppendedPath(uri, rid);
+			}
 		} catch (IllegalArgumentException e) {
 			Log.e(TAG, "unable to get uri for id: " + id, e);
 			return null;
@@ -228,4 +248,13 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 		return i;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void showQuickContact(final Context context, final View target,
+			final Uri lookupUri, final int mode, final String[] excludeMimes) {
+		ContactsContract.QuickContact.showQuickContact(context, target,
+				lookupUri, mode, excludeMimes);
+	}
 }

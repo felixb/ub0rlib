@@ -33,6 +33,7 @@ import android.provider.Contacts.PeopleColumns;
 import android.provider.Contacts.Phones;
 import android.provider.Contacts.PhonesColumns;
 import android.provider.Contacts.People.Extensions;
+import android.view.View;
 import de.ub0r.android.lib.Log;
 import de.ub0r.android.lib.R;
 
@@ -49,9 +50,10 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 	/** Projection for persons query, filter. */
 	private static final String[] PROJECTION_FILTER = // .
 	new String[] { Extensions.PERSON_ID, // 0
-			PeopleColumns.NAME, // 1
-			PhonesColumns.NUMBER, // 2
-			PhonesColumns.TYPE // 3
+			Extensions.PERSON_ID, // 1
+			PeopleColumns.NAME, // 2
+			PhonesColumns.NUMBER, // 3
+			PhonesColumns.TYPE // 4
 	};
 
 	/** Projection for persons query, filter. */
@@ -89,6 +91,14 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 			Log.e(TAG, "unable to get uri for id: " + id, e);
 			return null;
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Uri getLookupUri(final String id, final String rid) {
+		return this.getContactUri(null, id);
 	}
 
 	/**
@@ -217,5 +227,14 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 		i.putExtra(Contacts.Intents.Insert.PHONE_TYPE,
 				Contacts.PhonesColumns.TYPE_MOBILE);
 		return i;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void showQuickContact(final Context context, final View target,
+			final Uri lookupUri, final int mode, final String[] excludeMimes) {
+		context.startActivity(new Intent(Intent.ACTION_VIEW, lookupUri));
 	}
 }

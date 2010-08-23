@@ -19,6 +19,7 @@
 
 package de.ub0r.android.lib.apis;
 
+import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -26,6 +27,8 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
+import android.view.View;
+import android.view.View.OnClickListener;
 import de.ub0r.android.lib.Log;
 
 /**
@@ -37,14 +40,16 @@ public abstract class ContactsWrapper {
 	/** Tag for output. */
 	private static final String TAG = "cw";
 
-	/** Index of id. */
+	/** Index of id/lookup key. */
 	public static final int FILTER_INDEX_ID = 0;
+	/** Index of real id. */
+	public static final int FILTER_INDEX_REAL_ID = 1;
 	/** Index of name. */
-	public static final int FILTER_INDEX_NAME = 1;
+	public static final int FILTER_INDEX_NAME = 2;
 	/** Index of number. */
-	public static final int FILTER_INDEX_NUMBER = 2;
+	public static final int FILTER_INDEX_NUMBER = 3;
 	/** Index of type. */
-	public static final int FILTER_INDEX_TYPE = 3;
+	public static final int FILTER_INDEX_TYPE = 4;
 
 	/**
 	 * Static singleton instance of {@link ContactsWrapper} holding the
@@ -132,6 +137,17 @@ public abstract class ContactsWrapper {
 			final String id);
 
 	/**
+	 * Get LookUp {@link Uri} to a Contact.
+	 * 
+	 * @param id
+	 *            id/llokup key of contact
+	 * @param rid
+	 *            real id of contact
+	 * @return {@link Uri}
+	 */
+	public abstract Uri getLookupUri(final String id, final String rid);
+
+	/**
 	 * Get a {@link Cursor} with <id,name,number> for a given number.
 	 * 
 	 * @param cr
@@ -172,6 +188,89 @@ public abstract class ContactsWrapper {
 	public abstract Intent getInsertPickIntent(final String address);
 
 	/**
+	 * Trigger a dialog that lists the various methods of interacting with the
+	 * requested Contacts entry.
+	 * 
+	 * @param context
+	 *            The parent Context that may be used as the parent for this
+	 *            dialog.
+	 * @param target
+	 *            Specific View from your layout that this dialog should be
+	 *            centered around. In particular, if the dialog has a "callout"
+	 *            arrow, it will be pointed and centered around this View.
+	 * @param lookupUri
+	 *            A CONTENT_LOOKUP_URI style Uri that describes a specific
+	 *            contact to feature in this dialog.
+	 * @param mode
+	 *            Any of MODE_SMALL, MODE_MEDIUM, or MODE_LARGE, indicating the
+	 *            desired dialog size, when supported.
+	 * @param excludeMimes
+	 *            Optional list of MIMETYPE MIME-types to exclude when showing
+	 *            this dialog. For example, when already viewing the contact
+	 *            details card, this can be used to omit the details entry from
+	 *            the dialog.
+	 */
+	public abstract void showQuickContact(final Context context,
+			final View target, final Uri lookupUri, final int mode,
+			final String[] excludeMimes);
+
+	/**
+	 * Get a QuickContact dialog for a given number.
+	 * 
+	 * @param context
+	 *            The parent Context that may be used as the parent for this
+	 *            dialog.
+	 * @param target
+	 *            Specific View from your layout that this dialog should be
+	 *            centered around. In particular, if the dialog has a "callout"
+	 *            arrow, it will be pointed and centered around this View.
+	 * @param number
+	 *            Number of contact.
+	 * @param mode
+	 *            Any of MODE_SMALL, MODE_MEDIUM, or MODE_LARGE, indicating the
+	 *            desired dialog size, when supported.
+	 * @param excludeMimes
+	 *            Optional list of MIMETYPE MIME-types to exclude when showing
+	 *            this dialog. For example, when already viewing the contact
+	 *            details card, this can be used to omit the details entry from
+	 *            the dialog.
+	 * @return {@link OnClickListener} spawning the dialog.
+	 */
+	public final OnClickListener getQuickContact(final Context context,
+			final View target, final String number, final int mode,
+			final String[] excludeMimes) {
+		if (number == null) {
+			return null;
+		}
+		final OnClickListener ret = new OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				Uri u = null;
+				try {
+					u = ContactsWrapper.this.getLookupKeyForNumber(context
+							.getContentResolver(), number);
+					if (u != null) {
+						ContactsWrapper.this.showQuickContact(context, target,
+								u, mode, null);
+					}
+				} catch (Exception e) {
+					Log.e(TAG, "error showing QuickContact", e);
+					if (u != null) {
+						try {
+							context.startActivity(new Intent(
+									Intent.ACTION_VIEW, u));
+						} catch (ActivityNotFoundException e1) {
+							Log.e(TAG, "error showing contact", e1);
+						}
+					}
+				}
+			}
+		};
+		return ret;
+
+	}
+
+	/**
 	 * Get a Name for a given number.
 	 * 
 	 * @param cr
@@ -185,6 +284,35 @@ public abstract class ContactsWrapper {
 		final Cursor c = this.getContact(cr, number);
 		if (c != null) {
 			return c.getString(FILTER_INDEX_NAME);
+		}
+		return null;
+	}
+
+	/**
+	 * Get a id for a given number.
+	 * 
+	 * @param cr
+	 *            {@link ContentResolver}
+	 * @param number
+	 *            number to look for
+	 * @return id matching the number
+	 */
+	public final String getIdForNumber(final ContentResolver cr,
+			final String number) {
+		final Cursor c = this.getContact(cr, number);
+		if (c != null) {
+			return c.getString(FILTER_INDEX_ID);
+		}
+		return null;
+	}
+
+	public final Uri getLookupKeyForNumber(final ContentResolver cr,
+			final String number) {
+		final Cursor c = this.getContact(cr, number);
+		if (c != null) {
+			final String id = c.getString(FILTER_INDEX_ID);
+			final String rid = c.getString(FILTER_INDEX_REAL_ID);
+			return this.getLookupUri(id, rid);
 		}
 		return null;
 	}
