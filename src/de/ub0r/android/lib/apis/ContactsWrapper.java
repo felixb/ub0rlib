@@ -349,8 +349,22 @@ public abstract class ContactsWrapper {
 			final Uri uri) {
 		final Cursor c = this.getContact(cr, uri);
 		if (c != null) {
-			return c.getString(FILTER_INDEX_NUMBER);
+			return this.cleanNumber(c.getString(FILTER_INDEX_NUMBER));
 		}
 		return null;
+	}
+
+	/**
+	 * Clean a number from all but [+*0-9].
+	 * 
+	 * @param number
+	 *            drity number
+	 *@return clean number
+	 */
+	public final String cleanNumber(final String number) {
+		if (number == null) {
+			return null;
+		}
+		return number.replaceAll("[^*+0-9]", "");
 	}
 }

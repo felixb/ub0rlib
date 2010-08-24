@@ -126,14 +126,15 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 	@Override
 	public Cursor getContact(final ContentResolver cr, // .
 			final String number) {
-		if (number == null || number.length() == 0) {
+		final String n = this.cleanNumber(number);
+		if (n == null || n.length() == 0) {
 			return null;
 		}
 		final Uri uri = Uri.withAppendedPath(
-				Contacts.Phones.CONTENT_FILTER_URL, number);
+				Contacts.Phones.CONTENT_FILTER_URL, n);
 		Log.d(TAG, "query: " + uri);
-		Cursor c = cr.query(uri, PROJECTION_FILTER, null, null, null);
-		if (c.moveToFirst()) {
+		final Cursor c = cr.query(uri, PROJECTION_FILTER, null, null, null);
+		if (c != null && c.moveToFirst()) {
 			Log.d(TAG, "id: " + c.getString(FILTER_INDEX_ID));
 			Log.d(TAG, "name: " + c.getString(FILTER_INDEX_NAME));
 			Log.d(TAG, "number: " + c.getString(FILTER_INDEX_NUMBER));

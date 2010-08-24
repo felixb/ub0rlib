@@ -116,7 +116,8 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	@Override
 	public Uri getLookupUri(final String id, final String rid) {
 		try {
-			final Uri uri = Uri.withAppendedPath(Contacts.CONTENT_LOOKUP_URI, id);
+			final Uri uri = Uri.withAppendedPath(Contacts.CONTENT_LOOKUP_URI,
+					id);
 			if (rid == null) {
 				return uri;
 			} else {
@@ -134,12 +135,12 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	@Override
 	public Cursor getContact(final ContentResolver cr, // .
 			final String number) {
-		if (number == null || number.length() == 0) {
+		final String n = this.cleanNumber(number);
+		if (n == null || n.length() == 0) {
 			return null;
 		}
 		Uri uri = Uri.withAppendedPath(
-				ContactsContract.CommonDataKinds.Phone.CONTENT_FILTER_URI,
-				number);
+				ContactsContract.CommonDataKinds.Phone.CONTENT_FILTER_URI, n);
 		// FIXME: this is broken in android os; issue #8255
 		Log.d(TAG, "query: " + uri);
 		Cursor c = cr.query(uri, PROJECTION_FILTER, null, null, null);
@@ -147,7 +148,7 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 			return c;
 		}
 		// Fallback to API3
-		c = new ContactsWrapper3().getContact(cr, number);
+		c = new ContactsWrapper3().getContact(cr, n);
 		if (c != null && c.moveToFirst()) {
 			// get orig API5 cursor for the real number
 			final String where = PROJECTION_FILTER[FILTER_INDEX_NUMBER]
