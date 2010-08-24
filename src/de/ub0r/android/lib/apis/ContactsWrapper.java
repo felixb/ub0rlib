@@ -51,6 +51,15 @@ public abstract class ContactsWrapper {
 	/** Index of type. */
 	public static final int FILTER_INDEX_TYPE = 4;
 
+	/** Index of id/lookup key. */
+	public static final int CONTENT_INDEX_ID = 0;
+	/** Index of name. */
+	public static final int CONTENT_INDEX_NAME = 1;
+	/** Index of number. */
+	public static final int CONTENT_INDEX_NUMBER = 2;
+	/** Index of type. */
+	public static final int CONTENT_INDEX_TYPE = 3;
+
 	/**
 	 * Static singleton instance of {@link ContactsWrapper} holding the
 	 * SDK-specific implementation of the class.

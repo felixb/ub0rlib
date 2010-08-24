@@ -62,9 +62,9 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	};
 
 	/** SQL to select mobile numbers only. */
-	private static final String MOBILES_ONLY = ") AND ("
-			+ ContactsContract.CommonDataKinds.Phone.TYPE + " = "
-			+ ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE + ")";
+	private static final String MOBILES_ONLY = // .
+	ContactsContract.CommonDataKinds.Phone.TYPE + " = "
+			+ ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE;
 
 	/** Sort Order. */
 	private static final String SORT_ORDER = // .

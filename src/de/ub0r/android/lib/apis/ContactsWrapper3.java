@@ -72,8 +72,8 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 	};
 
 	/** SQL to select mobile numbers only. */
-	private static final String MOBILES_ONLY = ") AND (" + PhonesColumns.TYPE
-			+ " = " + PhonesColumns.TYPE_MOBILE + ")";
+	private static final String MOBILES_ONLY = // .
+	PhonesColumns.TYPE + " = " + PhonesColumns.TYPE_MOBILE;
 
 	/** Sort Order. */
 	private static final String SORT_ORDER = PeopleColumns.STARRED + " DESC, "
