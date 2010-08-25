@@ -174,9 +174,13 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 			final Uri uri) {
 		// FIXME: this is broken in android os; issue #8255
 		Log.d(TAG, "query: " + uri);
-		Cursor c = cr.query(uri, PROJECTION_FILTER, null, null, null);
-		if (c != null && c.moveToFirst()) {
-			return c;
+		try {
+			final Cursor c = cr.query(uri, PROJECTION_FILTER, null, null, null);
+			if (c != null && c.moveToFirst()) {
+				return c;
+			}
+		} catch (IllegalArgumentException e) {
+			Log.e(TAG, "error fetching contact: " + uri, e);
 		}
 		return null;
 	}

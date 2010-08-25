@@ -150,12 +150,17 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 	protected Cursor getContact(final ContentResolver cr, // .
 			final Uri uri) {
 		Log.d(TAG, "query: " + uri);
-		Cursor c = cr.query(uri, PROJECTION_FROM_URI, null, null, null);
-		if (c.moveToFirst()) {
-			Log.d(TAG, "id: " + c.getString(FILTER_INDEX_ID));
-			Log.d(TAG, "name: " + c.getString(FILTER_INDEX_NAME));
-			Log.d(TAG, "number: " + c.getString(FILTER_INDEX_NUMBER));
-			return c;
+		try {
+			final Cursor c = cr.query(uri, PROJECTION_FROM_URI, null, null,
+					null);
+			if (c.moveToFirst()) {
+				Log.d(TAG, "id: " + c.getString(FILTER_INDEX_ID));
+				Log.d(TAG, "name: " + c.getString(FILTER_INDEX_NAME));
+				Log.d(TAG, "number: " + c.getString(FILTER_INDEX_NUMBER));
+				return c;
+			}
+		} catch (IllegalArgumentException e) {
+			Log.e(TAG, "error fetching contact: " + uri, e);
 		}
 		return null;
 	}

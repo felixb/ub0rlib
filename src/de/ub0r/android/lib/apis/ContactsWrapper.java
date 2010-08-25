@@ -292,7 +292,9 @@ public abstract class ContactsWrapper {
 			final String number) {
 		final Cursor c = this.getContact(cr, number);
 		if (c != null) {
-			return c.getString(FILTER_INDEX_NAME);
+			final String ret = c.getString(FILTER_INDEX_NAME);
+			c.close();
+			return ret;
 		}
 		return null;
 	}
@@ -310,7 +312,9 @@ public abstract class ContactsWrapper {
 			final String number) {
 		final Cursor c = this.getContact(cr, number);
 		if (c != null) {
-			return c.getString(FILTER_INDEX_ID);
+			final String ret = c.getString(FILTER_INDEX_ID);
+			c.close();
+			return ret;
 		}
 		return null;
 	}
@@ -321,6 +325,7 @@ public abstract class ContactsWrapper {
 		if (c != null) {
 			final String id = c.getString(FILTER_INDEX_ID);
 			final String rid = c.getString(FILTER_INDEX_REAL_ID);
+			c.close();
 			return this.getLookupUri(id, rid);
 		}
 		return null;
@@ -339,8 +344,10 @@ public abstract class ContactsWrapper {
 			final Uri uri) {
 		final Cursor c = this.getContact(cr, uri);
 		if (c != null) {
-			return c.getString(FILTER_INDEX_NAME) + " <"
+			final String ret = c.getString(FILTER_INDEX_NAME) + " <"
 					+ c.getString(FILTER_INDEX_NUMBER) + ">";
+			c.close();
+			return ret;
 		}
 		return null;
 	}
@@ -358,7 +365,10 @@ public abstract class ContactsWrapper {
 			final Uri uri) {
 		final Cursor c = this.getContact(cr, uri);
 		if (c != null) {
-			return this.cleanNumber(c.getString(FILTER_INDEX_NUMBER));
+			final String ret = this.cleanNumber(c
+					.getString(FILTER_INDEX_NUMBER));
+			c.close();
+			return ret;
 		}
 		return null;
 	}
