@@ -39,16 +39,16 @@ gcodepassw=$(grep 'machine code.google.com' -A2 ${HOME}/.netrc | grep -oe passwo
 pversion=$(echo $pversion | tr ' ' '-')
 sname=$(echo $pname | tr -d ':' | tr ' ' '-')
 
-echo rpath     $rpath
-echo pname     $pname
-echo fname     $fname
-echo sname     $sname
-echo tname     $tname
-echo gproject  $gproject
-echo pversion  $pversion
-echo lextra    $lextra
-echo gc login  ${gcodelogin}
-echo gc passw  ${gcodepassw}
+echo "rpath     $rpath"
+echo "pname     $pname"
+echo "fname     $fname"
+echo "sname     $sname"
+echo "tname     $tname"
+echo "gproject  $gproject"
+echo "pversion  $pversion"
+echo "lextra    $lextra"
+echo "gc login  ${gcodelogin}"
+echo "gc passw  ${gcodepassw}"
 
 [ -z "${gcodelogin}" ] && exit -1
 [ -z "${gcodepassw}" ] && exit -1

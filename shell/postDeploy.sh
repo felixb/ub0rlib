@@ -3,7 +3,7 @@
 function add_logs {
 	echo "add logs in source: $(basename $1)"
 
-	for f in $(find src/ -name \*.java) ; do
+	for f in $(find $1/src/ -name \*.java) ; do
 		sed \
 			-e 's:///*Log\.v:Log.v:' \
 			-e 's:///*Log\.d:Log.d:' \
