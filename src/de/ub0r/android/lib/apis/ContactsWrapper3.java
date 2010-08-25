@@ -56,13 +56,6 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 			PhonesColumns.TYPE // 4
 	};
 
-	/** Projection for persons query, filter. */
-	private static final String[] PROJECTION_FROM_URI = // .
-	new String[] { BaseColumns._ID, // 0
-			PeopleColumns.NAME, // 1
-			PhonesColumns.NUMBER, // 2
-	};
-
 	/** Projection for persons query, content. */
 	private static final String[] PROJECTION_CONTENT = // .
 	new String[] { BaseColumns._ID, // 0
@@ -151,7 +144,7 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 			final Uri uri) {
 		Log.d(TAG, "query: " + uri);
 		try {
-			final Cursor c = cr.query(uri, PROJECTION_FROM_URI, null, null,
+			final Cursor c = cr.query(uri, PROJECTION_FILTER, null, null,
 					null);
 			if (c.moveToFirst()) {
 				Log.d(TAG, "id: " + c.getString(FILTER_INDEX_ID));
