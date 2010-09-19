@@ -87,6 +87,7 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 			InputStream is = Contacts.openContactPhotoInputStream(cr, this
 					.getContactUri(cr, contactId));
 			if (is == null) {
+				Log.d(TAG, "no photo for: " + contactId);
 				return null;
 			}
 			return BitmapFactory.decodeStream(is);
