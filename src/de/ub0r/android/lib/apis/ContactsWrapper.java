@@ -42,14 +42,12 @@ public abstract class ContactsWrapper {
 
 	/** Index of id/lookup key. */
 	public static final int FILTER_INDEX_ID = 0;
-	/** Index of real id. */
-	public static final int FILTER_INDEX_REAL_ID = 1;
 	/** Index of name. */
-	public static final int FILTER_INDEX_NAME = 2;
+	public static final int FILTER_INDEX_NAME = 1;
 	/** Index of number. */
-	public static final int FILTER_INDEX_NUMBER = 3;
+	public static final int FILTER_INDEX_NUMBER = 2;
 	/** Index of type. */
-	public static final int FILTER_INDEX_TYPE = 4;
+	public static final int FILTER_INDEX_TYPE = 3;
 
 	/** Index of id/lookup key. */
 	public static final int CONTENT_INDEX_ID = 0;
@@ -148,13 +146,13 @@ public abstract class ContactsWrapper {
 	/**
 	 * Get LookUp {@link Uri} to a Contact.
 	 * 
+	 * @param cr
+	 *            {@link ContentResolver}
 	 * @param id
-	 *            id/llokup key of contact
-	 * @param rid
-	 *            real id of contact
+	 *            id/lookup key of contact
 	 * @return {@link Uri}
 	 */
-	public abstract Uri getLookupUri(final String id, final String rid);
+	public abstract Uri getLookupUri(final ContentResolver cr, final String id);
 
 	/**
 	 * Get a {@link Cursor} with <id,name,number> for a given number.
@@ -319,16 +317,27 @@ public abstract class ContactsWrapper {
 		return null;
 	}
 
+	/**
+	 * Get LookUpKey for number.
+	 * 
+	 * @param cr
+	 *            {@link ContentResolver}
+	 * @param number
+	 *            number
+	 * @return {@link Uri} to contact
+	 */
 	public final Uri getLookupKeyForNumber(final ContentResolver cr,
 			final String number) {
+		Log.d(TAG, "getLookupKeyForNumber(cr, " + number + ")");
+		Uri ret = null;
 		final Cursor c = this.getContact(cr, number);
 		if (c != null) {
 			final String id = c.getString(FILTER_INDEX_ID);
-			final String rid = c.getString(FILTER_INDEX_REAL_ID);
 			c.close();
-			return this.getLookupUri(id, rid);
+			ret = this.getLookupUri(cr, id);
 		}
-		return null;
+		Log.d(TAG, "return: " + ret);
+		return ret;
 	}
 
 	/**

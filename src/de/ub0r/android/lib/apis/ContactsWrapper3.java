@@ -50,10 +50,9 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 	/** Projection for persons query, filter. */
 	private static final String[] PROJECTION_FILTER = // .
 	new String[] { Extensions.PERSON_ID, // 0
-			Extensions.PERSON_ID, // 1
-			PeopleColumns.NAME, // 2
-			PhonesColumns.NUMBER, // 3
-			PhonesColumns.TYPE // 4
+			PeopleColumns.NAME, // 1
+			PhonesColumns.NUMBER, // 2
+			PhonesColumns.TYPE // 3
 	};
 
 	/** Projection for persons query, content. */
@@ -90,7 +89,7 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Uri getLookupUri(final String id, final String rid) {
+	public Uri getLookupUri(final ContentResolver cr, final String id) {
 		return this.getContactUri(null, id);
 	}
 
@@ -144,8 +143,8 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 			final Uri uri) {
 		Log.d(TAG, "query: " + uri);
 		try {
-			final Cursor c = cr.query(uri, PROJECTION_FILTER, null, null,
-					null);
+			final String[] p = PROJECTION_FILTER;
+			final Cursor c = cr.query(uri, p, null, null, null);
 			if (c.moveToFirst()) {
 				Log.d(TAG, "id: " + c.getString(FILTER_INDEX_ID));
 				Log.d(TAG, "name: " + c.getString(FILTER_INDEX_NAME));

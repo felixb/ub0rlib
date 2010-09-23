@@ -31,6 +31,7 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
+import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.view.View;
 import de.ub0r.android.lib.Log;
@@ -46,32 +47,28 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 
 	/** Projection for persons query, filter. */
 	private static final String[] PROJECTION_FILTER = // .
-	new String[] { ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY, // 0
-			BaseColumns._ID, // 1
-			ContactsContract.Data.DISPLAY_NAME, // 2
-			ContactsContract.CommonDataKinds.Phone.NUMBER, // 3
-			ContactsContract.CommonDataKinds.Phone.TYPE // 4
+	new String[] { Phone.LOOKUP_KEY, // 0
+			Data.DISPLAY_NAME, // 1
+			Phone.NUMBER, // 2
+			Phone.TYPE // 3
 	};
 
 	/** Projection for persons query, show. */
 	private static final String[] PROJECTION_CONTENT = // .
 	new String[] { BaseColumns._ID, // 0
-			ContactsContract.Data.DISPLAY_NAME, // 1
-			ContactsContract.CommonDataKinds.Phone.NUMBER, // 2
-			ContactsContract.CommonDataKinds.Phone.TYPE // 3
+			Data.DISPLAY_NAME, // 1
+			Phone.NUMBER, // 2
+			Phone.TYPE // 3
 	};
 
 	/** SQL to select mobile numbers only. */
 	private static final String MOBILES_ONLY = // .
-	ContactsContract.CommonDataKinds.Phone.TYPE + " = "
-			+ ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE;
+	Phone.TYPE + " = " + Phone.TYPE_MOBILE;
 
 	/** Sort Order. */
 	private static final String SORT_ORDER = // .
-	ContactsContract.CommonDataKinds.Phone.STARRED + " DESC, "
-			+ ContactsContract.CommonDataKinds.Phone.TIMES_CONTACTED
-			+ " DESC, " + ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
-			+ " ASC, " + ContactsContract.CommonDataKinds.Phone.TYPE;
+	Phone.STARRED + " DESC, " + Phone.TIMES_CONTACTED + " DESC, "
+			+ Phone.DISPLAY_NAME + " ASC, " + Phone.TYPE;
 
 	/**
 	 * {@inheritDoc}
@@ -115,19 +112,25 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Uri getLookupUri(final String id, final String rid) {
-		try {
-			final Uri uri = Uri.withAppendedPath(Contacts.CONTENT_LOOKUP_URI,
-					id);
-			if (rid == null) {
-				return uri;
-			} else {
-				return Uri.withAppendedPath(uri, rid);
-			}
-		} catch (IllegalArgumentException e) {
-			Log.e(TAG, "unable to get uri for id: " + id, e);
+	public Uri getLookupUri(final ContentResolver cr, final String id) {
+		if (id == null) {
 			return null;
 		}
+		Uri ret = null;
+		final Cursor c = cr.query(Uri.withAppendedPath(
+				Contacts.CONTENT_LOOKUP_URI, id), new String[] {
+				Contacts.LOOKUP_KEY, BaseColumns._ID }, null, null,
+				BaseColumns._ID + " ASC");
+		if (c != null && c.moveToFirst()) {
+			ret = Contacts.getLookupUri(c.getLong(1), id);
+		}
+		if (c != null && !c.isClosed()) {
+			c.close();
+		}
+		if (ret == null) {
+			ret = Uri.withAppendedPath(Contacts.CONTENT_LOOKUP_URI, id);
+		}
+		return ret;
 	}
 
 	/**
@@ -140,8 +143,7 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 		if (n == null || n.length() == 0) {
 			return null;
 		}
-		Uri uri = Uri.withAppendedPath(
-				ContactsContract.CommonDataKinds.Phone.CONTENT_FILTER_URI, n);
+		Uri uri = Uri.withAppendedPath(Phone.CONTENT_FILTER_URI, n);
 		// FIXME: this is broken in android os; issue #8255
 		Log.d(TAG, "query: " + uri);
 		Cursor c = cr.query(uri, PROJECTION_FILTER, null, null, null);
@@ -191,7 +193,7 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	 */
 	@Override
 	public Uri getContentUri() {
-		return ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+		return Phone.CONTENT_URI;
 	}
 
 	/**
@@ -224,8 +226,7 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 		StringBuilder s = new StringBuilder();
 		s.append("(" + ContactsContract.Data.DISPLAY_NAME + " LIKE ");
 		s.append(f);
-		s.append(") OR (" + ContactsContract.CommonDataKinds.Phone.DATA1
-				+ " LIKE ");
+		s.append(") OR (" + Phone.DATA1 + " LIKE ");
 		s.append(f);
 		s.append(")");
 		return s.toString();
@@ -237,7 +238,7 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	@Override
 	public Intent getPickPhoneIntent() {
 		final Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-		i.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
+		i.setType(Phone.CONTENT_ITEM_TYPE);
 		return i;
 	}
 
@@ -250,7 +251,7 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 		i.setType(ContactsContract.Contacts.CONTENT_ITEM_TYPE);
 		i.putExtra(ContactsContract.Intents.Insert.PHONE, address);
 		i.putExtra(ContactsContract.Intents.Insert.PHONE_TYPE,
-				ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE);
+				Phone.TYPE_MOBILE);
 		return i;
 	}
 
