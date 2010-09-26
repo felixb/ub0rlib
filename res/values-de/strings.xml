@@ -24,6 +24,8 @@
 	<string name="source_">Sourcescode:</string>
 	<string name="website_">Website:</string>
 	<string name="about_hint">Über diese App</string>
+	<string name="custom_language_">Andere Sprache</stirng>
+	<string name="custom_language_hint">Eine andere Sprache einstellen.</stirng>
 	<string name="send_logs_">Logs senden</string>
 	<string name="send_logs_hint">Logs von deinem Handy an den Entwickler senden.\nBitte nur nach Aufforderung senden.</string>
 	<string name="sendlog_run_">SendLog starten</string>
