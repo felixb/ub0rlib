@@ -124,8 +124,6 @@ public class DonationHelper extends Activity implements OnClickListener {
 		private ProgressDialog dialog = null;
 		/** Did an error occurred? */
 		private boolean error = true;
-		/** Did an http error occurred? */
-		private boolean errorHttp = false;
 		/** Message to the user. */
 		private String msg = null;
 		/** Run in recheck mode. */
@@ -185,7 +183,7 @@ public class DonationHelper extends Activity implements OnClickListener {
 						.getDefaultSharedPreferences(this.ctx);
 				long period = p.getLong(PREFS_PERIOD, INIT_PERIOD) * 2;
 				long lastCheck = System.currentTimeMillis();
-				if (this.error && !this.errorHttp) {
+				if (this.error) {
 					p.edit().remove(PREFS_LASTCHECK).remove(PREFS_PERIOD)
 							.remove(PREFS_HIDEADS).commit();
 				} else if (!this.error) {
@@ -226,7 +224,8 @@ public class DonationHelper extends Activity implements OnClickListener {
 				if (resp != HttpStatus.SC_OK) {
 					this.msg = "Service is down. Retry later. Returncode: "
 							+ resp;
-					this.errorHttp = true;
+					// silent error on recheck
+					this.error = !this.doRecheck;
 					return null;
 				}
 				final BufferedReader bufferedReader = new BufferedReader(
@@ -250,9 +249,13 @@ public class DonationHelper extends Activity implements OnClickListener {
 			} catch (ClientProtocolException e) {
 				Log.e(TAG, "error loading sig", e);
 				this.msg = e.getMessage();
+				// silent error on recheck
+				this.error = !this.doRecheck;
 			} catch (IOException e) {
 				Log.e(TAG, "error loading sig", e);
 				this.msg = e.getMessage();
+				// silent error on recheck
+				this.error = !this.doRecheck;
 			}
 			return null;
 		}
