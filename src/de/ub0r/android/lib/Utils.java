@@ -21,6 +21,13 @@ package de.ub0r.android.lib;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.widget.Toast;
+
 /**
  * @author flx
  */
@@ -109,5 +116,30 @@ public final class Utils {
 			Log.e(TAG, null, e);
 		}
 		return "";
+	}
+
+	/**
+	 * Start MoreLocale2 or fetch it from market if unavailable.
+	 * 
+	 * @param context
+	 *            {@link Context}
+	 */
+	public static void startMoreLocale(final Context context) {
+		try {
+			final Intent i = new Intent(Intent.ACTION_MAIN);
+			i.setComponent(new ComponentName("jp.co.c_lis.ccl.morelocale",
+					"com.android.settings.morelocale.ui.MainActivity"));
+			context.startActivity(i);
+		} catch (ActivityNotFoundException e) {
+			try {
+				Log.e(TAG, "no morelocale2", e);
+				context.startActivity(new Intent(Intent.ACTION_VIEW, // .
+						Uri.parse("market://details?id="
+								+ "jp.co.c_lis.ccl.morelocale")));
+			} catch (ActivityNotFoundException e1) {
+				Log.e(TAG, "no market", e1);
+				Toast.makeText(context, "no market", Toast.LENGTH_LONG).show();
+			}
+		}
 	}
 }
