@@ -20,12 +20,16 @@ package de.ub0r.android.lib;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Locale;
 
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 /**
@@ -116,6 +120,23 @@ public final class Utils {
 			Log.e(TAG, null, e);
 		}
 		return "";
+	}
+
+	/**
+	 * Set locale read from preferences to context.
+	 * 
+	 * @param context
+	 *            {@link Context}
+	 */
+	public static void setLocale(final Context context) {
+		final SharedPreferences p = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		final String lc = p.getString("morelocale", "");
+		final Locale locale = new Locale(lc);
+		Locale.setDefault(locale);
+		final Configuration config = new Configuration();
+		config.locale = locale;
+		context.getResources().updateConfiguration(config, null);
 	}
 
 	/**
