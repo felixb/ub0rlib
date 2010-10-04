@@ -132,6 +132,9 @@ public final class Utils {
 		final SharedPreferences p = PreferenceManager
 				.getDefaultSharedPreferences(context);
 		final String lc = p.getString("morelocale", "");
+		if (lc.length() == 0) {
+			return;
+		}
 		final Locale locale = new Locale(lc);
 		Locale.setDefault(locale);
 		final Configuration config = new Configuration();
