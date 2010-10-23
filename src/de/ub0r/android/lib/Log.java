@@ -265,6 +265,8 @@ public final class Log {
 		} else {
 			intent.putExtra("filter", mTag + ":D *:W");
 			intent.setType("0||android@ub0r.de");
+			intent.putExtra(Intent.EXTRA_SUBJECT, "SendLog: "
+					+ activity.getString(R.string.app_name));
 			title = R.string.sendlog_run_;
 			message = R.string.sendlog_run;
 		}

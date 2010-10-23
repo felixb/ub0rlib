@@ -17,6 +17,7 @@
 		not, see <http://www.gnu.org/licenses/>.
 	-->
 <resources>
+	<string name="app_name">ub0rlib</string>
 	<string name="lang">en</string>
 	<string name="changelog_">Changelog</string>
 	<string name="donate_url">https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=5779152</string>
