@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 function remove_logs {
 	echo "remove logs from source: $(basename $1)"

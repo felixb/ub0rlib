@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 function add_logs {
 	echo "add logs in source: $(basename $1)"

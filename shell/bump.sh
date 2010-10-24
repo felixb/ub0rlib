@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 if echo "$(basename $PWD)" | grep -q "connector" ; then
 	echo -n "bump connector: "
