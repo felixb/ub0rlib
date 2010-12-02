@@ -39,6 +39,10 @@ gcodepassw=$(grep 'machine code.google.com' -A2 ${HOME}/.netrc | grep -oe passwo
 pversion=$(echo $pversion | tr ' ' '-')
 sname=$(echo $pname | tr -d ':' | tr ' ' '-')
 
+if [ "$gproject" == "ub0rapps" ] ; then
+	lextra="${lextra},Product-${pname}"
+fi
+
 echo "rpath     $rpath"
 echo "pname     $pname"
 echo "fname     $fname"
