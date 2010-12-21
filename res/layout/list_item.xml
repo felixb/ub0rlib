@@ -16,20 +16,8 @@
 		copy of the GNU General Public License along with this program; If
 		not, see <http://www.gnu.org/licenses/>.
 	-->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="de.ub0r.android.lib" android:versionCode="1"
-	android:versionName="1.0">
-	<application>
-		<activity android:name=".DonationHelper"
-			android:configChanges="orientation|keyboardHidden"
-			android:windowSoftInputMode="adjustResize" />
-		<activity android:name=".Changelog"
-			android:configChanges="orientation|keyboardHidden"
-			android:windowSoftInputMode="adjustResize" />
-		<receiver android:name="DonationReceiver">
-			<intent-filter>
-				<action android:name="de.ub0r.android.donator.REGISTERED" />
-			</intent-filter>
-		</receiver>
-	</application>
-</manifest> 
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res/de.ub0r.android.callmeter"
+	android:id="@android:id/text1" android:layout_height="wrap_content"
+	android:layout_width="fill_parent" android:singleLine="false"
+	android:background="#00000000" android:padding="5dip" android:autoLink="web" />

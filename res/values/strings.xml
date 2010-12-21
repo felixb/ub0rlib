@@ -49,4 +49,9 @@
 	<string name="terms">The app will send your donation id along with the md5-hash of your IMEI to the server (http://ub0r.de/donation/). The data is needed to verify your donation.\nThe data is never given to third party and used only for verifying your donation.\n\nIf your phone changes, the <i>noads</i> code will not work anymore. Please drop me a mail to get a new one.</string>
 	<string name="notify_">Forgot to remove the ads?</string>
 	<string name="notify_text">To finally remove the ads, you nead to load the <b>noads</b> Code. Click to proceed.</string>
+	<string name="changelog_notification_">Recent changes:</string>
+	<string name="changelog_notification_text">Click here to show recent changes of</string>
+	<string name="never_show_again">Never show changelog again</string>
+	<string name="notes_from_developer_">Notes from developer</string>
+	<string name="notes_from_developer_text">Click here to show recent news from the developer</string>
 </resources>

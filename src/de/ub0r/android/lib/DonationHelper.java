@@ -93,7 +93,7 @@ public class DonationHelper extends Activity implements OnClickListener {
 
 	/** Uri to market:donator. */
 	private static final Uri DONATOR_MARKET = Uri // .
-			.parse("market://search?q=pname:" + DONATOR_PACKAGE);
+			.parse("market://details?id=" + DONATOR_PACKAGE);
 
 	/** Crypto algorithm for signing UID hashs. */
 	private static final String ALGO = "RSA";
@@ -178,14 +178,15 @@ public class DonationHelper extends Activity implements OnClickListener {
 			if (this.dialog != null) {
 				this.dialog.dismiss();
 			}
+			final SharedPreferences p = PreferenceManager
+					.getDefaultSharedPreferences(this.ctx);
 			if (this.doRecheck) {
-				final SharedPreferences p = PreferenceManager
-						.getDefaultSharedPreferences(this.ctx);
 				long period = p.getLong(PREFS_PERIOD, INIT_PERIOD) * 2;
 				long lastCheck = System.currentTimeMillis();
 				if (this.error) {
 					p.edit().remove(PREFS_LASTCHECK).remove(PREFS_PERIOD)
-							.remove(PREFS_HIDEADS).commit();
+							.remove(PREFS_HIDEADS).remove(
+									PREFS_DONATOR_INSTALLED).commit();
 				} else if (!this.error) {
 					p.edit().putLong(PREFS_PERIOD, period).putLong(
 							PREFS_LASTCHECK, lastCheck).commit();
@@ -194,6 +195,9 @@ public class DonationHelper extends Activity implements OnClickListener {
 				if (this.msg != null) {
 					Toast.makeText(this.ctx, this.msg, Toast.LENGTH_LONG)
 							.show();
+				}
+				if (this.error) {
+					p.edit().remove(PREFS_DONATOR_INSTALLED).commit();
 				}
 			}
 			if (this.dh != null) {
