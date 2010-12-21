@@ -33,6 +33,12 @@ for f in tmp/* ; do
 		mv $f/* $target/
 		rmdir $f
 		sed -e 's:string :string formatted="false" :' -i  $target/*.xml
+		for xml in $target/*.xml ; do
+			mv $xml $xml.old
+			sed -n -e '1,/<resources>/p' res/values/strings.xml > $xml
+			sed -e '1,/<resources>/d'  $xml.old >> $xml
+			rm $xml.old
+		done
 	fi
 done
 
