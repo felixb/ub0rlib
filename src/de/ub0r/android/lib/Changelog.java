@@ -72,9 +72,29 @@ public final class Changelog extends ListActivity implements OnClickListener {
 
 	/** Notification id: change log. */
 	private static final int NOTIFICATION_CHANGELOG = 134;
+	/** Notification id: notes. */
+	private static final int NOTIFICATION_NOTES = 135;
 
 	/** Mode of operating. */
 	private int mode = 0;
+
+	/**
+	 * Check if a new version of this app is running.
+	 * 
+	 * @param context
+	 *            {@link Context}
+	 * @return true on first run after update.
+	 */
+	public static boolean isNewVersion(final Context context) {
+		final SharedPreferences p = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		final String v0 = p.getString(PREFS_LAST_RUN, "");
+		final String v1 = context.getString(R.string.app_version);
+		if (v0.equals(v1)) {
+			return false;
+		}
+		return true;
+	}
 
 	/**
 	 * Show change log {@link ListActivity} if needed.
@@ -85,20 +105,20 @@ public final class Changelog extends ListActivity implements OnClickListener {
 	public static void showChangelog(final Context context) {
 		final SharedPreferences p = PreferenceManager
 				.getDefaultSharedPreferences(context);
+		final String v0 = p.getString(PREFS_LAST_RUN, "");
+		final String v1 = context.getString(R.string.app_version);
+
+		p.edit().putString(PREFS_LAST_RUN, v1).commit();
 		if (p.getBoolean(PREFS_HIDE, false)) {
 			Log.d(TAG, "hide changelog");
 			return;
 		}
-		final String v0 = p.getString(PREFS_LAST_RUN, "");
-		final String v1 = context.getString(R.string.app_version);
-		if (v0.equals(v1)) {
-			Log.d(TAG, "no changes");
-			return;
-		}
-
-		p.edit().putString(PREFS_LAST_RUN, v1).commit();
 		if (v0.length() == 0) {
 			Log.d(TAG, "first boot, skip changelog");
+			return;
+		}
+		if (v0.equals(v1)) {
+			Log.d(TAG, "no changes");
 			return;
 		}
 
@@ -111,6 +131,7 @@ public final class Changelog extends ListActivity implements OnClickListener {
 				+ " " + appv;
 
 		final Intent i = new Intent(context, Changelog.class);
+		i.setAction("changelog");
 		i.putExtra(EXTRA_MODE, MODE_CHANGELOG);
 		final PendingIntent pi = PendingIntent.getActivity(context, 0, i,
 				PendingIntent.FLAG_CANCEL_CURRENT);
@@ -153,6 +174,7 @@ public final class Changelog extends ListActivity implements OnClickListener {
 		final String tt = context.getString(R.string.notes_from_developer_text);
 
 		final Intent i = new Intent(context, Changelog.class);
+		i.setAction("notes");
 		i.putExtra(EXTRA_MODE, MODE_NOTES);
 		if (!TextUtils.isEmpty(btnText)) {
 			i.putExtra(EXTRA_BUTTON, btnText);
@@ -169,7 +191,7 @@ public final class Changelog extends ListActivity implements OnClickListener {
 				android.R.drawable.stat_sys_warning, t, 0);
 		n.setLatestEventInfo(context, t, tt, pi);
 		n.flags |= Notification.FLAG_AUTO_CANCEL;
-		nmgr.notify(NOTIFICATION_CHANGELOG, n);
+		nmgr.notify(NOTIFICATION_NOTES, n);
 	}
 
 	/**
