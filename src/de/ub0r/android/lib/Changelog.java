@@ -257,7 +257,7 @@ public final class Changelog extends ListActivity implements OnClickListener {
 				}
 				s = "<b>" + s;
 				s = s.replaceFirst(": ", "</b><br>\n");
-				snotes.add(Html.fromHtml(s));
+				snotes.add(0, Html.fromHtml(s));
 			}
 			final ArrayAdapter<Spanned> adapter = new ArrayAdapter<Spanned>(
 					this, R.layout.list_item, snotes);
