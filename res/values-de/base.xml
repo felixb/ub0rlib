@@ -18,5 +18,4 @@
 	-->
 <resources>
 	<string name="lang">de</string>
-	<string name="donate_subject">Ich bin der Spender. Mein Hash ist...</string>
 </resources>
