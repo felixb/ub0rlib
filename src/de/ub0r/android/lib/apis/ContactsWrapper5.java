@@ -18,9 +18,11 @@
  */
 package de.ub0r.android.lib.apis;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -33,6 +35,8 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.telephony.PhoneNumberUtils;
+import android.text.TextUtils;
 import android.view.View;
 import de.ub0r.android.lib.Log;
 
@@ -44,6 +48,39 @@ import de.ub0r.android.lib.Log;
 public final class ContactsWrapper5 extends ContactsWrapper {
 	/** Tag for output. */
 	private static final String TAG = "cw5";
+
+	/** Uri for getting {@link Contact} from number. */
+	private static final Uri PHONES_WITH_PRESENCE_URI = Data.CONTENT_URI;
+
+	/** Selection for getting {@link Contact} from number. */
+	private static final String CALLER_ID_SELECTION = "PHONE_NUMBERS_EQUAL("
+			+ Phone.NUMBER + ",?) AND " + Data.MIMETYPE + "='"
+			+ Phone.CONTENT_ITEM_TYPE + "'" + " AND " + Data.RAW_CONTACT_ID
+			+ " IN " + "(SELECT raw_contact_id " + " FROM phone_lookup"
+			+ " WHERE normalized_number GLOB('+*'))";
+
+	/** Projection for getting {@link Contact} from number. */
+	private static final String[] CALLER_ID_PROJECTION = new String[] {
+			Phone.NUMBER, // 0
+			Phone.DISPLAY_NAME, // 1
+			Phone.CONTACT_ID, // 2
+			Phone.CONTACT_PRESENCE, // 3
+			Phone.CONTACT_STATUS, // 4
+			Contacts.LOOKUP_KEY, // 5
+	};
+
+	/** Index in CALLER_ID_PROJECTION: number. */
+	private static final int INDEX_CALLER_ID_NUMBER = 0;
+	/** Index in CALLER_ID_PROJECTION: name. */
+	private static final int INDEX_CALLER_ID_NAME = 1;
+	/** Index in CALLER_ID_PROJECTION: id. */
+	private static final int INDEX_CALLER_ID_CONTACTID = 2;
+	/** Index in CALLER_ID_PROJECTION: presence. */
+	private static final int INDEX_CALLER_ID_PRESENCE = 3;
+	/** Index in CALLER_ID_PROJECTION: status. */
+	private static final int INDEX_CALLER_ID_STATUS = 4;
+	/** Index in CALLER_ID_PROJECTION: lookup key. */
+	private static final int INDEX_CALLER_ID_LOOKUP_KEY = 5;
 
 	/** Projection for persons query, filter. */
 	private static final String[] PROJECTION_FILTER = // .
@@ -75,21 +112,22 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	 */
 	@Override
 	public Bitmap loadContactPhoto(final Context context, // .
-			final String contactId) {
-		if (contactId == null || contactId.length() == 0) {
+			final Uri contactUri) {
+		Log.d(TAG, "loadContactPhoto(ctx, " + contactUri + ")");
+		if (contactUri == null) {
 			return null;
 		}
 		try {
 			final ContentResolver cr = context.getContentResolver();
-			InputStream is = Contacts.openContactPhotoInputStream(cr, this
-					.getContactUri(cr, contactId));
+			InputStream is = Contacts.openContactPhotoInputStream(cr,
+					contactUri);
 			if (is == null) {
-				Log.d(TAG, "no photo for: " + contactId);
+				Log.d(TAG, "no photo for: " + contactUri);
 				return null;
 			}
 			return BitmapFactory.decodeStream(is);
 		} catch (Exception e) {
-			Log.e(TAG, "error getting photo: " + contactId, e);
+			Log.e(TAG, "error getting photo: " + contactUri, e);
 			return null;
 		}
 	}
@@ -98,10 +136,24 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public Uri getContactUri(final long id) {
+		return ContentUris.withAppendedId(Contacts.CONTENT_URI, id);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public Uri getContactUri(final ContentResolver cr, final String id) {
+		if (id == null) {
+			return null;
+		}
+		Log.d(TAG, "getContactUri(cr, " + id + ")");
 		try {
-			return Contacts.lookupContact(cr, Uri.withAppendedPath(
+			final Uri ret = Contacts.lookupContact(cr, Uri.withAppendedPath(
 					Contacts.CONTENT_LOOKUP_URI, id));
+			Log.d(TAG, "found uri: " + ret);
+			return ret;
 		} catch (IllegalArgumentException e) {
 			Log.e(TAG, "unable to get uri for id: " + id, e);
 			return null;
@@ -113,6 +165,7 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	 */
 	@Override
 	public Uri getLookupUri(final ContentResolver cr, final String id) {
+		Log.d(TAG, "getLookupUri(cr, " + id + ")");
 		if (id == null) {
 			return null;
 		}
@@ -121,15 +174,14 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 				Contacts.CONTENT_LOOKUP_URI, id), new String[] {
 				Contacts.LOOKUP_KEY, BaseColumns._ID }, null, null,
 				BaseColumns._ID + " ASC");
-		if (c != null && c.moveToFirst()) {
+		if (c.moveToFirst()) {
 			ret = Contacts.getLookupUri(c.getLong(1), id);
 		}
-		if (c != null && !c.isClosed()) {
-			c.close();
-		}
+		c.close();
 		if (ret == null) {
 			ret = Uri.withAppendedPath(Contacts.CONTENT_LOOKUP_URI, id);
 		}
+		Log.d(TAG, "found uri: " + ret);
 		return ret;
 	}
 
@@ -263,5 +315,143 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 			final Uri lookupUri, final int mode, final String[] excludeMimes) {
 		ContactsContract.QuickContact.showQuickContact(context, target,
 				lookupUri, mode, excludeMimes);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean updateContactDetails(final Context context,
+			final boolean loadOnly, final boolean loadAvatar,
+			final Contact contact) {
+		boolean changed = false;
+		final long rid = contact.mRecipientId;
+		final ContentResolver cr = context.getContentResolver();
+
+		// mNumber
+		String number = contact.mNumber;
+		boolean changedNameAndNumber = false;
+		if (rid > 0L && (!loadOnly || number == null)) {
+			final Cursor cursor = cr.query(ContentUris.withAppendedId(
+					CANONICAL_ADDRESS, rid), null, null, null, null);
+			if (cursor.moveToFirst()) {
+				number = cursor.getString(0);
+				Log.d(TAG, "found address for " + rid + ": " + number);
+				contact.mNumber = number;
+				changedNameAndNumber = true;
+				changed = true;
+			}
+			cursor.close();
+		}
+
+		// mName + mPersonId + mLookupKey + mPresenceState + mPresenceText
+		if (number != null && (!loadOnly || contact.mName == null || // .
+				contact.mPersonId < 0L)) {
+			final String n = PhoneNumberUtils.toCallerIDMinMatch(number);
+			if (!TextUtils.isEmpty(n)) {
+				final String selection = CALLER_ID_SELECTION.replace("+", n);
+				Log.d(TAG, "sel: " + selection);
+				final Cursor cursor = cr.query(PHONES_WITH_PRESENCE_URI,
+						CALLER_ID_PROJECTION, selection,
+						new String[] { number }, null);
+
+				if (cursor.moveToFirst()) {
+					final long pid = cursor.getLong(INDEX_CALLER_ID_CONTACTID);
+					final String lookup = cursor
+							.getString(INDEX_CALLER_ID_LOOKUP_KEY);
+					final String na = cursor.getString(INDEX_CALLER_ID_NAME);
+					final String nu = cursor.getString(INDEX_CALLER_ID_NUMBER);
+					final int prs = cursor.getInt(INDEX_CALLER_ID_PRESENCE);
+					final String prt = cursor.getString(INDEX_CALLER_ID_STATUS);
+					Log.d(TAG, "id: " + pid);
+					Log.d(TAG, "name: " + na);
+					Log.d(TAG, "number: " + nu);
+					Log.d(TAG, "presence state: " + prs);
+					Log.d(TAG, "presence text: " + prt);
+					if (pid != contact.mPersonId) {
+						contact.mPersonId = pid;
+						changed = true;
+					}
+					if (lookup != null && !lookup.equals(contact.mLookupKey)) {
+						contact.mLookupKey = lookup;
+						changed = true;
+					}
+					if (na != null && !na.equals(contact.mName)) {
+						contact.mName = na;
+						changedNameAndNumber = true;
+						changed = true;
+					}
+					if (prs != contact.mPresenceState) {
+						contact.mPresenceState = prs;
+						changed = true;
+					}
+					if (prt != null && !prt.equals(contact.mPresenceText)) {
+						contact.mPresenceText = prt;
+						changed = true;
+					}
+				}
+				cursor.close();
+			}
+		}
+
+		// mNameAndNumber
+		if (changedNameAndNumber) {
+			contact.updateNameAndNumer();
+		}
+
+		if (loadAvatar) {
+			final byte[] data = this.loadAvatarData(context, contact);
+			synchronized (contact) {
+				contact.mAvatarData = data;
+			}
+		}
+		return changed;
+	}
+
+	/**
+	 * Load the avatar data from the cursor into memory. Don't decode the data
+	 * until someone calls for it (see getAvatar). Hang onto the raw data so
+	 * that we can compare it when the data is reloaded. TODO: consider
+	 * comparing a checksum so that we don't have to hang onto the raw bytes
+	 * after the image is decoded.
+	 * 
+	 * @param context
+	 *            {@link Context}
+	 * @param contact
+	 *            {@link Contact}
+	 * @return avatar as byte[]
+	 */
+	private byte[] loadAvatarData(final Context context, // .
+			final Contact contact) {
+		byte[] data = null;
+
+		if (contact.mPersonId <= 0L || contact.mAvatar != null) {
+			return null;
+		}
+
+		final Uri contactUri = ContentUris.withAppendedId(Contacts.CONTENT_URI,
+				contact.mPersonId);
+
+		final InputStream avatarDataStream = Contacts
+				.openContactPhotoInputStream(context.getContentResolver(),
+						contactUri);
+		try {
+			if (avatarDataStream != null) {
+				data = new byte[avatarDataStream.available()];
+				avatarDataStream.read(data, 0, data.length);
+			}
+		} catch (IOException e) {
+			Log.e(TAG, "error recoding stream", e);
+		} finally {
+			try {
+				if (avatarDataStream != null) {
+					avatarDataStream.close();
+				}
+			} catch (IOException e) {
+				Log.e(TAG, "error closing stream", e);
+			}
+		}
+
+		return data;
 	}
 }

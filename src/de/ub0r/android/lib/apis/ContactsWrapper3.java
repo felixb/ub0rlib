@@ -20,11 +20,13 @@
 package de.ub0r.android.lib.apis;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.provider.Contacts;
@@ -32,7 +34,10 @@ import android.provider.Contacts.People;
 import android.provider.Contacts.PeopleColumns;
 import android.provider.Contacts.Phones;
 import android.provider.Contacts.PhonesColumns;
+import android.provider.Contacts.PresenceColumns;
 import android.provider.Contacts.People.Extensions;
+import android.telephony.PhoneNumberUtils;
+import android.text.TextUtils;
 import android.view.View;
 import de.ub0r.android.lib.Log;
 import de.ub0r.android.lib.R;
@@ -46,6 +51,28 @@ import de.ub0r.android.lib.R;
 public final class ContactsWrapper3 extends ContactsWrapper {
 	/** Tag for output. */
 	private static final String TAG = "cw3";
+
+	/** Selection for getting {@link Contact} from number. */
+	private static final String CALLER_ID_SELECTION = "PHONE_NUMBERS_EQUAL("
+			+ PhonesColumns.NUMBER + ",?)";
+	/** {@link Uri} for getting {@link Contact} from number. */
+	private static final Uri PHONES_WITH_PRESENCE_URI = Uri
+			.parse(Contacts.Phones.CONTENT_URI + "_with_presence");
+	/** Projection for getting {@link Contact} from number. */
+	private static final String[] CALLER_ID_PROJECTION = new String[] {
+			PhonesColumns.NUMBER, // 0
+			PeopleColumns.NAME, // 1
+			Contacts.Phones.PERSON_ID, // 2
+			PresenceColumns.PRESENCE_STATUS, // 3
+	};
+	/** Index in CALLER_ID_PROJECTION: number. */
+	private static final int INDEX_CALLER_ID_NUMBER = 0;
+	/** Index in CALLER_ID_PROJECTION: name. */
+	private static final int INDEX_CALLER_ID_NAME = 1;
+	/** Index in CALLER_ID_PROJECTION: id. */
+	private static final int INDEX_CALLER_ID_CONTACTID = 2;
+	/** Index in CALLER_ID_PROJECTION: presence. */
+	private static final int INDEX_CALLER_ID_PRESENCE = 3;
 
 	/** Projection for persons query, filter. */
 	private static final String[] PROJECTION_FILTER = // .
@@ -76,6 +103,14 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public Uri getContactUri(final long id) {
+		return ContentUris.withAppendedId(People.CONTENT_URI, id);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public Uri getContactUri(final ContentResolver cr, final String id) {
 		try {
 			return Uri.withAppendedPath(People.CONTENT_URI, id);
@@ -98,16 +133,15 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 	 */
 	@Override
 	public Bitmap loadContactPhoto(final Context context, // .
-			final String contactId) {
-		if (contactId == null || contactId.length() == 0) {
+			final Uri contactUri) {
+		if (contactUri == null) {
 			return null;
 		}
 		try {
-			Uri uri = Uri.withAppendedPath(People.CONTENT_URI, contactId);
-			return People.loadContactPhoto(context, uri,
+			return People.loadContactPhoto(context, contactUri,
 					R.drawable.ic_contact_picture, null);
 		} catch (Exception e) {
-			Log.e(TAG, "error getting photo: " + contactId, e);
+			Log.e(TAG, "error getting photo: " + contactUri, e);
 			return null;
 		}
 	}
@@ -234,5 +268,95 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 	public void showQuickContact(final Context context, final View target,
 			final Uri lookupUri, final int mode, final String[] excludeMimes) {
 		context.startActivity(new Intent(Intent.ACTION_VIEW, lookupUri));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean updateContactDetails(final Context context,
+			final boolean loadOnly, final boolean loadAvatar,
+			final Contact contact) {
+		boolean changed = false;
+		final long rid = contact.mRecipientId;
+		final ContentResolver cr = context.getContentResolver();
+
+		// mNumber
+		String number = contact.mNumber;
+		boolean changedNameAndNumber = false;
+		if (rid > 0L && (!loadOnly || number == null)) {
+			final Cursor cursor = cr.query(ContentUris.withAppendedId(
+					CANONICAL_ADDRESS, rid), null, null, null, null);
+			if (cursor.moveToFirst()) {
+				number = cursor.getString(0);
+				Log.d(TAG, "found address for " + rid + ": " + number);
+				contact.mNumber = number;
+				changedNameAndNumber = true;
+				changed = true;
+			}
+			cursor.close();
+		}
+
+		// mName + mPersonId + mLookupKey + mPresenceState
+		if (number != null && (!loadOnly || contact.mName == null || // .
+				contact.mPersonId < 0L)) {
+			final String n = PhoneNumberUtils.stripSeparators(number);
+			if (!TextUtils.isEmpty(n)) {
+				Log.d(TAG, "lookup contact: " + n);
+				final Cursor cursor = cr.query(PHONES_WITH_PRESENCE_URI,
+						CALLER_ID_PROJECTION, CALLER_ID_SELECTION,
+						new String[] { n }, null);
+				if (cursor.moveToFirst()) {
+					final long pid = cursor.getLong(INDEX_CALLER_ID_CONTACTID);
+					final String na = cursor.getString(INDEX_CALLER_ID_NAME);
+					final String nu = cursor.getString(INDEX_CALLER_ID_NUMBER);
+					final int prs = cursor.getInt(INDEX_CALLER_ID_PRESENCE);
+					Log.d(TAG, "id: " + pid);
+					Log.d(TAG, "name: " + na);
+					Log.d(TAG, "number: " + nu);
+					Log.d(TAG, "presence state: " + prs);
+					if (pid != contact.mPersonId) {
+						contact.mPersonId = pid;
+						contact.mLookupKey = String.valueOf(pid);
+						changed = true;
+					}
+					if (na != null && !na.equals(contact.mName)) {
+						contact.mName = na;
+						changedNameAndNumber = true;
+						changed = true;
+					}
+					if (prs != contact.mPresenceState) {
+						contact.mPresenceState = prs;
+						changed = true;
+					}
+				}
+				cursor.close();
+			}
+		}
+
+		// mNameAndNumber
+		if (changedNameAndNumber) {
+			contact.updateNameAndNumer();
+		}
+		// mPresenceText;
+		contact.mPresenceText = null;
+
+		if (contact.mLookupKey == null && contact.mPersonId >= 0L) {
+			contact.mLookupKey = String.valueOf(contact.mPersonId);
+			changed = true;
+		}
+
+		if (loadAvatar && contact.mPersonId >= 0L) {
+			// mAvatar[Data];
+			Bitmap b = this.loadContactPhoto(context, this
+					.getContactUri(contact.mPersonId));
+			if (b == null) {
+				contact.mAvatar = null;
+				contact.mAvatarData = null;
+			} else {
+				contact.mAvatar = new BitmapDrawable(context.getResources(), b);
+			}
+		}
+		return changed;
 	}
 }

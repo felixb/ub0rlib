@@ -58,6 +58,25 @@ public abstract class ContactsWrapper {
 	/** Index of type. */
 	public static final int CONTENT_INDEX_TYPE = 3;
 
+	/** Presence's state: unavailable. */
+	public static final int PRESENCE_STATE_UNKNOWN = -1;
+	/** Presence's state: available. */
+	public static final int PRESENCE_STATE_AVAILABLE = 5;
+	/** Presence's state: away. */
+	public static final int PRESENCE_STATE_AWAY = 2;
+	/** Presence's state: do not disturb. */
+	public static final int PRESENCE_STATE_DO_NOT_DISTURB = 4;
+	/** Presence's state: idle. */
+	public static final int PRESENCE_STATE_IDLE = 3;
+	/** Presence's state: invisible. */
+	public static final int PRESENCE_STATE_INVISIBLE = 1;
+	/** Presence's state: offline. */
+	public static final int PRESENCE_STATE_OFFLINE = 0;
+
+	/** Uri to fetch addresses. */
+	protected static final Uri CANONICAL_ADDRESS = Uri
+			.parse("content://mms-sms/canonical-address");
+
 	/**
 	 * Static singleton instance of {@link ContactsWrapper} holding the
 	 * SDK-specific implementation of the class.
@@ -124,12 +143,21 @@ public abstract class ContactsWrapper {
 	 * 
 	 * @param context
 	 *            {@link Context}
-	 * @param contactId
-	 *            id of contact
+	 * @param contactUri
+	 *            uri of contact
 	 * @return {@link Bitmap}
 	 */
 	public abstract Bitmap loadContactPhoto(final Context context, // .
-			final String contactId);
+			final Uri contactUri);
+
+	/**
+	 * Get {@link Uri} to a Contact.
+	 * 
+	 * @param id
+	 *            id of contact
+	 * @return {@link Uri}
+	 */
+	public abstract Uri getContactUri(final long id);
 
 	/**
 	 * Get {@link Uri} to a Contact.
@@ -222,6 +250,74 @@ public abstract class ContactsWrapper {
 			final String[] excludeMimes);
 
 	/**
+	 * Update {@link Contact}'s details.
+	 * 
+	 * @param context
+	 *            {@link Context}
+	 * @param loadOnly
+	 *            load only data which is not available
+	 * @param loadAvatar
+	 *            load avatar?
+	 * @param contact
+	 *            {@link Contact}
+	 * @return true if {@link Contact}'s details where changed
+	 */
+	public abstract boolean updateContactDetails(final Context context,
+			final boolean loadOnly, final boolean loadAvatar,
+			final Contact contact);
+
+	/**
+	 * Get a QuickContact dialog for a given number.
+	 * 
+	 * @param context
+	 *            The parent Context that may be used as the parent for this
+	 *            dialog.
+	 * @param target
+	 *            Specific View from your layout that this dialog should be
+	 *            centered around. In particular, if the dialog has a "callout"
+	 *            arrow, it will be pointed and centered around this View.
+	 * @param uri
+	 *            {@link Uri} for {@link Contact}.
+	 * @param mode
+	 *            Any of MODE_SMALL, MODE_MEDIUM, or MODE_LARGE, indicating the
+	 *            desired dialog size, when supported.
+	 * @param excludeMimes
+	 *            Optional list of MIMETYPE MIME-types to exclude when showing
+	 *            this dialog. For example, when already viewing the contact
+	 *            details card, this can be used to omit the details entry from
+	 *            the dialog.
+	 * @return {@link OnClickListener} spawning the dialog.
+	 */
+	public final OnClickListener getQuickContact(final Context context,
+			final View target, final Uri uri, final int mode,
+			final String[] excludeMimes) {
+		if (uri == null) {
+			return null;
+		}
+		final OnClickListener ret = new OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				Uri u = null;
+				try {
+					ContactsWrapper.this.showQuickContact(context, target, uri,
+							mode, null);
+				} catch (Exception e) {
+					Log.e(TAG, "error showing QuickContact", e);
+					if (u != null) {
+						try {
+							context.startActivity(new Intent(
+									Intent.ACTION_VIEW, u));
+						} catch (ActivityNotFoundException e1) {
+							Log.e(TAG, "error showing contact", e1);
+						}
+					}
+				}
+			}
+		};
+		return ret;
+	}
+
+	/**
 	 * Get a QuickContact dialog for a given number.
 	 * 
 	 * @param context
@@ -274,7 +370,6 @@ public abstract class ContactsWrapper {
 			}
 		};
 		return ret;
-
 	}
 
 	/**
