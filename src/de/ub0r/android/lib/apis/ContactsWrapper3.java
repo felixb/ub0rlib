@@ -277,6 +277,10 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 	public boolean updateContactDetails(final Context context,
 			final boolean loadOnly, final boolean loadAvatar,
 			final Contact contact) {
+		Log.d(TAG, "updateContactDetails(" + contact.mRecipientId + ")");
+		Log.d(TAG, "id: " + contact.mPersonId + ")");
+		Log.d(TAG, "number: " + contact.mNumber + ")");
+		Log.d(TAG, "name: " + contact.mName + ")");
 		boolean changed = false;
 		final long rid = contact.mRecipientId;
 		final ContentResolver cr = context.getContentResolver();

@@ -324,6 +324,10 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	public boolean updateContactDetails(final Context context,
 			final boolean loadOnly, final boolean loadAvatar,
 			final Contact contact) {
+		Log.d(TAG, "updateContactDetails(" + contact.mRecipientId + ")");
+		Log.d(TAG, "id: " + contact.mPersonId + ")");
+		Log.d(TAG, "number: " + contact.mNumber + ")");
+		Log.d(TAG, "name: " + contact.mName + ")");
 		boolean changed = false;
 		final long rid = contact.mRecipientId;
 		final ContentResolver cr = context.getContentResolver();
@@ -399,10 +403,14 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 			contact.updateNameAndNumer();
 		}
 
-		if (loadAvatar) {
+		if (loadAvatar && contact.mAvatarData == null
+				&& contact.mAvatar == null) {
 			final byte[] data = this.loadAvatarData(context, contact);
 			synchronized (contact) {
-				contact.mAvatarData = data;
+				if (data != null) {
+					contact.mAvatarData = data;
+					changed = true;
+				}
 			}
 		}
 		return changed;

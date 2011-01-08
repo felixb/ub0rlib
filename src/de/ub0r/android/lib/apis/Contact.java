@@ -27,6 +27,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
+import de.ub0r.android.lib.Log;
 
 /**
  * Information about a {@link Contact}.
@@ -65,6 +66,31 @@ public final class Contact {
 	private Uri mContactUri = null;
 	/** Lookup {@link Uri} to {@link Contact}. **/
 	private Uri mLookupUri = null;
+
+	/**
+	 * Get default {@link Drawable} resource id for {@link Contact}'s presence
+	 * state.
+	 * 
+	 * @param presenceState
+	 *            presence state
+	 * @return {@link Drawable}'s resId
+	 */
+	public static int getPresenceRes(final int presenceState) {
+		switch (presenceState) {
+		case ContactsWrapper.PRESENCE_STATE_AVAILABLE:
+			return android.R.drawable.presence_online;
+		case ContactsWrapper.PRESENCE_STATE_AWAY:
+		case ContactsWrapper.PRESENCE_STATE_IDLE:
+		case ContactsWrapper.PRESENCE_STATE_INVISIBLE:
+			return android.R.drawable.presence_away;
+		case ContactsWrapper.PRESENCE_STATE_DO_NOT_DISTURB:
+			return android.R.drawable.presence_busy;
+		case ContactsWrapper.PRESENCE_STATE_OFFLINE:
+			return android.R.drawable.presence_offline;
+		default:
+			return -1;
+		}
+	}
 
 	/**
 	 * Create a {@link Contact}.
@@ -116,8 +142,9 @@ public final class Contact {
 	 *            load avatar?
 	 * @return true if {@link Contact}'s details where changed
 	 */
-	public synchronized boolean update(final Context context,
-			final boolean loadOnly, final boolean loadAvatar) {
+	public boolean update(final Context context, final boolean loadOnly,
+			final boolean loadAvatar) {
+		Log.d(TAG, "update()");
 		return ContactsWrapper.getInstance().updateContactDetails(context,
 				loadOnly, loadAvatar, this);
 	}
@@ -125,7 +152,7 @@ public final class Contact {
 	/**
 	 * @return {@link Contact}'s number
 	 */
-	public synchronized String getNumber() {
+	public String getNumber() {
 		return this.mNumber;
 	}
 
@@ -135,7 +162,7 @@ public final class Contact {
 	 * @param number
 	 *            number
 	 */
-	public synchronized void setNumber(final String number) {
+	public void setNumber(final String number) {
 		this.mNumber = number;
 		this.updateNameAndNumer();
 	}
@@ -165,7 +192,7 @@ public final class Contact {
 	/**
 	 * @return {@link Contact}'s name
 	 */
-	public synchronized String getName() {
+	public String getName() {
 		if (TextUtils.isEmpty(this.mName)) {
 			return this.mNumber;
 		} else {
@@ -179,7 +206,7 @@ public final class Contact {
 	 * @param name
 	 *            name
 	 */
-	public synchronized void setName(final String name) {
+	public void setName(final String name) {
 		this.mName = name;
 		this.updateNameAndNumer();
 	}
@@ -188,14 +215,14 @@ public final class Contact {
 	 * @return {@link Contact}'s name and number formated like "name
 	 *         &lt;number&gt;
 	 */
-	public synchronized String getNameAndNumber() {
+	public String getNameAndNumber() {
 		return this.mNameAndNumber;
 	}
 
 	/**
 	 * @return {@link Contact}'s name or number or "...".
 	 */
-	public synchronized String getDisplayName() {
+	public String getDisplayName() {
 		if (TextUtils.isEmpty(this.mName)) {
 			if (TextUtils.isEmpty(this.mNumber)) {
 				return "...";
@@ -210,28 +237,28 @@ public final class Contact {
 	/**
 	 * @return recipient's id
 	 */
-	public synchronized long getRecipientId() {
+	public long getRecipientId() {
 		return this.mRecipientId;
 	}
 
 	/**
 	 * @return Person's id
 	 */
-	public synchronized long getContactId() {
+	public long getContactId() {
 		return this.mPersonId;
 	}
 
 	/**
 	 * @return LookupKey
 	 */
-	public synchronized String getLookUpKey() {
+	public String getLookUpKey() {
 		return this.mLookupKey;
 	}
 
 	/**
 	 * @return {@link Uri} to {@link Contact}
 	 */
-	public synchronized Uri getUri() {
+	public Uri getUri() {
 		if (this.mContactUri == null && this.mPersonId > 0L) {
 			this.mContactUri = ContactsWrapper.getInstance().getContactUri(
 					this.mPersonId);
@@ -244,7 +271,7 @@ public final class Contact {
 	 *            {@link ContentResolver}
 	 * @return {@link Uri} to {@link Contact}
 	 */
-	public synchronized Uri getLookUpUri(final ContentResolver cr) {
+	public Uri getLookUpUri(final ContentResolver cr) {
 		if (this.mLookupUri == null && this.mLookupKey != null) {
 			this.mLookupUri = ContactsWrapper.getInstance().getLookupUri(cr,
 					this.mLookupKey);
@@ -255,14 +282,14 @@ public final class Contact {
 	/**
 	 * @return presence's state
 	 */
-	public synchronized int getPresenceState() {
+	public int getPresenceState() {
 		return this.mPresenceState;
 	}
 
 	/**
 	 * @return presence's text
 	 */
-	public synchronized String getPresenceText() {
+	public String getPresenceText() {
 		return this.mPresenceText;
 	}
 
@@ -275,8 +302,9 @@ public final class Contact {
 	 *            default {@link Drawable}
 	 * @return {@link Contact}'s avatar
 	 */
-	public synchronized Drawable getAvatar(final Context context,
+	public Drawable getAvatar(final Context context, // .
 			final Drawable defaultValue) {
+		Log.d(TAG, "getAvatar()");
 		if (this.mAvatar == null) {
 			if (this.mAvatarData != null) {
 				Bitmap b = BitmapFactory.decodeByteArray(this.mAvatarData, 0,
