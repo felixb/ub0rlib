@@ -18,18 +18,19 @@ cd ..
 for f in tmp/* ; do
 	llang=$(echo $f | cut -d/ -f2)
 	lang=$(echo $llang | cut -d- -f1)
+	if [ "$lang" = "no" ] ; then
+		lang=nb
+	fi
 
 	target=""
 	if [ -e "res/values-$llang" ] ; then
 		target="res/values-$llang"
 	elif [ -e "res/values-$lang" ] ; then
 		target="res/values-$lang"
-	elif [ "$lang" == "no" -a -e "res/values-nb" ] ; then
-		target="res/values-nb"
 	fi
 
 	if [ -n "$target" ] ; then
-		echo mv $f/* $target/
+		#echo mv $f/* $target/
 		mv $f/* $target/
 		rmdir $f
 		sed -e 's:string name:string formatted="false" name:' -i  $target/*.xml
