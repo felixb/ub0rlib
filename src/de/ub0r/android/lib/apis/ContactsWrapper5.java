@@ -340,6 +340,10 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 					CANONICAL_ADDRESS, rid), null, null, null, null);
 			if (cursor.moveToFirst()) {
 				number = cursor.getString(0);
+				if (number != null && !number.startsWith("000")
+						&& number.startsWith("00")) {
+					number = number.replaceFirst("^00", "+");
+				}
 				Log.d(TAG, "found address for " + rid + ": " + number);
 				contact.mNumber = number;
 				changedNameAndNumber = true;
