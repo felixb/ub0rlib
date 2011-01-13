@@ -193,11 +193,7 @@ public final class Contact {
 	 * @return {@link Contact}'s name
 	 */
 	public String getName() {
-		if (TextUtils.isEmpty(this.mName)) {
-			return this.mNumber;
-		} else {
-			return this.mName;
-		}
+		return this.mName;
 	}
 
 	/**
