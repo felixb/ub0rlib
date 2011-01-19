@@ -30,6 +30,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 /**
@@ -131,10 +132,11 @@ public final class Utils {
 	public static void setLocale(final Context context) {
 		final SharedPreferences p = PreferenceManager
 				.getDefaultSharedPreferences(context);
-		final String lc = p.getString("morelocale", "");
-		if (lc.length() == 0) {
+		final String lc = p.getString("morelocale", null);
+		if (TextUtils.isEmpty(lc)) {
 			return;
 		}
+		Log.i(TAG, "set custom locale: " + lc);
 		final Locale locale = new Locale(lc);
 		Locale.setDefault(locale);
 		final Configuration config = new Configuration();
