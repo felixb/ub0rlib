@@ -362,7 +362,7 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 				contact.mAvatar = null;
 				contact.mAvatarData = null;
 			} else {
-				contact.mAvatar = new BitmapDrawable(context.getResources(), b);
+				contact.mAvatar = new BitmapDrawable(b);
 			}
 		}
 		return changed;
