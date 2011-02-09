@@ -39,6 +39,7 @@ for f in tmp/* ; do
 			-e 's: *\\n:\\n:g' \
 			-e 's:&amp;gt;:\&gt;:g' \
 			-e 's:&amp;lt;:\&lt;:g' \
+			-e 's:&amp;amp;:\&amp;:g' \
 			-i $target/*.xml
 		for xml in $target/*.xml ; do
 			mv $xml $xml.old
