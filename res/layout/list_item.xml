@@ -20,4 +20,4 @@
 	xmlns:app="http://schemas.android.com/apk/res/de.ub0r.android.callmeter"
 	android:id="@android:id/text1" android:layout_height="wrap_content"
 	android:layout_width="fill_parent" android:singleLine="false"
-	android:background="#00000000" android:padding="5dip" android:autoLink="web" />
+	 android:padding="5dip" android:autoLink="web" />
