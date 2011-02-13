@@ -54,4 +54,5 @@
 	<string name="never_show_again">Never show changelog again</string>
 	<string name="notes_from_developer_">Notes from developer</string>
 	<string name="notes_from_developer_text">Click here to show recent news from the developer</string>
+	<string name="reset">Reset</string>
 </resources>
