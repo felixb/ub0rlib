@@ -54,8 +54,8 @@ public class AmbilWarnaDialog {
 		this.satudp = context.getResources().getDimension(
 				R.dimen.ambilwarna_satudp);
 		this.ukuranUiPx = this.ukuranUiDp * this.satudp;
-		Log.d(TAG,
-				"satudp = " + this.satudp + ", ukuranUiPx=" + this.ukuranUiPx); //$NON-NLS-1$//$NON-NLS-2$
+		Log.d(TAG, "satudp = " + this.satudp);
+		Log.d(TAG, "ukuranUiPx=" + this.ukuranUiPx);
 
 		View view = LayoutInflater.from(context).inflate(
 				R.layout.ambilwarna_dialog, null);
