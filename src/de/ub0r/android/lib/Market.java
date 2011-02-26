@@ -82,6 +82,59 @@ public final class Market {
 	}
 
 	/**
+	 * get {@link Intent} to any market app to load an app.
+	 * 
+	 * @param activity
+	 *            {@link Activity} used to launch the intent
+	 * @param packagename
+	 *            package name of target app
+	 * @param alternativeLink
+	 *            link to some alternative source, if no market is available
+	 * @return {@link Intent} which should be launched
+	 */
+	public static Intent getInstallAppIntent(final Activity activity,
+			final String packagename, final String alternativeLink) {
+		Log.i(TAG, "getInstallAppIntent(" + activity + ", " + packagename
+				+ ", " + alternativeLink + ")");
+		final Intent i = new Intent(Intent.ACTION_VIEW);
+
+		// try google market
+		i.setData(Uri.parse(GOOGLE_INSTALL + packagename));
+		if (i.resolveActivity(activity.getPackageManager()) != null) {
+			return i;
+		}
+
+		// try amazon market
+		i.setData(Uri.parse(AMAZON_INSTALL + packagename));
+		final List<ResolveInfo> l = activity.getPackageManager()
+				.queryIntentActivities(i, 0);
+		for (ResolveInfo r : l) {
+			if (r.activityInfo.packageName.contains("amazon")) {
+				Log.i(TAG, "use app: " + r.activityInfo.packageName);
+				return i;
+			} else {
+				Log.i(TAG, "skipp app: " + r.activityInfo.packageName);
+			}
+		}
+		Log.w(TAG, "no amazon market installed");
+
+		if (!TextUtils.isEmpty(alternativeLink)) {
+			// try alternative link
+			i.setData(Uri.parse(alternativeLink));
+			if (i.resolveActivity(activity.getPackageManager()) != null) {
+				return i;
+			}
+			Log.w(TAG, "no handler installed: " + alternativeLink);
+		}
+
+		final String msg = "no handler found to install package: "
+				+ packagename;
+		Log.w(TAG, msg);
+		Toast.makeText(activity, msg, Toast.LENGTH_LONG).show();
+		return null;
+	}
+
+	/**
 	 * Open any market app to load an app.
 	 * 
 	 * @param activity
@@ -96,50 +149,73 @@ public final class Market {
 			final String packagename, final String alternativeLink) {
 		Log.i(TAG, "installApp(" + activity + ", " + packagename + ", "
 				+ alternativeLink + ")");
-		final Intent i = new Intent(Intent.ACTION_VIEW);
-
-		try { // try google market
-			i.setData(Uri.parse(GOOGLE_INSTALL + packagename));
-			activity.startActivity(i);
-			return true;
-		} catch (ActivityNotFoundException e) {
-			Log.w(TAG, "no google market installed", e);
-		}
-
-		try { // try amazon market
-			i.setData(Uri.parse(AMAZON_INSTALL + packagename));
-			// TODO: launch amazon app explicitly?
-			final List<ResolveInfo> l = activity.getPackageManager()
-					.queryIntentActivities(i, 0);
-			for (ResolveInfo r : l) {
-				if (r.activityInfo.packageName.contains("amazon")) {
-					Log.i(TAG, "use app: " + r.activityInfo.packageName);
-					activity.startActivity(i);
-					return true;
-				} else {
-					Log.i(TAG, "skipp app: " + r.activityInfo.packageName);
-				}
-			}
-			Log.w(TAG, "no amazon market installed");
-		} catch (ActivityNotFoundException e) {
-			Log.w(TAG, "no amazon market installed", e);
-		}
-
-		if (!TextUtils.isEmpty(alternativeLink)) {
-			try { // try alternative link
-				i.setData(Uri.parse(alternativeLink));
+		final Intent i = getInstallAppIntent(activity, packagename,
+				alternativeLink);
+		if (i != null) {
+			try {
 				activity.startActivity(i);
 				return true;
 			} catch (ActivityNotFoundException e) {
-				Log.e(TAG, "no handler installed: " + alternativeLink, e);
+				Log.e(TAG, "activity not found", e);
+				Toast.makeText(activity, "activity not found",
+						Toast.LENGTH_LONG).show();
 			}
 		}
+		return false;
+	}
 
-		final String msg = "no handler found to install package: "
-				+ packagename;
+	/**
+	 * Get {@link Intent} to market app to search for an app.
+	 * 
+	 * @param activity
+	 *            {@link Activity} used to launch the intent
+	 * @param search
+	 *            search string
+	 * @param alternativeLink
+	 *            link to some alternative source, if no market is available
+	 * @return intent to content
+	 */
+	public static Intent getSearchAppIntent(final Activity activity,
+			final String search, final String alternativeLink) {
+		Log.i(TAG, "getSearchAppIntent(" + activity + ", " + search + ", "
+				+ alternativeLink + ")");
+		final Intent i = new Intent(Intent.ACTION_VIEW);
+
+		// try google market
+		i.setData(Uri.parse(GOOGLE_SEARCH + search));
+		if (i.resolveActivity(activity.getPackageManager()) != null) {
+			return i;
+		}
+		Log.w(TAG, "no google market installed");
+
+		// try amazon market
+		i.setData(Uri.parse(AMAZON_SEARCH + search));
+		// TODO: launch amazon app explicitly?
+		final List<ResolveInfo> l = activity.getPackageManager()
+				.queryIntentActivities(i, 0);
+		for (ResolveInfo r : l) {
+			if (r.activityInfo.packageName.contains("amazon")) {
+				Log.i(TAG, "use app: " + r.activityInfo.packageName);
+				return i;
+			} else {
+				Log.i(TAG, "skipp app: " + r.activityInfo.packageName);
+			}
+		}
+		Log.w(TAG, "no amazon market installed");
+
+		if (!TextUtils.isEmpty(alternativeLink)) {
+			// try alternative link
+			i.setData(Uri.parse(alternativeLink));
+			if (i.resolveActivity(activity.getPackageManager()) != null) {
+				return i;
+			}
+			Log.e(TAG, "no handler installed: " + alternativeLink);
+		}
+
+		final String msg = "no handler found to search app: " + search;
 		Log.w(TAG, msg);
 		Toast.makeText(activity, msg, Toast.LENGTH_LONG).show();
-		return false;
+		return null;
 	}
 
 	/**
@@ -157,48 +233,17 @@ public final class Market {
 			final String search, final String alternativeLink) {
 		Log.i(TAG, "searchApp(" + activity + ", " + search + ", "
 				+ alternativeLink + ")");
-		final Intent i = new Intent(Intent.ACTION_VIEW);
-
-		try { // try google market
-			i.setData(Uri.parse(GOOGLE_SEARCH + search));
-			activity.startActivity(i);
-			return true;
-		} catch (ActivityNotFoundException e) {
-			Log.w(TAG, "no google market installed", e);
-		}
-
-		try { // try amazon market
-			i.setData(Uri.parse(AMAZON_SEARCH + search));
-			// TODO: launch amazon app explicitly?
-			final List<ResolveInfo> l = activity.getPackageManager()
-					.queryIntentActivities(i, 0);
-			for (ResolveInfo r : l) {
-				if (r.activityInfo.packageName.contains("amazon")) {
-					Log.i(TAG, "use app: " + r.activityInfo.packageName);
-					activity.startActivity(i);
-					return true;
-				} else {
-					Log.i(TAG, "skipp app: " + r.activityInfo.packageName);
-				}
-			}
-			Log.w(TAG, "no amazon market installed");
-		} catch (ActivityNotFoundException e) {
-			Log.w(TAG, "no amazon market installed", e);
-		}
-
-		if (!TextUtils.isEmpty(alternativeLink)) {
-			try { // try alternative link
-				i.setData(Uri.parse(alternativeLink));
+		final Intent i = getSearchAppIntent(activity, search, alternativeLink);
+		if (i != null) {
+			try {
 				activity.startActivity(i);
 				return true;
 			} catch (ActivityNotFoundException e) {
-				Log.e(TAG, "no handler installed: " + alternativeLink, e);
+				Log.e(TAG, "activity not found", e);
+				Toast.makeText(activity, "activity not found",
+						Toast.LENGTH_LONG).show();
 			}
 		}
-
-		final String msg = "no handler found to search app: " + search;
-		Log.w(TAG, msg);
-		Toast.makeText(activity, msg, Toast.LENGTH_LONG).show();
 		return false;
 	}
 
