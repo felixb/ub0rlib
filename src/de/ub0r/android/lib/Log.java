@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2010 Felix Bechstein
+ * Copyright (C) 2010-2011 Felix Bechstein
  * 
- * This file is part of ConversationList.
+ * This file is part of ub0rlib.
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,10 +20,12 @@ package de.ub0r.android.lib;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.widget.Toast;
 
 /**
  * @author flx
@@ -31,6 +33,8 @@ import android.net.Uri;
 public final class Log {
 	/** Tag for output. */
 	private static String mTag = "ub0rlib";
+	/** Tag for own output. */
+	private static final String TAG = "ub0rlib";
 
 	/** Packagename of SendLog. */
 	private static final String SENDLOG_PACKAGE_NAME = "org.l6n.sendlog";
@@ -80,7 +84,13 @@ public final class Log {
 		 */
 		public void onClick(final DialogInterface dialog, // .
 				final int whichButton) {
-			this.a.startActivity(this.i);
+			try {
+				this.a.startActivity(this.i);
+			} catch (ActivityNotFoundException e) {
+				e(TAG, "activity not found", e);
+				Toast.makeText(this.a, "no activity found", Toast.LENGTH_LONG)
+						.show();
+			}
 		}
 	}
 
