@@ -40,6 +40,7 @@ function get_args($argnames, $args) {
 
 $defargs = array();
 $defargs[] = 'username';
+$defargs[] = 'orig';
 $color_green='style="background:#A0FFA0"';
 $color_red='style="background:#FFA0A0"';
 $color_yellow='style="background:#FFFFA0"';
@@ -72,6 +73,13 @@ while (false !== ($entry = $d->read())) {
 }
 $d->close();
 
+$hidegreen = $_GET['hidegreen'];
+if (empty($hidegreen) || $hidegreen != '1') {
+  $hidegreen = 0;
+} else {
+  $hidegreen = 1;
+}
+
 
 ?>
 <html>
@@ -88,24 +96,29 @@ Set username or select an other language on the <b><a href="index.php">index pag
 
 <h3>Currently available files:</h3>
 <?
-foreach ($files as $f) {
-  echo '<a href="edit.php?lang='.$lang.'&file='.$f.'">Edit file '.$lang.'/'.$f.'</a></br>';
-}
-?>
 
-<?
 $file = $_GET['file'];
 if (empty($file)) {
   $file = $_POST['file'];
 }
-if (!empty($file)) {
-  $hidegreen = $_GET['hidegreen'];
-  if (empty($hidegreen) || $hidegreen != '1') {
-    $hidegreen = 0;
-  } else {
-    $hidegreen = 1;
+
+foreach ($files as $f) {
+  echo '<a href="edit.php?lang='.$lang.'&file='.$f.'&hidegreen='.$hidegreen.'">';
+  if ($file == $f) {
+    echo '<b>';
   }
+  echo 'Edit file '.$lang.'/'.$f;
+  if ($file === $f) {
+    echo '</b>';
+  }
+  echo '</a></br>';
+}
+?>
+
+<?
+if (!empty($file)) {
   echo '<h3>Current file: '.$lang.'/'.$file."</h3>\n";
+  echo 'Color codes: <ul><li>green == ok</li><li>yellow == original text changed since last translation</li><li>red == missing string</li></ul>'."\n";
   if ($hidegreen) {
     echo '<a href="edit.php?lang='.$lang.'&file='.$file.'">[Show green strings]</a>';
   } else {
@@ -113,6 +126,7 @@ if (!empty($file)) {
   }
   echo "</br>\n";
   echo "</br>\n";
+  echo "<hr>\n";
   
   // load source strings
   $sourcexml = file_get_contents($location.'res/values/'.$file);
@@ -228,6 +242,7 @@ if (!empty($file)) {
 	}
 	$targetstrings[$k] = $v;
 	$targetargs[$k]['username'] = $username;
+	$targetargs[$k]['orig'] = $sourcestrings[$k];
       }
     } else if ($action == 'edit-string-array') {
       $arrayname = '';
@@ -297,6 +312,8 @@ if (!empty($file)) {
       $decodedtv = decode_string($tv);
       if (empty($decodedtv)) {
 	$color = $color_red;
+      } else if (!empty($targetargs[$k]['orig']) and $v != $targetargs[$k]['orig']) {
+	$color = $color_yellow;
       } else {
 	$color = $color_green;
       }

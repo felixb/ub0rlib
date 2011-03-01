@@ -4,7 +4,7 @@ include('global.conf.php');
 
 $username = $_POST['username'];
 if (!empty($username)) {
-  setcookie('username', $username);
+  setcookie('username', $username, time()+60*60*24*356, '/');
 }
 
 if (empty($username)) {
