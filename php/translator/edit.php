@@ -18,6 +18,9 @@ function encode_string($s) {
   $ret = str_replace("'", "\'", $ret);
   $ret = str_replace("\\\\'", "\'", $ret);
   $ret = str_replace("\n", '\n', $ret);
+  $ret = str_replace("&", '&amp;', $ret);
+  $ret = str_replace("<", '&lt;', $ret);
+  $ret = str_replace(">", '&gt;', $ret);
   return $ret;
 }
 
@@ -287,14 +290,24 @@ if (!empty($file)) {
     $xml = $xml.'<resources>'."\n";
     foreach ($sourcestrings as $k => $v) {
       if (!is_array($v)) {
-	$xml = $xml.'  <string name="'.$k.'" formatted="false"'.get_args($defargs, $targetargs[$k]).'>'.encode_string($targetstrings[$k]).'</string>'."\n";
+	if(!empty($targetstrings[$k])) {
+	  $xml = $xml.'  <string name="'.$k.'" formatted="false"'.get_args($defargs, $targetargs[$k]).'>'.encode_string($targetstrings[$k]).'</string>'."\n";
+	}
       } else {
-	$xml = $xml.'  <string-array name="'.$k.'"'.get_args($defargs, $targetargs[$k]).'>'."\n";
+	$empty = true;
+	$xmlsnip = '';
+	$xmlsnip = $xmlsnip.'  <string-array name="'.$k.'"'.get_args($defargs, $targetargs[$k]).'>'."\n";
 	$tv = $targetstrings[$k];
 	foreach ($tv as $tvv) {
-	  $xml = $xml.'    <item>'.encode_string($tvv).'</item>'."\n";
+	  if (!empty($tvv)) {
+	    $empty = false;
+	  }
+	  $xmlsnip = $xmlsnip.'    <item>'.encode_string($tvv).'</item>'."\n";
 	}
-	$xml = $xml.'  </string-array>'."\n";
+	$xmlsnip = $xmlsnip.'  </string-array>'."\n";
+	if (!$empty) {
+	  $xml = $xml.$xmlsnip;
+	}
       }
     }
     $xml = $xml.'</resources>'."\n";
@@ -349,7 +362,7 @@ if (!empty($file)) {
 	if (is_array($tv) and count($tv) > $i) {
 	  $atv = $tv[$i];
 	} else {
-	  $atv = "";
+	  $atv = '';
 	}
 	$decodedv = decode_string($av);
 	$decodedtv = decode_string($atv);

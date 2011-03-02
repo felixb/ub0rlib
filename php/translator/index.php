@@ -1,5 +1,7 @@
 <?
 
+header('Content-Type:text/html; charset=UTF-8');
+
 include('global.conf.php');
 
 $username = $_POST['username'];
