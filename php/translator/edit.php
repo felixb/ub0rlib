@@ -186,7 +186,7 @@ if (!empty($file)) {
   foreach ($targetlines as $line) {
     if (false === strpos($line, '<string') and 
 	false === strpos($line, '</string-array>') and 
-	false === strpos($line, '<item>')) {
+	false === strpos($line, '<item')) {
       continue;
     }
 
@@ -220,11 +220,14 @@ if (!empty($file)) {
     }
 
 
-
     if (!empty($arrayname)) {
       $tmp = split('<item>', $line, 2);
-      list($linevalue, $tmp) = split('</item>', $tmp[1], 2);
-      $arrayvalue[] = $linevalue;
+      if (count($tmp) < 2) {
+        $arrayvalue[] = '';
+      } else {
+        list($linevalue, $tmp) = split('</item>', $tmp[1], 2);
+        $arrayvalue[] = $linevalue;
+      }
     }
     
     $tmp = split('>', $line, 2);
@@ -284,6 +287,7 @@ if (!empty($file)) {
        -->
       <!--
                This file is generated automatically by ub0rlib/php.
+               Visit http://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'].'?lang='.$lang.'&file='.$file.' to edit the file.
        -->
 ';
 
@@ -298,11 +302,16 @@ if (!empty($file)) {
 	$xmlsnip = '';
 	$xmlsnip = $xmlsnip.'  <string-array name="'.$k.'"'.get_args($defargs, $targetargs[$k]).'>'."\n";
 	$tv = $targetstrings[$k];
+	$i = 0;
 	foreach ($tv as $tvv) {
 	  if (!empty($tvv)) {
 	    $empty = false;
+	    $xmlsnip = $xmlsnip.'    <item>'.encode_string($tvv).'</item>'."\n";
+	  } else {
+            $tvv = $sourcestrings[$k][$i];
+	    $xmlsnip = $xmlsnip.'    <item notranslation="true">'.encode_string($tvv).'</item>'."\n";
 	  }
-	  $xmlsnip = $xmlsnip.'    <item>'.encode_string($tvv).'</item>'."\n";
+	  $i++;
 	}
 	$xmlsnip = $xmlsnip.'  </string-array>'."\n";
 	if (!$empty) {

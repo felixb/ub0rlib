@@ -2,6 +2,8 @@
 
 # $1 = branch to merge from
 
+eval $(keychain -q --eval)
+
 dir=$(grep location $(dirname $0)/local.conf.php | cut -d\' -f2)
 cd $dir
 
