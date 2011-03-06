@@ -9,6 +9,9 @@ function decode_string($s) {
   $ret = str_replace('\"', '"', $ret);
   $ret = str_replace("\'", "'", $ret);
   $ret = str_replace('\n', "\n", $ret);
+  $ret = str_replace('&lt;', '<', $ret);
+  $ret = str_replace('&gt;', '>', $ret);
+  $ret = str_replace('&amp;', '&', $ret);
   return $ret;
 }
 
@@ -21,6 +24,12 @@ function encode_string($s) {
   $ret = str_replace("&", '&amp;', $ret);
   $ret = str_replace("<", '&lt;', $ret);
   $ret = str_replace(">", '&gt;', $ret);
+  $ret = str_replace('&amp;lt;', '&lt;', $ret);
+  $ret = str_replace('&amp;lt;', '&lt;', $ret);
+  $ret = str_replace('&amp;gt;', '&gt;', $ret);
+  $ret = str_replace('&amp;gt;', '&gt;', $ret);
+  $ret = str_replace('&amp;amp;', '&amp;', $ret);
+  $ret = str_replace('&amp;amp;', '&amp;', $ret);
   return $ret;
 }
 
