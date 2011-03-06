@@ -1,13 +1,43 @@
 #! /bin/sh
 
-# $1 = branch to merge from
+# $1 = target directory
+# $2 = branch to merge from
+
+[ -z "$1" ] && return 1
+[ -d "$1" ] || return 2
 
 eval $(keychain -q --eval)
 
-dir=$(grep location $(dirname $0)/local.conf.php | cut -d\' -f2)
-cd $dir
+cd $1
 
-git commit -am "auto commit for translation" --author "ub0r bot <noreply@ub0r.de>"
-git pull
-git merge $1
-git push
+ret=0
+if [ $(git diff --shortstat | wc -l) != 0 ] ; then
+	git commit -am "auto commit for translation" --author "ub0r bot <noreply@ub0r.de>" > commit.log 2> commit.log
+	rc=$?
+	if [ $rc != 0 ] ; then
+		ret=$rc
+		echo rc=$ret | tee -a commit.log
+	fi
+fi
+git pull >> commit.log 2>> commit.log
+rc=$?
+if [ $rc != 0 ] ; then
+	ret=$rc
+	echo rc=$ret | tee -a commit.log
+fi
+[ -n "$2" ] && git merge $2 >> commit.log 2>> commit.log
+rc=$?
+if [ $rc != 0 ] ; then
+	ret=$rc
+	echo rc=$ret | tee -a commit.log
+fi
+git push >> commit.log 2>> commit.log
+rc=$?
+if [ $rc != 0 ] ; then
+	ret=$rc
+	echo rc=$ret | tee -a commit.log
+fi
+
+if [ $ret != 0 ] ; then
+	cat commit.log
+fi
