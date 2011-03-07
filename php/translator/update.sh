@@ -6,6 +6,10 @@
 [ -z "$1" ] && return 1
 [ -d "$1" ] || return 2
 
+if [ -z "$TERM" ] ; then
+	export TERM=xterm
+fi
+
 eval $(keychain -q --eval)
 
 cd $1
