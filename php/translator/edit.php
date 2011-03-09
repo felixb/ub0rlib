@@ -62,7 +62,7 @@ $username = $_COOKIE['username'];
 
 $lang = $_GET['lang'];
 if (empty($lang)) {
-  $lang = $_post['lang'];
+  $lang = $_POST['lang'];
 }
 
 $files = array();
@@ -116,7 +116,7 @@ Set username or select an other language on the <b><a href="./">index page</a></
 
 $file = $_GET['file'];
 if (empty($file)) {
-  $file = $_post['file'];
+  $file = $_POST['file'];
 }
 
 foreach ($files as $f) {
@@ -253,13 +253,13 @@ if (!empty($file)) {
   }
 
   // process new strings
-  $action = $_post['action'];
+  $action = $_POST['action'];
   if (empty($action)) {
     $action = $_GET['action'];
   }
   if (!empty($action)) {
     if ($action == 'edit-string') {
-      foreach ($_post as $k => $v) {
+      foreach ($_POST as $k => $v) {
 	if ($k == 'action' or $k == 'lang' or $k == 'file') {
 	  continue;
 	}
@@ -270,7 +270,7 @@ if (!empty($file)) {
     } else if ($action == 'edit-string-array') {
       $arrayname = '';
       $arrayvalue = array();
-      foreach ($_post as $k => $v) {
+      foreach ($_POST as $k => $v) {
 	if ($k == 'action' or $k == 'lang' or $k == 'file') {
 	  continue;
 	}
@@ -304,7 +304,7 @@ if (!empty($file)) {
        -->
       <!--
                This file is generated automatically by ub0rlib/php.
-               Visit http://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'].'?lang='.$lang.'&amp;file='.$file.' to edit the file.
+               Visit http://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'].'?lang='.$lang.'&file='.$file.' to edit the file.
        -->
 ';
 
