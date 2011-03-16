@@ -127,10 +127,7 @@ public final class Market {
 			Log.w(TAG, "no handler installed: " + alternativeLink);
 		}
 
-		final String msg = "no handler found to install package: "
-				+ packagename;
-		Log.w(TAG, msg);
-		Toast.makeText(activity, msg, Toast.LENGTH_LONG).show();
+		Log.w(TAG, "no handler found to install package: " + packagename);
 		return null;
 	}
 
@@ -160,6 +157,10 @@ public final class Market {
 				Toast.makeText(activity, "activity not found",
 						Toast.LENGTH_LONG).show();
 			}
+		} else {
+			Toast.makeText(activity,
+					"no handler found to install package: " + packagename,
+					Toast.LENGTH_LONG).show();
 		}
 		return false;
 	}
@@ -212,9 +213,7 @@ public final class Market {
 			Log.e(TAG, "no handler installed: " + alternativeLink);
 		}
 
-		final String msg = "no handler found to search app: " + search;
-		Log.w(TAG, msg);
-		Toast.makeText(activity, msg, Toast.LENGTH_LONG).show();
+		Log.w(TAG, "no handler found to search app: " + search);
 		return null;
 	}
 
@@ -243,6 +242,10 @@ public final class Market {
 				Toast.makeText(activity, "activity not found",
 						Toast.LENGTH_LONG).show();
 			}
+		} else {
+			Toast.makeText(activity,
+					"no handler found to search app: " + search,
+					Toast.LENGTH_LONG).show();
 		}
 		return false;
 	}
