@@ -21,6 +21,7 @@ function encode_string($s) {
   $ret = $s;
   $ret = str_replace("'", "\'", $ret);
   $ret = str_replace("\\\\'", "\'", $ret);
+  $ret = str_replace("\r\n", '\n', $ret);
   $ret = str_replace("\n", '\n', $ret);
   $ret = str_replace('&', '&amp;', $ret);
   $ret = str_replace('<', '&lt;', $ret);
