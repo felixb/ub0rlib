@@ -74,6 +74,11 @@ public final class Market {
 	/** URL used for amazon market to search. */
 	private static final String AMAZON_SEARCH = "http://www.amazon.com"
 			+ "/gp/mas/dl/android?s=";
+	
+	/** Skip google market. */
+	private static final boolean GOOGLE_SKIP = true;
+	/** Skip amazon market. */
+	private static final boolean AMAZON_SKIP = false;
 
 	/**
 	 * Hide default constructor.
@@ -98,25 +103,34 @@ public final class Market {
 				+ ", " + alternativeLink + ")");
 		final Intent i = new Intent(Intent.ACTION_VIEW);
 
-		// try google market
-		i.setData(Uri.parse(GOOGLE_INSTALL + packagename));
-		if (i.resolveActivity(activity.getPackageManager()) != null) {
-			return i;
+		if (!GOOGLE_SKIP) {
+			// try google market
+			i.setData(Uri.parse(GOOGLE_INSTALL + packagename));
+			if (i.resolveActivity(activity.getPackageManager()) != null) {
+				return i;
+			}
+			Log.w(TAG, "no google market installed");
+		} else {
+			Log.i(TAG, "skip google market");
 		}
 
-		// try amazon market
-		i.setData(Uri.parse(AMAZON_INSTALL + packagename));
-		final List<ResolveInfo> l = activity.getPackageManager()
-				.queryIntentActivities(i, 0);
-		for (ResolveInfo r : l) {
-			if (r.activityInfo.packageName.contains("amazon")) {
-				Log.i(TAG, "use app: " + r.activityInfo.packageName);
-				return i;
-			} else {
-				Log.i(TAG, "skipp app: " + r.activityInfo.packageName);
+		if (!AMAZON_SKIP) {
+			// try amazon market
+			i.setData(Uri.parse(AMAZON_INSTALL + packagename));
+			final List<ResolveInfo> l = activity.getPackageManager()
+					.queryIntentActivities(i, 0);
+			for (ResolveInfo r : l) {
+				if (r.activityInfo.packageName.contains("amazon")) {
+					Log.i(TAG, "use app: " + r.activityInfo.packageName);
+					return i;
+				} else {
+					Log.i(TAG, "skipp app: " + r.activityInfo.packageName);
+				}
 			}
+			Log.w(TAG, "no amazon market installed");
+		} else {
+			Log.i(TAG, "skip amazon market");
 		}
-		Log.w(TAG, "no amazon market installed");
 
 		if (!TextUtils.isEmpty(alternativeLink)) {
 			// try alternative link
@@ -182,27 +196,35 @@ public final class Market {
 				+ alternativeLink + ")");
 		final Intent i = new Intent(Intent.ACTION_VIEW);
 
-		// try google market
-		i.setData(Uri.parse(GOOGLE_SEARCH + search));
-		if (i.resolveActivity(activity.getPackageManager()) != null) {
-			return i;
-		}
-		Log.w(TAG, "no google market installed");
-
-		// try amazon market
-		i.setData(Uri.parse(AMAZON_SEARCH + search));
-		// TODO: launch amazon app explicitly?
-		final List<ResolveInfo> l = activity.getPackageManager()
-				.queryIntentActivities(i, 0);
-		for (ResolveInfo r : l) {
-			if (r.activityInfo.packageName.contains("amazon")) {
-				Log.i(TAG, "use app: " + r.activityInfo.packageName);
+		if (!GOOGLE_SKIP) {
+			// try google market
+			i.setData(Uri.parse(GOOGLE_SEARCH + search));
+			if (i.resolveActivity(activity.getPackageManager()) != null) {
 				return i;
-			} else {
-				Log.i(TAG, "skipp app: " + r.activityInfo.packageName);
 			}
+			Log.w(TAG, "no google market installed");
+		} else {
+			Log.i(TAG, "skip google market");
 		}
-		Log.w(TAG, "no amazon market installed");
+
+		if (!AMAZON_SKIP) {
+			// try amazon market
+			i.setData(Uri.parse(AMAZON_SEARCH + search));
+			// TODO: launch amazon app explicitly?
+			final List<ResolveInfo> l = activity.getPackageManager()
+					.queryIntentActivities(i, 0);
+			for (ResolveInfo r : l) {
+				if (r.activityInfo.packageName.contains("amazon")) {
+					Log.i(TAG, "use app: " + r.activityInfo.packageName);
+					return i;
+				} else {	
+					Log.i(TAG, "skipp app: " + r.activityInfo.packageName);
+				}
+			}
+			Log.w(TAG, "no amazon market installed");
+		} else {
+			Log.i(TAG, "skip amazon market");
+		}
 
 		if (!TextUtils.isEmpty(alternativeLink)) {
 			// try alternative link

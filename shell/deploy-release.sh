@@ -2,6 +2,13 @@
 
 ODIR=${PWD}
 
+doamazon=0
+if [ "x$1" = "xamazon" ] ; then
+	doamazon=1
+	shift
+fi
+export doamazon
+
 if [ -z "$1" ] ; then
 	p=$(basename ${PWD})
 	cd ..
@@ -21,13 +28,16 @@ preDeploy.sh
 ant clean
 ant debug || exit -1
 ant release < ${keyfile} 
-adb -d install -r bin/*-debug.apk || adb -d install -r bin/*-release.apk
 
-mv bin/*-release.apk bin/${fname}-${pversion}.apk
-
-[ -n "${gproject}" ] && \
-googlecode_upload.py -u ${gcodelogin} -w ${gcodepassw} -p ${gproject}  -s "${sname}-${pversion}"  -l Featured,Type-Package,OpSys-Android${lextra}  bin/${fname}-${pversion}.apk
-
+if [ ${doamazon} -eq 1 ] ; then
+	mv bin/*-release.apk bin/${fname}-${pversion}-amazon.apk
+else
+	adb -d install -r bin/*-debug.apk || adb -d install -r bin/*-release.apk
+	mv bin/*-release.apk bin/${fname}-${pversion}.apk
+	exit 1
+	[ -n "${gproject}" ] && [ ${doamazon} -eq 0 ] && \
+		googlecode_upload.py -u ${gcodelogin} -w ${gcodepassw} -p ${gproject}  -s "${sname}-${pversion}"  -l Featured,Type-Package,OpSys-Android${lextra}  bin/${fname}-${pversion}.apk
+fi
 postDeploy.sh
 
 cd ${ODIR}
