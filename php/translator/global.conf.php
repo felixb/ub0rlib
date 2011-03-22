@@ -2,6 +2,7 @@
 include('local.conf.php');
 $langnames = array(
   'cs' => 'Czech',
+  'da' => 'Danish',
   'de' => 'German',
   'en' => 'English',
   'el' => 'Greek',

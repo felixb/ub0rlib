@@ -14,6 +14,8 @@ eval $(keychain -q --eval)
 
 cd $1
 
+rm commit.log
+
 ret=0
 if [ $(git diff --shortstat | wc -l) != 0 ] ; then
 	git commit -am "auto commit for translation" --author "ub0r bot <noreply@ub0r.de>" > commit.log 2> commit.log
@@ -35,7 +37,7 @@ if [ $rc != 0 ] ; then
 	ret=$rc
 	echo rc=$ret | tee -a commit.log
 fi
-git push >> commit.log 2>> commit.log
+git push origin $(git branch --no-color | grep '*' | cut -d\  -f2) >> commit.log 2>> commit.log
 rc=$?
 if [ $rc != 0 ] ; then
 	ret=$rc
