@@ -65,6 +65,16 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 			Contacts.Phones.PERSON_ID, // 2
 			PresenceColumns.PRESENCE_STATUS, // 3
 	};
+
+	/** {@link Uri} for getting {@link Contact} from number. */
+	private static final Uri PHONES_WITHOUT_PRESENCE_URI = Contacts.Phones.CONTENT_URI;
+	/** Projection for getting {@link Contact} from number. */
+	private static final String[] CALLER_ID_PROJECTION_WITHOUT_PRESENCE = new String[] {
+			PhonesColumns.NUMBER, // 0
+			PeopleColumns.NAME, // 1
+			Contacts.Phones.PERSON_ID, // 2
+	};
+
 	/** Index in CALLER_ID_PROJECTION: number. */
 	private static final int INDEX_CALLER_ID_NUMBER = 0;
 	/** Index in CALLER_ID_PROJECTION: name. */
@@ -311,14 +321,30 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 			final String n = PhoneNumberUtils.stripSeparators(number);
 			if (!TextUtils.isEmpty(n)) {
 				Log.d(TAG, "lookup contact: " + n);
-				final Cursor cursor = cr.query(PHONES_WITH_PRESENCE_URI,
-						CALLER_ID_PROJECTION, CALLER_ID_SELECTION,
-						new String[] { n }, null);
+				boolean withpresence = true;
+				Cursor cursor = null;
+				try {
+					cursor = cr.query(PHONES_WITH_PRESENCE_URI,
+							CALLER_ID_PROJECTION, CALLER_ID_SELECTION,
+							new String[] { n }, null);
+				} catch (IllegalArgumentException e) {
+					Log.e(TAG, "could not query: " + PHONES_WITH_PRESENCE_URI,
+							e);
+					Log.i(TAG, "try without presence: "
+							+ PHONES_WITHOUT_PRESENCE_URI);
+					cursor = cr.query(PHONES_WITHOUT_PRESENCE_URI,
+							CALLER_ID_PROJECTION_WITHOUT_PRESENCE,
+							CALLER_ID_SELECTION, new String[] { n }, null);
+					withpresence = false;
+				}
 				if (cursor.moveToFirst()) {
 					final long pid = cursor.getLong(INDEX_CALLER_ID_CONTACTID);
 					final String na = cursor.getString(INDEX_CALLER_ID_NAME);
 					final String nu = cursor.getString(INDEX_CALLER_ID_NUMBER);
-					final int prs = cursor.getInt(INDEX_CALLER_ID_PRESENCE);
+					int prs = PRESENCE_STATE_UNKNOWN;
+					if (withpresence) {
+						cursor.getInt(INDEX_CALLER_ID_PRESENCE);
+					}
 					Log.d(TAG, "id: " + pid);
 					Log.d(TAG, "name: " + na);
 					Log.d(TAG, "number: " + nu);

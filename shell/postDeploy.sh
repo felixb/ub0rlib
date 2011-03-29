@@ -9,6 +9,7 @@ function add_logs {
 			-e 's:///*Log\.d:Log.d:' \
 			-i $f
 	done
+	sed -e 's:GOOGLE_SKIP = true:GOOGLE_SKIP = false:' -i $f
 }
 
 for lib in $PWD $(grep android.library.reference default.properties | cut -d= -f2) ; do

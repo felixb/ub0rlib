@@ -273,8 +273,16 @@ public class DonationHelper extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.donation);
 
+		final Intent marketIntent = Market.getInstallAppIntent(this,
+				DONATOR_PACKAGE, null);
+		if (marketIntent != null
+				&& marketIntent.getDataString().startsWith("market://")) {
+			this.findViewById(R.id.donate_market).setOnClickListener(this);
+		} else { // TODO: add android market here + change title
+			this.findViewById(R.id.donate_market).setVisibility(View.GONE);
+		}
+
 		this.findViewById(R.id.donate_paypal).setOnClickListener(this);
-		this.findViewById(R.id.donate_market).setOnClickListener(this);
 		this.findViewById(R.id.send).setOnClickListener(this);
 		this.etPaypalId = (EditText) this.findViewById(R.id.paypalid);
 		final String mail = PreferenceManager.getDefaultSharedPreferences(this)
@@ -326,13 +334,7 @@ public class DonationHelper extends Activity implements OnClickListener {
 			}
 			return;
 		case R.id.donate_market:
-			try {
-				this.startActivity(new Intent(Intent.ACTION_VIEW,
-						DONATOR_MARKET));
-			} catch (Exception e) {
-				Log.e(TAG, "error launching market", e);
-				Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
-			}
+			Market.installApp(this, DONATOR_PACKAGE, null);
 			return;
 		case R.id.send:
 			if (this.etPaypalId.getText().toString().length() == 0) {
