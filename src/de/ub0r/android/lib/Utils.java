@@ -18,6 +18,11 @@
  */
 package de.ub0r.android.lib;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
@@ -39,6 +44,11 @@ import android.widget.Toast;
 public final class Utils {
 	/** Tag for output. */
 	private static final String TAG = "utls";
+
+	/** k aka 1024. */
+	public static final int K = 1024;
+	/** M aka 1024 * 1024. */
+	public static final int M = K * K;
 
 	/**
 	 * Default Constructor.
@@ -87,6 +97,28 @@ public final class Utils {
 			ret = Long.parseLong(value);
 		} catch (NumberFormatException e) {
 			Log.w(TAG, "parseLong(" + value + ") failed: " + e.toString());
+		}
+		return ret;
+	}
+
+	/**
+	 * Parse {@link Float}.
+	 * 
+	 * @param value
+	 *            value a {@link String}
+	 * @param defValue
+	 *            default value
+	 * @return parsed {@link Float}
+	 */
+	public static float parseFloat(final String value, final float defValue) {
+		float ret = defValue;
+		if (value == null || value.length() == 0) {
+			return ret;
+		}
+		try {
+			ret = Float.parseFloat(value);
+		} catch (NumberFormatException e) {
+			Log.w(TAG, "parseFloat(" + value + ") failed: " + e.toString());
 		}
 		return ret;
 	}
@@ -167,5 +199,29 @@ public final class Utils {
 				Toast.makeText(context, "no market", Toast.LENGTH_LONG).show();
 			}
 		}
+	}
+
+	/**
+	 * Copy a file from source to destination.
+	 * 
+	 * @param source
+	 *            source
+	 * @param destination
+	 *            destination
+	 * @throws IOException
+	 *             File not found or any other IO Exception.
+	 */
+	public static void copyFile(final String source, final String destination)
+			throws IOException {
+		final InputStream in = new FileInputStream(source);
+		final OutputStream out = new FileOutputStream(destination);
+		byte[] buf = new byte[K];
+		int len;
+		while ((len = in.read(buf)) > 0) {
+			out.write(buf, 0, len);
+		}
+		in.close();
+		out.close();
+
 	}
 }

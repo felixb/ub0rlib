@@ -34,8 +34,7 @@ if [ ${doamazon} -eq 1 ] ; then
 else
 	adb -d install -r bin/*-debug.apk || adb -d install -r bin/*-release.apk
 	mv bin/*-release.apk bin/${fname}-${pversion}.apk
-	exit 1
-	[ -n "${gproject}" ] && [ ${doamazon} -eq 0 ] && \
+	[ -n "${gproject}" ] && \
 		googlecode_upload.py -u ${gcodelogin} -w ${gcodepassw} -p ${gproject}  -s "${sname}-${pversion}"  -l Featured,Type-Package,OpSys-Android${lextra}  bin/${fname}-${pversion}.apk
 fi
 postDeploy.sh
