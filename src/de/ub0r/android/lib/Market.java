@@ -74,9 +74,9 @@ public final class Market {
 	/** URL used for amazon market to search. */
 	private static final String AMAZON_SEARCH = "http://www.amazon.com"
 			+ "/gp/mas/dl/android?s=";
-	
+
 	/** Skip google market. */
-	private static final boolean GOOGLE_SKIP = true;
+	private static final boolean GOOGLE_SKIP = false;
 	/** Skip amazon market. */
 	private static final boolean AMAZON_SKIP = false;
 
@@ -217,7 +217,7 @@ public final class Market {
 				if (r.activityInfo.packageName.contains("amazon")) {
 					Log.i(TAG, "use app: " + r.activityInfo.packageName);
 					return i;
-				} else {	
+				} else {
 					Log.i(TAG, "skipp app: " + r.activityInfo.packageName);
 				}
 			}
