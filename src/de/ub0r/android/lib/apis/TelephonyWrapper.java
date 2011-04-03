@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import android.app.PendingIntent;
 import android.os.Build;
+import android.telephony.gsm.SmsManager;
 import android.util.Log;
 
 /**
@@ -30,9 +31,22 @@ import android.util.Log;
  * 
  * @author flx
  */
+@SuppressWarnings("deprecation")
 public abstract class TelephonyWrapper {
 	/** Tag for output. */
 	private static final String TAG = "tw";
+	/** Generic failure cause. */
+	public static final int RESULT_ERROR_GENERIC_FAILURE = // .
+	SmsManager.RESULT_ERROR_GENERIC_FAILURE;
+	/** Failed because service is currently unavailable. */
+	public static final int RESULT_ERROR_NO_SERVICE = // .
+	SmsManager.RESULT_ERROR_NO_SERVICE;
+	/** Failed because no pdu provided. */
+	public static final int RESULT_ERROR_NULL_PDU = // .
+	SmsManager.RESULT_ERROR_NULL_PDU;
+	/** Failed because radio was explicitly turned off. */
+	public static final int RESULT_ERROR_RADIO_OFF = // .
+	SmsManager.RESULT_ERROR_RADIO_OFF;
 
 	/**
 	 * Static singleton instance of {@link TelephonyWrapper} holding the
