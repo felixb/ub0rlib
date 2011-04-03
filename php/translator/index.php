@@ -37,6 +37,10 @@ $d->close();
 
 <h1>Translate Strings for <? echo $appname; ?></h1>
 
+<h3>Other apps</h3>
+
+Other apps you might want to translate are available <a href="../">here</a>.
+
 <h3>User settings</h3>
 <p>
 You might set you username in the following form to mark all of your edited strings with this name as author.

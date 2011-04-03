@@ -385,6 +385,7 @@ if (!empty($file)) {
 	$form = $form.'  translator: <input type="text" disabled="disabled" value="'.$targetargs[$k]['username'].'" size="50" />'."<br/>\n";
       }
       $form = $form.'  <input name="action" value="edit-string-array" type="hidden" />'."\n";
+      $form = $form.'  <table>';
       $i = 0;
       foreach ($v as $av) {
 	$tv = $targetstrings[$k];
@@ -404,14 +405,25 @@ if (!empty($file)) {
 	} else {
 	  $color = $color_green;
 	}
+        $numlines = count(split('\\\n', $av));
+        $numlines += strlen($av) / 50;
 	// echo '  <!-- '.$av.'-->'."\n";
+        $form = $form.'  <tr>';
+        $form = $form.'  <td>';
 	$form = $form.'  '.$i.': '."\n";
-	$form = $form.'  <input disabled="disabled" value="'.$decodedv.'" size="35" />';
-	$form = $form.'  <input name="'.$k.','.$i.'" value="'.$decodedtv.'"  '.$color.' size="35" />';
-	$form = $form."  <br/>\n";
+        $form = $form.'  </td>';
+        $form = $form.'  <td>';
+	$form = $form.'  <textarea disabled="disabled" value="'.$decodedv.'" cols="50" rows="'.$numlines.'">'.$decodedv.'</textarea>';
+        $form = $form.'  </td>';
+        $form = $form.'  <td>';
+	$form = $form.'  <textarea name="'.$k.','.$i.'" value="'.$decodedtv.'"  '.$color.' cols="60" rows="'.$numlines.'">'.$decodedtv.'</textarea>';
+        $form = $form.'  </td>';
+        $form = $form.'  </tr>';
+        $form = $form."\n";
 	$i++;
       }
-      $form = $form.'<input type="submit" />'."<br/>\n";
+      $form = $form.'  </table>';
+      $form = $form.'  <input type="submit" />'."<br/>\n";
       $form = $form.'</form>'."\n";
       $form = $form."<hr/>\n";
 
