@@ -7,7 +7,6 @@ src/de/ub0r/android/andGMXsms/IIOOp.java
 build.properties
 doc
 *.zip
-*.jar
 *.swp
 *~
 uml/*.png
