@@ -324,6 +324,10 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	public boolean updateContactDetails(final Context context,
 			final boolean loadOnly, final boolean loadAvatar,
 			final Contact contact) {
+		if (contact == null) {
+			Log.w(TAG, "updateContactDetails(" + contact + ")");
+			return false;
+		}
 		Log.d(TAG, "updateContactDetails(" + contact.mRecipientId + ")");
 		Log.d(TAG, "id: " + contact.mPersonId + ")");
 		Log.d(TAG, "number: " + contact.mNumber + ")");
