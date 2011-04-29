@@ -264,9 +264,13 @@ if (!empty($file)) {
 	if ($k == 'action' or $k == 'lang' or $k == 'file') {
 	  continue;
 	}
-	$targetstrings[$k] = $v;
-	$targetargs[$k]['username'] = $username;
-	$targetargs[$k]['orig'] = $sourcestrings[$k];
+	$spos = strpos($sourcestrings[$k], 'http:');
+	$tpos = strpos($v, 'http:');
+	if (($spos === false && $tpos === false) || $spos !== false) {
+		$targetstrings[$k] = $v;
+		$targetargs[$k]['username'] = $username;
+		$targetargs[$k]['orig'] = $sourcestrings[$k];
+	}
       }
     } else if ($action == 'edit-string-array') {
       $arrayname = '';
