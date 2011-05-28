@@ -345,6 +345,7 @@ if (!empty($file)) {
     file_put_contents($location.'res/values-'.$lang.'/'.$file, $xml);
   }
 
+  $alltext = '';
   // show forms
   foreach ($sourcestrings as $k => $v) {
     if (!is_array($v)) {
@@ -356,10 +357,13 @@ if (!empty($file)) {
       $decodedtv = decode_string($tv);
       if (empty($decodedtv)) {
 	$color = $color_red;
+        $alltext = $alltext . "\n\n" . $decodedv;
       } else if (!empty($targetargs[$k]['orig']) and $v != $targetargs[$k]['orig']) {
 	$color = $color_yellow;
+        $alltext = $alltext . "\n\n" . $decodedtv;
       } else {
 	$color = $color_green;
+        $alltext = $alltext . "\n\n" . $decodedtv;
       }
       if ($hidegreen and $color == $color_green) {
 	continue;
@@ -436,6 +440,17 @@ if (!empty($file)) {
       }
       echo $form;
     }
+  }
+
+  // show $alltext if $file==market.xml
+  if ($file == 'market.xml') {
+    $numlines = count(split("\n", $alltext));
+    $numlines += strlen($alltext) / 80;
+    $form = '<form>';
+    $form = $form."<b>Merged text:</b><br/>\n";
+    $form = $form.'<textarea disabled="disabled" cols="80" rows="'.$numlines.'">' . $alltext . '</textarea></form>';
+    $form = $form."<hr/>\n";
+    echo $form;
   }
 }
 ?>
