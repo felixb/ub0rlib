@@ -21,5 +21,9 @@ for lib in $PWD $(grep android.library.reference default.properties | cut -d= -f
 done
 
 echo "set debuggable=false"
-
 sed -e 's/android:debuggable="true"/android:debuggable="false"/' -i AndroidManifest.xml
+
+echo "set api key"
+for f in $(grep -rl "0qZA1bZBqi-GIWgquIfvMAjb3StJluB8mW_xz-w" res/ src/) ; do
+	sed -e 's/0qZA1bZBqi-GIWgquIfvMAjb3StJluB8mW_xz-w/0qZA1bZBqi-FBUCzyDAFazseN7fOJ3kzsoBtGIg/' -i $f
+done
