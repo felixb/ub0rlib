@@ -1,36 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-	<!--
-		Copyright (C) 2009-2011 Felix Bechstein
-	-->
-	<!--
-		This file is part of ub0rlib. This program is free software; you can
-		redistribute it and/or modify it under the terms of the GNU General
-		Public License as published by the Free Software Foundation; either
-		version 3 of the License, or (at your option) any later version.
-	-->
-	<!--
-		This program is distributed in the hope that it will be useful, but
-		WITHOUT ANY WARRANTY; without even the implied warranty of
-		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-		General Public License for more details. You should have received a
-		copy of the GNU General Public License along with this program; If
-		not, see <http://www.gnu.org/licenses/>.
-	-->
+       <!--
+               Copyright (C) 2009-2011 Felix Bechstein
+       -->
+       <!--
+               This file is part of ub0rlib. This program is free software; you can
+               redistribute it and/or modify it under the terms of the GNU General
+               Public License as published by the Free Software Foundation; either
+               version 3 of the License, or (at your option) any later version.
+       -->
+       <!--
+               This program is distributed in the hope that it will be useful, but
+               WITHOUT ANY WARRANTY; without even the implied warranty of
+               MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+               General Public License for more details. You should have received a
+               copy of the GNU General Public License along with this program; If
+               not, see <http://www.gnu.org/licenses/>.
+       -->
+      <!--
+               This file is generated automatically by ub0rlib/php.
+               Visit http://ub0r.de/translate/ub0rlib/edit.php?lang=de&file=donation.xml to edit the file.
+       -->
 <resources>
-	<string name="donate_paypal_">Spenden (Paypal)</string>
-	<string name="donate_market_">Spenden (Market)</string>
-	<string name="donate_bitcoin_">Spenden (Bitcoin)</string>
-	<string name="donate_remove_ads_">Spenden/Werbung entfernen</string>
-	<string name="remove_ads_">Werbung entfernen</string>
-	<string name="predonate">Dies ist eine open-source App. Sie ist und bleibt frei. Wenn du die App wirklich magst oder dich die Werbung nervt, kannst du gerne etwas spenden. Ich werde die Werbung so schnell wie möglich entfernen.\n\nSolltest du mehrere Apps von mir einsetzen, reicht eine Spende um überall die Werbung zu entfernen.</string>
-	<string name="postdonate">Um die Werbung zu entfernen musst du den <i>noads</i> Code laden. Er steht erst zur Verfügung, wenn die Spende bei mir eingegangen ist. Bitte sei geduldig und melde dich bei mir, wenn es nach einem Tag immernoch nicht funktioniert hat.</string>
-	<string name="donator_id_">Um die Spende zu überprüfen, wird deine Paypal Id (Mail Adresse) benötigt:</string>
-	<string name="load_hash_">Noads Code laden</string>
-	<string name="sig_loaded">Werbung entfernt!</string>
-	<string name="sig_failed">Fehler beim entfernen der Werbung!</string>
-	<string name="accept_">Bedingungen akzeptieren</string>
-	<string name="accept_missing">Bitte akzeptiere die Bedingungen bevor du die Daten sendest.</string>
-	<string name="terms">Die App sendet deine Spender ID und den MD5-Hash deiner IMEI an den Server (http://ub0r.de/donation/). Diese Daten werden auschließlich dazu benutzt deine Spende zu verifizieren.\nDie Daten werden niemals an Dritte weitergegeben.\n\nWenn dein Telefon wechseln sollte, wird der Code nicht mehr funktionieren. Bitte schreib mir eine Mail, um einen neuen Code zu bekommen.</string>
-	<string name="notify_">Vergessen die Werbung zu deaktivieren?</string>
-	<string name="notify_text">Um die Werbung abzustellen, musst du den <b>noads</b> Code laden. Klicke hier um fortzufahren.</string>
+  <string name="donate_paypal_" formatted="false">Spenden (Paypal)</string>
+  <string name="donate_market_" formatted="false">Spenden (Market)</string>
+  <string name="donate_bitcoin_" formatted="false">Spenden (Bitcoin)</string>
+  <string name="donate_bitcoin" formatted="false" username="flx &lt;f+translator@ub0r.de&gt;" orig="Just send some BTC to the address below and drop me a mail to notify me.">Sende einfach ein paar BTC an die unten stehende Adresse und gib mir per Mail Bescheid.</string>
+  <string name="donate_bitcoin_cb" formatted="false" username="flx &lt;f+translator@ub0r.de&gt;" orig="Copy to clipboard">In die Zwischenablage kopieren</string>
+  <string name="donate_bitcoin_send" formatted="false" username="flx &lt;f+translator@ub0r.de&gt;" orig="Send by App">Per App senden</string>
+  <string name="donate_remove_ads_" formatted="false">Spenden/Werbung entfernen</string>
+  <string name="remove_ads_" formatted="false">Werbung entfernen</string>
+  <string name="predonate" formatted="false">Dies ist eine open-source App. Sie ist und bleibt frei. Wenn du die App wirklich magst oder dich die Werbung nervt, kannst du gerne etwas spenden. Ich werde die Werbung so schnell wie möglich entfernen.\n\nSolltest du mehrere Apps von mir einsetzen, reicht eine Spende um überall die Werbung zu entfernen.</string>
+  <string name="postdonate" formatted="false">Um die Werbung zu entfernen musst du den &lt;i&gt;noads&lt;/i&gt; Code laden. Er steht erst zur Verfügung, wenn die Spende bei mir eingegangen ist. Bitte sei geduldig und melde dich bei mir, wenn es nach einem Tag immernoch nicht funktioniert hat.</string>
+  <string name="donator_id_" formatted="false">Um die Spende zu überprüfen, wird deine Paypal Id (Mail Adresse) benötigt:</string>
+  <string name="donator_id_hint" formatted="false" username="flx &lt;f+translator@ub0r.de&gt;" orig="Paypal address">Paypal Adresse</string>
+  <string name="load_hash_" formatted="false">Noads Code laden</string>
+  <string name="sig_loaded" formatted="false">Werbung entfernt!</string>
+  <string name="sig_failed" formatted="false">Fehler beim entfernen der Werbung!</string>
+  <string name="accept_" formatted="false">Bedingungen akzeptieren</string>
+  <string name="accept_missing" formatted="false">Bitte akzeptiere die Bedingungen bevor du die Daten sendest.</string>
+  <string name="terms" formatted="false">Die App sendet deine Spender ID und den MD5-Hash deiner IMEI an den Server (http://ub0r.de/donation/). Diese Daten werden auschließlich dazu benutzt deine Spende zu verifizieren.\nDie Daten werden niemals an Dritte weitergegeben.\n\nWenn dein Telefon wechseln sollte, wird der Code nicht mehr funktionieren. Bitte schreib mir eine Mail, um einen neuen Code zu bekommen.</string>
+  <string name="notify_" formatted="false">Vergessen die Werbung zu deaktivieren?</string>
+  <string name="notify_text" formatted="false">Um die Werbung abzustellen, musst du den &lt;b&gt;noads&lt;/b&gt; Code laden. Klicke hier um fortzufahren.</string>
 </resources>
