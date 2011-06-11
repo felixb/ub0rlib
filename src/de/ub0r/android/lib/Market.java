@@ -22,6 +22,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
@@ -89,24 +90,24 @@ public final class Market {
 	/**
 	 * get {@link Intent} to any market app to load an app.
 	 * 
-	 * @param activity
-	 *            {@link Activity} used to launch the intent
+	 * @param context
+	 *            {@link Context} used to launch the intent
 	 * @param packagename
 	 *            package name of target app
 	 * @param alternativeLink
 	 *            link to some alternative source, if no market is available
 	 * @return {@link Intent} which should be launched
 	 */
-	public static Intent getInstallAppIntent(final Activity activity,
+	public static Intent getInstallAppIntent(final Context context,
 			final String packagename, final String alternativeLink) {
-		Log.i(TAG, "getInstallAppIntent(" + activity + ", " + packagename
-				+ ", " + alternativeLink + ")");
+		Log.i(TAG, "getInstallAppIntent(" + context + ", " + packagename + ", "
+				+ alternativeLink + ")");
 		final Intent i = new Intent(Intent.ACTION_VIEW);
 
 		if (!GOOGLE_SKIP) {
 			// try google market
 			i.setData(Uri.parse(GOOGLE_INSTALL + packagename));
-			if (i.resolveActivity(activity.getPackageManager()) != null) {
+			if (i.resolveActivity(context.getPackageManager()) != null) {
 				return i;
 			}
 			Log.w(TAG, "no google market installed");
@@ -117,7 +118,7 @@ public final class Market {
 		if (!AMAZON_SKIP) {
 			// try amazon market
 			i.setData(Uri.parse(AMAZON_INSTALL + packagename));
-			final List<ResolveInfo> l = activity.getPackageManager()
+			final List<ResolveInfo> l = context.getPackageManager()
 					.queryIntentActivities(i, 0);
 			for (ResolveInfo r : l) {
 				if (r.activityInfo.packageName.contains("amazon")) {
@@ -135,7 +136,7 @@ public final class Market {
 		if (!TextUtils.isEmpty(alternativeLink)) {
 			// try alternative link
 			i.setData(Uri.parse(alternativeLink));
-			if (i.resolveActivity(activity.getPackageManager()) != null) {
+			if (i.resolveActivity(context.getPackageManager()) != null) {
 				return i;
 			}
 			Log.w(TAG, "no handler installed: " + alternativeLink);
@@ -182,24 +183,24 @@ public final class Market {
 	/**
 	 * Get {@link Intent} to market app to search for an app.
 	 * 
-	 * @param activity
-	 *            {@link Activity} used to launch the intent
+	 * @param context
+	 *            {@link Context} used to launch the intent
 	 * @param search
 	 *            search string
 	 * @param alternativeLink
 	 *            link to some alternative source, if no market is available
 	 * @return intent to content
 	 */
-	public static Intent getSearchAppIntent(final Activity activity,
+	public static Intent getSearchAppIntent(final Context context,
 			final String search, final String alternativeLink) {
-		Log.i(TAG, "getSearchAppIntent(" + activity + ", " + search + ", "
+		Log.i(TAG, "getSearchAppIntent(" + context + ", " + search + ", "
 				+ alternativeLink + ")");
 		final Intent i = new Intent(Intent.ACTION_VIEW);
 
 		if (!GOOGLE_SKIP) {
 			// try google market
 			i.setData(Uri.parse(GOOGLE_SEARCH + search));
-			if (i.resolveActivity(activity.getPackageManager()) != null) {
+			if (i.resolveActivity(context.getPackageManager()) != null) {
 				return i;
 			}
 			Log.w(TAG, "no google market installed");
@@ -211,7 +212,7 @@ public final class Market {
 			// try amazon market
 			i.setData(Uri.parse(AMAZON_SEARCH + search));
 			// TODO: launch amazon app explicitly?
-			final List<ResolveInfo> l = activity.getPackageManager()
+			final List<ResolveInfo> l = context.getPackageManager()
 					.queryIntentActivities(i, 0);
 			for (ResolveInfo r : l) {
 				if (r.activityInfo.packageName.contains("amazon")) {
@@ -229,7 +230,7 @@ public final class Market {
 		if (!TextUtils.isEmpty(alternativeLink)) {
 			// try alternative link
 			i.setData(Uri.parse(alternativeLink));
-			if (i.resolveActivity(activity.getPackageManager()) != null) {
+			if (i.resolveActivity(context.getPackageManager()) != null) {
 				return i;
 			}
 			Log.e(TAG, "no handler installed: " + alternativeLink);

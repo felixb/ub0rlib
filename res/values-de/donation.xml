@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+	<!--
+		Copyright (C) 2009-2011 Felix Bechstein
+	-->
+	<!--
+		This file is part of ub0rlib. This program is free software; you can
+		redistribute it and/or modify it under the terms of the GNU General
+		Public License as published by the Free Software Foundation; either
+		version 3 of the License, or (at your option) any later version.
+	-->
+	<!--
+		This program is distributed in the hope that it will be useful, but
+		WITHOUT ANY WARRANTY; without even the implied warranty of
+		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+		General Public License for more details. You should have received a
+		copy of the GNU General Public License along with this program; If
+		not, see <http://www.gnu.org/licenses/>.
+	-->
+<resources>
+	<string name="donate_paypal_">Spenden (Paypal)</string>
+	<string name="donate_market_">Spenden (Market)</string>
+	<string name="donate_bitcoin_">Spenden (Bitcoin)</string>
+	<string name="donate_remove_ads_">Spenden/Werbung entfernen</string>
+	<string name="remove_ads_">Werbung entfernen</string>
+	<string name="predonate">Dies ist eine open-source App. Sie ist und bleibt frei. Wenn du die App wirklich magst oder dich die Werbung nervt, kannst du gerne etwas spenden. Ich werde die Werbung so schnell wie möglich entfernen.\n\nSolltest du mehrere Apps von mir einsetzen, reicht eine Spende um überall die Werbung zu entfernen.</string>
+	<string name="postdonate">Um die Werbung zu entfernen musst du den <i>noads</i> Code laden. Er steht erst zur Verfügung, wenn die Spende bei mir eingegangen ist. Bitte sei geduldig und melde dich bei mir, wenn es nach einem Tag immernoch nicht funktioniert hat.</string>
+	<string name="donator_id_">Um die Spende zu überprüfen, wird deine Paypal Id (Mail Adresse) benötigt:</string>
+	<string name="load_hash_">Noads Code laden</string>
+	<string name="sig_loaded">Werbung entfernt!</string>
+	<string name="sig_failed">Fehler beim entfernen der Werbung!</string>
+	<string name="accept_">Bedingungen akzeptieren</string>
+	<string name="accept_missing">Bitte akzeptiere die Bedingungen bevor du die Daten sendest.</string>
+	<string name="terms">Die App sendet deine Spender ID und den MD5-Hash deiner IMEI an den Server (http://ub0r.de/donation/). Diese Daten werden auschließlich dazu benutzt deine Spende zu verifizieren.\nDie Daten werden niemals an Dritte weitergegeben.\n\nWenn dein Telefon wechseln sollte, wird der Code nicht mehr funktionieren. Bitte schreib mir eine Mail, um einen neuen Code zu bekommen.</string>
+	<string name="notify_">Vergessen die Werbung zu deaktivieren?</string>
+	<string name="notify_text">Um die Werbung abzustellen, musst du den <b>noads</b> Code laden. Klicke hier um fortzufahren.</string>
+</resources>
