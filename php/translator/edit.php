@@ -61,7 +61,11 @@ $color_green='style="background:#A0FFA0"';
 $color_red='style="background:#FFA0A0"';
 $color_yellow='style="background:#FFFFA0"';
 
-$username = $_COOKIE['username'];
+if (array_key_exists('username', $_COOKIE)) {
+  $username = $_COOKIE['username'];
+} else {
+  $username = '';
+}
 
 $lang = $_GET['lang'];
 if (empty($lang)) {
@@ -385,7 +389,11 @@ if (!empty($file)) {
       $numlines += strlen($v) / 80;
       $decodedv = decode_string($v);
 
-      $tv = $targetstrings[$k];
+      if (array_key_exists($k, $targetstrings)) {
+        $tv = $targetstrings[$k];
+      } else {
+        $tv = '';
+      }
       $decodedtv = decode_string($tv);
       if (empty($decodedtv)) {
 	$color = $color_red;
