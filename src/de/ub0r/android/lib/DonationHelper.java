@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Felix Bechstein
+ * Copyright (C) 2010-2011 Felix Bechstein
  * 
  * This file is part of ub0rlib.
  * 
@@ -33,19 +33,21 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.content.ActivityNotFoundException;
+import android.app.AlertDialog.Builder;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
+import android.text.ClipboardManager;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;
@@ -67,10 +69,6 @@ public class DonationHelper extends Activity implements OnClickListener {
 	/** Standard buffer size. */
 	public static final int BUFSIZE = 512;
 
-	/** Id of {@link Notification}. */
-	private static final int NOTIFICATION_ID = 123457;
-	/** Preference: donator installed. */
-	static final String PREFS_DONATOR_INSTALLED = "donater_installed";
 	/** Preference: paypal id. */
 	static final String PREFS_DONATEMAIL = "donate_mail";
 	/** Preference: last check. */
@@ -80,20 +78,20 @@ public class DonationHelper extends Activity implements OnClickListener {
 	/** Initial period. */
 	private static final long INIT_PERIOD = 24 * 60 * 60 * 1000; // 1 day
 
+	/** Threshold for chacking donator app license. */
+	private static final double CHECK_DONATOR_LIC = 0.05;
+
 	/** URL for checking hash. */
 	public static final String URL = "http://www.4.ub0r.de/donation/";
 
+	/** Bitcoin address. */
+	private static final String DONATE_BITCOIN = "1LvQe3ARrdKeMrzxkFn1MW3YrvbQKZsq5P";
+
 	/** Donator package. */
 	private static final String DONATOR_PACKAGE = "de.ub0r.android.donator";
-	/** Donator class. */
-	private static final String DONATOR_CLASS = DONATOR_PACKAGE + ".Main";
-	/** Dontor Broadcast. */
-	public static final String DONATOR_BROADCAST = DONATOR_PACKAGE
-			+ ".REGISTERED";
-
-	/** Uri to market:donator. */
-	private static final Uri DONATOR_MARKET = Uri // .
-			.parse("market://details?id=" + DONATOR_PACKAGE);
+	/** Check dontor Broadcast. */
+	private static final String DONATOR_BROADCAST_CHECK = DONATOR_PACKAGE
+			+ ".CHECK";
 
 	/** Crypto algorithm for signing UID hashs. */
 	private static final String ALGO = "RSA";
@@ -183,11 +181,7 @@ public class DonationHelper extends Activity implements OnClickListener {
 			if (this.doRecheck) {
 				long period = p.getLong(PREFS_PERIOD, INIT_PERIOD) * 2;
 				long lastCheck = System.currentTimeMillis();
-				if (this.error) {
-					p.edit().remove(PREFS_LASTCHECK).remove(PREFS_PERIOD)
-							.remove(PREFS_HIDEADS).remove(
-									PREFS_DONATOR_INSTALLED).commit();
-				} else if (!this.error) {
+				if (!this.error) {
 					p.edit().putLong(PREFS_PERIOD, period).putLong(
 							PREFS_LASTCHECK, lastCheck).commit();
 				}
@@ -195,9 +189,6 @@ public class DonationHelper extends Activity implements OnClickListener {
 				if (this.msg != null) {
 					Toast.makeText(this.ctx, this.msg, Toast.LENGTH_LONG)
 							.show();
-				}
-				if (this.error) {
-					p.edit().remove(PREFS_DONATOR_INSTALLED).commit();
 				}
 			}
 			if (this.dh != null) {
@@ -271,6 +262,7 @@ public class DonationHelper extends Activity implements OnClickListener {
 	@Override
 	public final void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		this.setTheme(android.R.style.Theme_Light);
 		this.setContentView(R.layout.donation);
 
 		final Intent marketIntent = Market.getInstallAppIntent(this,
@@ -283,40 +275,12 @@ public class DonationHelper extends Activity implements OnClickListener {
 		}
 
 		this.findViewById(R.id.donate_paypal).setOnClickListener(this);
+		this.findViewById(R.id.donate_bitcoin).setOnClickListener(this);
 		this.findViewById(R.id.send).setOnClickListener(this);
 		this.etPaypalId = (EditText) this.findViewById(R.id.paypalid);
 		final String mail = PreferenceManager.getDefaultSharedPreferences(this)
 				.getString(PREFS_DONATEMAIL, "");
 		this.etPaypalId.setText(mail);
-
-		if (mail == null || mail.length() == 0) {
-			final Intent intent = new Intent(Intent.ACTION_VIEW);
-			intent.setClassName(DONATOR_PACKAGE, DONATOR_CLASS);
-			try {
-				this.startActivityForResult(intent, 0);
-			} catch (ActivityNotFoundException e) {
-				Log.d(TAG, "no donator installed");
-			}
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected final void onActivityResult(final int requestCode,
-			final int resultCode, final Intent data) {
-		if (resultCode == Activity.RESULT_OK && data != null) {
-			final String mail = data.getStringExtra(Intent.EXTRA_EMAIL);
-			if (mail != null && mail.length() > 0) {
-				this.etPaypalId.setText(mail);
-				final SharedPreferences prefs = PreferenceManager
-						.getDefaultSharedPreferences(this);
-				prefs.edit().putBoolean(PREFS_HIDEADS, true).putString(
-						PREFS_DONATEMAIL, mail).commit();
-				this.finish();
-			}
-		}
 	}
 
 	/**
@@ -336,8 +300,11 @@ public class DonationHelper extends Activity implements OnClickListener {
 		case R.id.donate_market:
 			Market.installApp(this, DONATOR_PACKAGE, null);
 			return;
+		case R.id.donate_bitcoin:
+			this.donateBitcoin();
+			return;
 		case R.id.send:
-			if (this.etPaypalId.getText().toString().length() == 0) {
+			if (TextUtils.isEmpty(this.etPaypalId.getText())) {
 				Toast.makeText(this, R.string.donator_id_, Toast.LENGTH_LONG)
 						.show();
 				return;
@@ -354,6 +321,42 @@ public class DonationHelper extends Activity implements OnClickListener {
 		default:
 			return;
 		}
+	}
+
+	/**
+	 * Show donation dialog for bitcoin donation.
+	 */
+	private void donateBitcoin() {
+		final Builder b = new Builder(this);
+		b.setCancelable(true);
+		b.setTitle(R.string.donate_bitcoin_);
+		String s = this.getString(R.string.donate_bitcoin);
+		s += "\n\n" + DONATE_BITCOIN;
+		b.setMessage(s);
+		b.setPositiveButton(android.R.string.ok, null);
+		b.setNeutralButton(R.string.donate_bitcoin_cb,
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(final DialogInterface dialog,
+							final int which) {
+						ClipboardManager cbm = (ClipboardManager) //
+						DonationHelper.this.getSystemService(CLIPBOARD_SERVICE);
+						cbm.setText(DONATE_BITCOIN);
+					}
+				});
+		final Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("bitcoin:"
+				+ DONATE_BITCOIN));
+		if (i.resolveActivity(this.getPackageManager()) != null) {
+			b.setNegativeButton(R.string.donate_bitcoin_send,
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(final DialogInterface dialog,
+								final int which) {
+							DonationHelper.this.startActivity(i);
+						}
+					});
+		}
+		b.show();
 	}
 
 	/**
@@ -424,6 +427,24 @@ public class DonationHelper extends Activity implements OnClickListener {
 	 * @return true if ads should be hidden
 	 */
 	public static boolean hideAds(final Context context) {
+		PackageManager pm = context.getPackageManager();
+		final int match = pm.checkSignatures(context.getPackageName(),
+				DONATOR_PACKAGE);
+		if (match != PackageManager.SIGNATURE_UNKNOWN_PACKAGE) {
+			if (Math.random() < CHECK_DONATOR_LIC) {
+				// verify donator license
+				ComponentName cn = context.startService(new Intent(
+						DONATOR_BROADCAST_CHECK));
+				Log.d(TAG, "Started service: " + cn);
+			}
+			if (match == PackageManager.SIGNATURE_MATCH) {
+				return true;
+			}
+			return false;
+		}
+		pm = null;
+
+		// no donator installed, check donation traditionally
 		final SharedPreferences p = PreferenceManager
 				.getDefaultSharedPreferences(context);
 		final boolean ret = p.getBoolean(PREFS_HIDEADS, false);
@@ -438,23 +459,6 @@ public class DonationHelper extends Activity implements OnClickListener {
 			} else {
 				Log.d(TAG, "next recheck: " + nextCheck);
 			}
-		} else if (!ret && p.getBoolean(PREFS_DONATOR_INSTALLED, false)) {
-			// donator installed but not yet loaded the noads code
-			final CharSequence t = context.getString(R.string.notify_);
-			final Notification n = new Notification(
-					android.R.drawable.stat_sys_warning, t, System
-							.currentTimeMillis());
-			final Intent intent = new Intent(context, DonationHelper.class);
-			n.setLatestEventInfo(context, t, context
-					.getString(R.string.notify_text), PendingIntent
-					.getActivity(context, 0, intent,
-							PendingIntent.FLAG_CANCEL_CURRENT));
-			n.flags |= Notification.FLAG_AUTO_CANCEL;
-
-			final NotificationManager mNotificationMgr = // .
-			(NotificationManager) context
-					.getSystemService(Context.NOTIFICATION_SERVICE);
-			mNotificationMgr.notify(NOTIFICATION_ID, n);
 		}
 		return ret;
 	}
