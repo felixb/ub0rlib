@@ -37,9 +37,11 @@ function encode_string($s) {
 
 
 function get_arg($arg, $args) {
-  $a = $args[$arg];
-  if (!empty($a)) {
-    return ' '.$arg.'="'.htmlspecialchars($a).'"';
+  if (is_array($args) && array_key_exists($arg, $args)) {
+    $a = $args[$arg];
+    if (!empty($a)) {
+      return ' '.$arg.'="'.htmlspecialchars($a).'"';
+    }
   }
   return '';
 }
@@ -87,7 +89,9 @@ while (false !== ($entry = $d->read())) {
 }
 $d->close();
 
-$hidegreen = $_GET['hidegreen'];
+if (array_key_exists('hidegreen', $_GET)) {
+  $hidegreen = $_GET['hidegreen'];
+}
 if (empty($hidegreen) || $hidegreen != '1') {
   $hidegreen = 0;
 } else {
@@ -115,9 +119,12 @@ Set username or select an other language on the <b><a href="./">index page</a></
 <p>
 <?
 
-$file = $_GET['file'];
-if (empty($file)) {
+if (array_key_exists('file', $_GET)) {
+  $file = $_GET['file'];
+} else if (array_key_exists('file', $_POST)) {
   $file = $_POST['file'];
+} else {
+  $file = '';
 }
 
 foreach ($files as $f) {
@@ -165,7 +172,10 @@ if (!empty($file)) {
 
     //echo '<!-- processing line: '.$line." -->\n";
     $tmp = split('name="', $line);
-    list($linename, $tmp) = split('"', $tmp[1], 2);
+    if (array_key_exists(1, $tmp)) {
+      $tmp = split('"', $tmp[1], 2);
+      $linename = $tmp[0];
+    }
 
     if (false !== strpos($line, '<string-array')) {
       //echo '<!-- new array: '.$linename." -->\n";
@@ -220,13 +230,22 @@ if (!empty($file)) {
 
     // echo '<!-- processing line: '.$line." -->\n";
     $tmp = split('name="', $line);
-    list($linename, $tmp) = split('"', $tmp[1], 2);
+    if (array_key_exists(1, $tmp)) {
+      list($linename, $tmp) = split('"', $tmp[1], 2);
+    } else {
+      echo '<!-- skip (1) processing line: '.$line." -->\n";
+    }
 
     if (!empty($linename)) {
       foreach ($defargs as $arg) {
 	$tmp = split($arg.'="', $line);
-	list($argval, $tmp) = split('"', $tmp[1], 2);
-	$targetargs[$linename][$arg] = htmlspecialchars_decode($argval);
+        if (array_key_exists(1, $tmp)) {
+	  list($argval, $tmp) = split('"', $tmp[1], 2);
+	  $targetargs[$linename][$arg] = htmlspecialchars_decode($argval);
+        } else {
+          echo '<!-- skip (2) processing line: '.$line." -->\n";
+          echo '<!-- skip (2) processing arg: '.$arg." -->\n";
+        }
       }
     }
 
@@ -249,13 +268,18 @@ if (!empty($file)) {
     }
     
     $tmp = split('>', $line, 2);
-    list($linevalue, $tmp) = split('</string>', $tmp[1], 2);
-    $targetstrings[$linename] = $linevalue;
+    if (array_key_exists(1, $tmp)) {
+      $tmp = split('</string>', $tmp[1], 2);
+      $targetstrings[$linename] = $tmp[0];
+    } else {
+      echo '<!-- skip (3) processing line: '.$line." -->\n";
+    }
   }
 
   // process new strings
-  $action = $_POST['action'];
-  if (empty($action)) {
+  if (array_key_exists('action', $_POST)) {
+    $action = $_POST['action'];
+  } else if (array_key_exists('action', $_GET)) {
     $action = $_GET['action'];
   }
   if (!empty($action)) {
@@ -316,13 +340,21 @@ if (!empty($file)) {
     $xml = $xml.'<resources>'."\n";
     foreach ($sourcestrings as $k => $v) {
       if (!is_array($v)) {
-	if(!empty($targetstrings[$k])) {
-	  $xml = $xml.'  <string name="'.$k.'" formatted="false"'.get_args($defargs, $targetargs[$k]).'>'.encode_string($targetstrings[$k]).'</string>'."\n";
+	if(array_key_exists($k, $targetstrings) && !empty($targetstrings[$k])) {
+	  $xml = $xml.'  <string name="'.$k.'" formatted="false"';
+          if (array_key_exists($k, $targetargs)) {
+            $xml = $xml.get_args($defargs, $targetargs[$k]);
+          }
+          $xml = $xml.'>'.encode_string($targetstrings[$k]).'</string>'."\n";
 	}
       } else {
 	$empty = true;
 	$xmlsnip = '';
-	$xmlsnip = $xmlsnip.'  <string-array name="'.$k.'"'.get_args($defargs, $targetargs[$k]).'>'."\n";
+	$xmlsnip = $xmlsnip.'  <string-array name="'.$k.'"';
+        if (array_key_exists($k, $targetargs)) {
+          $xmlsnip = $xmlsnip.get_args($defargs, $targetargs[$k]);
+        }
+        $xmlsnip = $xmlsnip.'>'."\n";
 	$tv = $targetstrings[$k];
 	$i = 0;
 	foreach ($tv as $tvv) {
