@@ -21,7 +21,7 @@
                Visit http://ub0r.de/translate/ub0rlib/edit.php?lang=de&file=strings.xml to edit the file.
        -->
 <resources>
-  <string name="author_" formatted="false">Autor:</string>
+  <string name="author_" formatted="false" username="flx &lt;f+translator@ub0r.de&gt;" orig="Author:">Autor:</string>
   <string name="version_" formatted="false">Version:</string>
   <string name="license_" formatted="false">Lizenz:</string>
   <string name="license" formatted="false">GPLv3 - siehe http://www.gnu.org/licenses/gpl-3.0.txt</string>

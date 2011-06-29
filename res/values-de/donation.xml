@@ -21,7 +21,7 @@
                Visit http://ub0r.de/translate/ub0rlib/edit.php?lang=de&file=donation.xml to edit the file.
        -->
 <resources>
-  <string name="donate_paypal_" formatted="false">Spenden (Paypal)</string>
+  <string name="donate_paypal_" formatted="false" username="flx &lt;f+translator@ub0r.de&gt;" orig="Donate (Paypal)">Spenden (Paypal)</string>
   <string name="donate_market_" formatted="false">Spenden (Market)</string>
   <string name="donate_bitcoin_" formatted="false">Spenden (Bitcoin)</string>
   <string name="donate_bitcoin" formatted="false" username="flx &lt;f+translator@ub0r.de&gt;" orig="Just send some BTC to the address below and drop me a mail to notify me.">Sende einfach ein paar BTC an die unten stehende Adresse und gib mir per Mail Bescheid.</string>
