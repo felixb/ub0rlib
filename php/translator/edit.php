@@ -35,33 +35,80 @@ function encode_string($s) {
   return $ret;
 }
 
-
-function get_arg($arg, $args) {
-  if (is_array($args) && array_key_exists($arg, $args)) {
-    $a = $args[$arg];
-    if (!empty($a)) {
-      return ' '.$arg.'="'.htmlspecialchars($a).'"';
-    }
-  }
-  return '';
-}
-
-function get_args($argnames, $args) {
-  $ret = '';
-  foreach ($argnames as $arg) {
-    $ret = $ret.get_arg($arg, $args);
-  }
+function clean_username($un) {
+  $ret = $un;
+  $ret = str_replace("'", '', $ret);
+  $ret = str_replace('"', '', $ret);
   return $ret;
 }
 
-$defargs = array();
-$defargs[] = 'username';
-$defargs[] = 'orig';
+function sxmle_setarg($sxmle, $arg, $value) { 
+  if (!empty($sxmle[$arg])) {
+    $sxmle[$arg] = $value;
+  } else {
+    $sxmle->addAttribute($arg, $value);
+  }
+}
+
+function sxmle_rmarg($sxmle, $arg) {
+  if (!empty($sxmle[$arg])) {
+    $sxmle[$arg] = NULL;
+  }
+}
+
+function sxmle_readxml($location, $filename) {
+  $xml = file_get_contents($location.$filename);
+  $elems = 'b,i,u,big,small,sub,sup,strike';
+  foreach (explode(',', $elems) as $e) {
+    $xml = str_ireplace('<'.$e.'>', '&lt;'.$e.'&gt;', $xml);
+    $xml = str_ireplace('</'.$e.'>', '&lt;/'.$e.'&gt;', $xml);
+  }
+  return new SimpleXMLElement($xml);
+}
+
+function sxmle_writexml($sxmle, $location, $lang, $file) {
+  $xml = $sxmle->asXML();
+  $xml = preg_replace('/Visit http.*to edit the file./', 'Visit http://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'].'?lang='.$lang.'&file='.$file.' to edit the file.', $xml);
+  $xml = preg_replace('/\>\<string/', '>'."\n".'<string', $xml);
+  $xml = preg_replace('/\>\<item/', '>'."\n".'<item', $xml);
+  $xml = preg_replace('/.*\<string/', '  <string', $xml);
+  $xml = preg_replace('/.*\<item/', '    <item', $xml);
+  $xml = preg_replace('/\>\<\/string/', '>'."\n".'  </string', $xml);
+  $xml = preg_replace('/\>\<\/resources/', '>'."\n".'</resources', $xml);
+  $xml = preg_replace('/ notranslation=""/', '', $xml);
+  $xml = preg_replace('/.*\<item\/\>/', '', $xml);
+  $xml = preg_replace('/.*\<item\>\<\/item\>/', '', $xml);
+
+  $nxml = '';
+  foreach (explode("\n", $xml) as $line) {
+    if (empty($line)) {
+      continue;
+    }
+    $parts = explode('>', $line, 2);
+    if (count($parts) > 1) {
+      $elems = 'b,i,u,big,small,sub,sup,strike';
+      foreach (explode(',', $elems) as $e) {
+	$parts[1] = str_ireplace('&lt;'.$e.'&gt;', '<'.$e.'>', $parts[1]);
+	$parts[1] = str_ireplace('&lt;/'.$e.'&gt;', '</'.$e.'>', $parts[1]);
+      }
+    }
+    $line = implode('>', $parts);
+    $nxml = $nxml . $line . "\n";
+  }
+  $xml = $nxml;
+  file_put_contents($location.'res/values-'.$lang.'/'.$file, $xml);
+}
+
 $color_green='style="background:#A0FFA0"';
 $color_red='style="background:#FFA0A0"';
 $color_yellow='style="background:#FFFFA0"';
 
-$username = $_COOKIE['username'];
+if (array_key_exists('username', $_COOKIE)) {
+  $username = $_COOKIE['username'];
+} else {
+  $username = '';
+}
+$username = clean_username($username);
 
 $lang = $_GET['lang'];
 if (empty($lang)) {
@@ -157,124 +204,8 @@ if (!empty($file)) {
   echo "<hr/>\n";
   
   // load source strings
-  $sourcexml = file_get_contents($location.'res/values/'.$file);
-  $targetxml = file_get_contents($location.'res/values-'.$lang.'/'.$file);
-  $sourcelines = split("\n", $sourcexml);
-  $sourcestrings = array();
-  $arrayname = '';
-  $arrayvalue = array();
-  foreach ($sourcelines as $line) {
-    if (false === strpos($line, '<string') and 
-	false === strpos($line, '</string-array>') and 
-	false === strpos($line, '<item>')) {
-      continue;
-    }
-
-    //echo '<!-- processing line: '.$line." -->\n";
-    $tmp = split('name="', $line);
-    if (array_key_exists(1, $tmp)) {
-      $tmp = split('"', $tmp[1], 2);
-      $linename = $tmp[0];
-    }
-
-    if (false !== strpos($line, '<string-array')) {
-      //echo '<!-- new array: '.$linename." -->\n";
-      $arrayname = $linename;
-      $arrayvalue = array();
-      continue;
-    }
-
-    if (false !== strpos($line, '</string-array>')) {
-      //echo '<!-- close array: '.$arrayname." -->\n";
-      $sourcestrings[$arrayname] = $arrayvalue;
-      $arrayname = '';
-      //echo '<!--';
-      //print_r($arrayvalue);
-      //echo '-->';
-      continue;
-    }
-
-
-    if (!empty($arrayname)) {
-      $tmp = split('<item>', $line, 2);
-      list($linevalue, $tmp) = split('</item>', $tmp[1], 2);
-      $arrayvalue[] = $linevalue;
-      continue;
-    }
-    
-    $tmp = split('>', $line, 2);
-    list($linevalue, $tmp) = split('</string>', $tmp[1], 2);
-    $sourcestrings[$linename] = $linevalue;
-  }
-
-  // load target strings
-  $targetlines = split("\n", $targetxml);
-  $targetstrings = array();
-  $targetargs = array();
-  foreach ($targetlines as $line) {
-    if (false === strpos($line, '<string') and 
-	false === strpos($line, '</string-array>') and 
-	false === strpos($line, '<item')) {
-      continue;
-    }
-
-    if (false !== strpos($line, '</string-array>')) {
-      //echo '<!-- close array: '.$arrayname." -->\n";
-      $targetstrings[$arrayname] = $arrayvalue;
-      $arrayname = '';
-      //echo '<!--';
-      //print_r($arrayvalue);
-      //echo '-->';
-      continue;
-    }
-
-    // echo '<!-- processing line: '.$line." -->\n";
-    $tmp = split('name="', $line);
-    if (array_key_exists(1, $tmp)) {
-      list($linename, $tmp) = split('"', $tmp[1], 2);
-    } else {
-      echo '<!-- skip (1) processing line: '.$line." -->\n";
-    }
-
-    if (!empty($linename)) {
-      foreach ($defargs as $arg) {
-	$tmp = split($arg.'="', $line);
-        if (array_key_exists(1, $tmp)) {
-	  list($argval, $tmp) = split('"', $tmp[1], 2);
-	  $targetargs[$linename][$arg] = htmlspecialchars_decode($argval);
-        } else {
-          echo '<!-- skip (2) processing line: '.$line." -->\n";
-          echo '<!-- skip (2) processing arg: '.$arg." -->\n";
-        }
-      }
-    }
-
-    if (false !== strpos($line, '<string-array')) {
-      //echo '<!-- new array: '.$linename." -->\n";
-      $arrayname = $linename;
-      $arrayvalue = array();
-      continue;
-    }
-
-
-    if (!empty($arrayname)) {
-      $tmp = split('<item>', $line, 2);
-      if (count($tmp) < 2) {
-        $arrayvalue[] = '';
-      } else {
-        list($linevalue, $tmp) = split('</item>', $tmp[1], 2);
-        $arrayvalue[] = $linevalue;
-      }
-    }
-    
-    $tmp = split('>', $line, 2);
-    if (array_key_exists(1, $tmp)) {
-      $tmp = split('</string>', $tmp[1], 2);
-      $targetstrings[$linename] = $tmp[0];
-    } else {
-      echo '<!-- skip (3) processing line: '.$line." -->\n";
-    }
-  }
+  $sxml = sxmle_readxml($location, 'res/values/'.$file);
+  $txml = sxmle_readxml($location,  'res/values-'.$lang.'/'.$file);
 
   // process new strings
   if (array_key_exists('action', $_POST)) {
@@ -288,12 +219,26 @@ if (!empty($file)) {
 	if ($k == 'action' or $k == 'lang' or $k == 'file') {
 	  continue;
 	}
-	$spos = strpos($sourcestrings[$k], 'http:');
+	$strings = $sxml->xpath('//string[@name="' . $k . '"]');
+	$tstrings = $txml->xpath('//string[@name="' . $k . '"]');
+	if (is_array($strings) && array_key_exists(0, $strings)) {
+	  $string = $strings[0];
+	} else {
+	  continue;
+	}
+	$spos = strpos($string, 'http:');
 	$tpos = strpos($v, 'http:');
 	if (($spos === false && $tpos === false) || $spos !== false) {
-		$targetstrings[$k] = $v;
-		$targetargs[$k]['username'] = $username;
-		$targetargs[$k]['orig'] = $sourcestrings[$k];
+	  if (is_array($tstrings) && array_key_exists(0, $tstrings)) {
+	    $tstring = $tstrings[0];
+	    $tstring[0] = (string) $v;
+	  } else {
+	    $tstring = $txml->addChild('string', $v);
+	    $tstring->addAttribute('name', $k);
+	    $tstring->addAttribute('formatted', 'false');
+	  }
+	  sxmle_setarg($tstring, 'username', $username);
+	  sxmle_setarg($tstring, 'orig', (string) $string);
 	}
       }
     } else if ($action == 'edit-string-array') {
@@ -306,131 +251,157 @@ if (!empty($file)) {
 	list($arrayname, $i) = split(',', $k);
 	$arrayvalue[$i] = $v;
       }
+      $add = true;
       if (!empty($arrayname)) {
-	$targetstrings[$arrayname] = $arrayvalue;
-	$targetargs[$arrayname]['username'] = $username;
+	$k = $arrayname;
+	$strings = $sxml->xpath('//string-array[@name="' . $k . '"]');
+	$tstrings = $txml->xpath('//string-array[@name="' . $k . '"]');
+	if (is_array($strings) && array_key_exists(0, $strings)) {
+	  $string = $strings[0];
+	} else {
+	  $add = false;
+	}
+	$i = 0;
+	foreach ($string->item as $item) {
+	  $spos = strpos($item, 'http:');
+	  if (array_key_exists($i, $arrayvalue)) {
+	    $tpos = strpos($arrayvalue[$i], 'http:');
+	  } else {
+	    $tpos = false;
+	  }
+	  if ($spos === false && $tpos !== false) {
+	    $add = false;
+	    break;
+	  }
+	  $i++;
+	}
+      }
+      if ($add === true) {
+	if (is_array($tstrings) && array_key_exists(0, $tstrings)) {
+	  $tstring = $tstrings[0];
+	} else {
+	  $tstring = $txml->addChild('string-array');
+	  $tstring->addAttribute('name', $k);	
+	}
+	if (!empty($tstring['username'])) {
+	  $tstring['username'] = $username;
+	} else {
+	  $tstring->addAttribute('username', $username);
+	}
+	for ($i = 0; $i<count($arrayvalue); $i++) {
+	  if (!empty($tstring->item[$i])) {
+	    if (!empty($arrayvalue[$i])) {
+	      $tstring->item[$i] = $arrayvalue[$i];
+	      sxmle_rmarg($tstring->item[$i], 'notranslation');
+	    } else {
+	      $tstring->item[$i] = $string->item[$i];
+	      sxmle_setarg($tstring->item[$i], 'notranslation', 'true');
+	    }
+	  } else {
+	    if (!empty($arrayvalue[$i])) {
+	      $tstring->addChild('item', $arrayvalue[$i]);
+	      sxmle_rmarg($tstring->item[$i], 'notranslation');
+	    } else {
+	      $tstring->addChild('item', $string->item[$i]);
+	      sxmle_setarg($tstring->item[$i], 'notranslation', 'true');
+	    }
+	  }
+	}
+      }
+    }
+
+    // clean xml
+    foreach ($txml->string as $string) {
+      if (!empty($string['username'])) {
+	$string['username'] = clean_username($string['username']);
+      }
+    }
+    foreach ($txml->{'string-array'} as $string) {
+      if (!empty($string['username'])) {
+	$string['username'] = clean_username($string['username']);
       }
     }
 
     // write xml
-    $xml = '<?xml version="1.0" encoding="utf-8"?>
-       <!--
-               Copyright (C) 2009-2011 Felix Bechstein
-       -->
-       <!--
-               This file is part of '.$appname.'. This program is free software; you can
-               redistribute it and/or modify it under the terms of the GNU General
-               Public License as published by the Free Software Foundation; either
-               version 3 of the License, or (at your option) any later version.
-       -->
-       <!--
-               This program is distributed in the hope that it will be useful, but
-               WITHOUT ANY WARRANTY; without even the implied warranty of
-               MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-               General Public License for more details. You should have received a
-               copy of the GNU General Public License along with this program; If
-               not, see <http://www.gnu.org/licenses/>.
-       -->
-      <!--
-               This file is generated automatically by ub0rlib/php.
-               Visit http://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'].'?lang='.$lang.'&file='.$file.' to edit the file.
-       -->
-';
-
-    $xml = $xml.'<resources>'."\n";
-    foreach ($sourcestrings as $k => $v) {
-      if (!is_array($v)) {
-	if(array_key_exists($k, $targetstrings) && !empty($targetstrings[$k])) {
-	  $xml = $xml.'  <string name="'.$k.'" formatted="false"';
-          if (array_key_exists($k, $targetargs)) {
-            $xml = $xml.get_args($defargs, $targetargs[$k]);
-          }
-          $xml = $xml.'>'.encode_string($targetstrings[$k]).'</string>'."\n";
-	}
-      } else {
-	$empty = true;
-	$xmlsnip = '';
-	$xmlsnip = $xmlsnip.'  <string-array name="'.$k.'"';
-        if (array_key_exists($k, $targetargs)) {
-          $xmlsnip = $xmlsnip.get_args($defargs, $targetargs[$k]);
-        }
-        $xmlsnip = $xmlsnip.'>'."\n";
-	$tv = $targetstrings[$k];
-	$i = 0;
-	foreach ($tv as $tvv) {
-	  if (!empty($tvv)) {
-	    $empty = false;
-	    $xmlsnip = $xmlsnip.'    <item>'.encode_string($tvv).'</item>'."\n";
-	  } else {
-            $tvv = $sourcestrings[$k][$i];
-	    $xmlsnip = $xmlsnip.'    <item notranslation="true">'.encode_string($tvv).'</item>'."\n";
-	  }
-	  $i++;
-	}
-	$xmlsnip = $xmlsnip.'  </string-array>'."\n";
-	if (!$empty) {
-	  $xml = $xml.$xmlsnip;
-	}
-      }
-    }
-    $xml = $xml.'</resources>'."\n";
-    file_put_contents($location.'res/values-'.$lang.'/'.$file, $xml);
+    sxmle_writexml($txml, $location, $lang, $file);
   }
 
   $alltext = '';
   // show forms
-  foreach ($sourcestrings as $k => $v) {
-    if (!is_array($v)) {
-      $numlines = count(split('\\\n', $v));
-      $numlines += strlen($v) / 80;
-      $decodedv = decode_string($v);
+  foreach ($sxml->string as $string) {
+    $k = $string['name'];
+    $v = (string) $string;
 
-      $tv = $targetstrings[$k];
+    $numlines = count(split('\\\n', $v));
+    $numlines += strlen($v) / 80;
+    $decodedv = decode_string($v);
+
+    $tstrings = $txml->xpath('//string[@name="' . $k . '"]');
+    if (is_array($tstrings) && array_key_exists(0, $tstrings)) {
+      $tstring = $tstrings[0];
+      $tv =  $tstring;
       $decodedtv = decode_string($tv);
       if (empty($decodedtv)) {
 	$color = $color_red;
-        $alltext = $alltext . "\n\n" . $decodedv;
-      } else if (!empty($targetargs[$k]['orig']) and $v != $targetargs[$k]['orig']) {
+	$alltext = $alltext . "\n\n" . $decodedv;
+      } else if (!empty($tstring['orig']) && $v != $tstring['orig']) {
 	$color = $color_yellow;
-        $alltext = $alltext . "\n\n" . $decodedtv;
+	$alltext = $alltext . "\n\n" . $decodedtv;
       } else {
 	$color = $color_green;
-        $alltext = $alltext . "\n\n" . $decodedtv;
+	$alltext = $alltext . "\n\n" . $decodedtv;
       }
-      if ($hidegreen and $color == $color_green) {
+      if ($hidegreen && $color == $color_green) {
 	continue;
       }
-
-      $form = '';
-      $form = $form.'<form method="post" action="edit.php?lang='.$lang.'&amp;file='.$file.'&amp;hidegreen='.$hidegreen.'#'.$k.'" id="'.$k.'">'."\n";
-      $form = $form.'<p>';
-      $form = $form.'  String name: <b>'.$k."</b><br/>\n";
-      if (!empty($username) and !empty($targetargs[$k]['username'])) {
-	$form = $form.'  translator: <input type="text" disabled="disabled" value="'.$targetargs[$k]['username'].'" size="50" />'."<br/>\n";
-      }
-      $form = $form.'  <input name="action" value="edit-string" type="hidden" />'."\n";
-      $form = $form.'  en: <textarea disabled="disabled" cols="80" rows="'.$numlines.'">'.$decodedv.'</textarea>'."<br/>\n";
-      $form = $form.'  '.$lang.': <textarea name="'.$k.'" cols="80" rows="'.$numlines.'" '.$color.'>'.$decodedtv.'</textarea>'."<br/>\n";
-      $form = $form.'  <input type="submit" />'."<br/>\n";
-      $form = $form.'</p>';
-      $form = $form.'</form>'."\n";
-      $form = $form."<hr/>\n";
-      echo $form;
     } else {
-      $formcolor = $color_green;
-      $form = '';
-      $form = $form.'<form method="post" action="edit.php?lang='.$lang.'&amp;file='.$file.'&amp;hidegreen='.$hidegreen.'#'.$k.'" id="'.$k.'">'."\n";
-      $form = $form.'  String name: <b>'.$k."</b><br/>\n";
-      if (!empty($username) and !empty($targetargs[$k]['username'])) {
-	$form = $form.'  translator: <input type="text" disabled="disabled" value="'.$targetargs[$k]['username'].'" size="50" />'."<br/>\n";
-      }
-      $form = $form.'  <input name="action" value="edit-string-array" type="hidden" />'."\n";
-      $form = $form.'  <table>';
-      $i = 0;
-      foreach ($v as $av) {
-	$tv = $targetstrings[$k];
-	if (is_array($tv) and count($tv) > $i) {
-	  $atv = $tv[$i];
+      $tv = '';
+      $decodedtv = decode_string($tv);
+      $color = $color_red;
+    }
+
+    $form = '';
+    $form = $form.'<form method="post" action="edit.php?lang='.$lang.'&amp;file='.$file.'&amp;hidegreen='.$hidegreen.'#'.$k.'" id="'.$k.'">'."\n";
+    $form = $form.'<p>';
+    $form = $form.'  String name: <b>'.$k."</b><br/>\n";
+    if (!empty($username) && !empty($tstring['username'])) {
+      $form = $form.'  translator: <input type="text" disabled="disabled" value="'.clean_username($tstring['username']).'" size="50" />'."<br/>\n";
+    }
+    $form = $form.'  <input name="action" value="edit-string" type="hidden" />'."\n";
+    $form = $form.'  en: <textarea disabled="disabled" cols="80" rows="'.$numlines.'">'.$decodedv.'</textarea>'."<br/>\n";
+    $form = $form.'  '.$lang.': <textarea name="'.$k.'" cols="80" rows="'.$numlines.'" '.$color.'>'.$decodedtv.'</textarea>'."<br/>\n";
+    $form = $form.'  <input type="submit" />'."<br/>\n";
+    $form = $form.'</p>';
+    $form = $form.'</form>'."\n";
+    $form = $form."<hr/>\n";
+    echo $form;
+  }
+
+  // show array forms
+  foreach ($sxml->{'string-array'} as $stringarray) {
+    $k = $stringarray['name'];
+    $tstringarrays = $txml->xpath('//string-array[@name="' . $k . '"]');
+    if (is_array($tstringarrays) && array_key_exists(0, $tstringarrays)) {
+      $tstringarray = $tstringarrays[0];
+    } else {
+      $tstringarray = array(); // FIXME
+    }
+    
+    $formcolor = $color_green;
+    $form = '';
+    $form = $form.'<form method="post" action="edit.php?lang='.$lang.'&amp;file='.$file.'&amp;hidegreen='.$hidegreen.'#'.$k.'" id="'.$k.'">'."\n";
+    $form = $form.'  String name: <b>'.$k."</b><br/>\n";
+    if (!empty($username) && !empty($tstringarray['username'])) {
+      $form = $form.'  translator: <input type="text" disabled="disabled" value="'.clean_username($tstringarray['username']).'" size="50" />'."<br/>\n";
+    }
+    $form = $form.'  <input name="action" value="edit-string-array" type="hidden" />'."\n";
+    $form = $form.'  <table>';
+    $i = 0;
+    foreach ($stringarray->item as $item) {
+	$av = (string) $item;
+	$tv = (string) $tstringarray;
+	if (count($tstringarray) > $i && empty($tstringarray->item[$i]['notranslation'])) {
+	  $atv = (string) $tstringarray->item[$i];
 	} else {
 	  $atv = '';
 	}
@@ -471,9 +442,8 @@ if (!empty($file)) {
 	continue;
       }
       echo $form;
-    }
   }
-
+  
   // show $alltext if $file==market.xml
   if ($file == 'market.xml') {
     $numlines = count(split("\n", $alltext));
