@@ -45,6 +45,21 @@ public final class Utils {
 	/** Tag for output. */
 	private static final String TAG = "utls";
 
+	/** 100. */
+	public static final int N_100 = 100;
+	/** 1000. */
+	public static final int N_1000 = 1000;
+	/** One hour in minutes. */
+	public static final int HOUR_IN_MINUTES = 60;
+	/** One hour in seconds. */
+	public static final int HOUR_IN_SECONDS = 60 * 60;
+	/** One hour in milliseconds. */
+	public static final int HOUR_IN_MILLIS = 60 * 60 * 1000;
+	/** One minutes in seconds. */
+	public static final int MINUTES_IN_SECONDS = 60;
+	/** One minutes in milliseconds. */
+	public static final int MINUTES_IN_MILLIS = 60 * 1000;
+
 	/** k aka 1024. */
 	public static final int K = 1024;
 	/** M aka 1024 * 1024. */

@@ -43,6 +43,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
@@ -374,6 +375,9 @@ public class DonationHelper extends Activity implements OnClickListener {
 			final String did = mTelephonyMgr.getDeviceId();
 			if (did != null) {
 				imeiHash = Utils.md5(did);
+			} else {
+				imeiHash = Utils.md5(Build.BOARD + Build.BRAND + Build.PRODUCT
+						+ Build.DEVICE);
 			}
 		}
 		return imeiHash;
