@@ -18,10 +18,7 @@
        -->
       <!--
                This file is generated automatically by ub0rlib/php.
-               Visit http://ub0r.de/translate/ub0rlib/edit.php?lang=de&file=donator.xml to edit the file.
+               Visit http://ub0r.de/translate/ub0rlib/edit.php?lang=de&file=donation.xml to edit the file.
        -->
 <resources>
-  <string name="donator_postdonate" formatted="false" username="flx &lt;f+translator@ub0r.de&gt;" orig="Thank you very much for your donation.\n\nTo remove ads in all my apps, you just need to let this tiny app installed on your phone. Install it on any number of your devices to remove ads on them too.\nRemoving the donator app, will bring back ads again.">Vielen herzlichen Dank für deine Spende.\n\nUm die Werbung in allen meinen Apps auszublenden, musst du nur diese App installiert lassen. Du kannst sie auf einer beliebingen Anzahl deiner Geräte installieren.\nWenn du die App wieder deinstallierst, wird die Werbung wieder angezeigt.</string>
-  <string name="donator_license_fail_" formatted="false">Failed checking license!</string>
-  <string name="donator_license_fail" formatted="false">Please load a licensed copy of this donator app.</string>
 </resources>
