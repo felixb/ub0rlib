@@ -35,6 +35,13 @@ function encode_string($s) {
   return $ret;
 }
 
+function clean_nl($s) {
+  $ret = $s;
+  $ret = str_replace("\r\n", '\n', $ret);
+  $ret = str_replace("\n", '\n', $ret);
+  return $ret;
+}
+
 function clean_username($un) {
   $ret = $un;
   $ret = str_replace("'", '', $ret);
@@ -226,6 +233,8 @@ if (!empty($file)) {
 	} else {
 	  continue;
 	}
+	echo '<!-- ' . $v . ' -->';
+	$v = clean_nl($v);
 	$spos = strpos($string, 'http:');
 	$tpos = strpos($v, 'http:');
 	if (($spos === false && $tpos === false) || $spos !== false) {
