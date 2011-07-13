@@ -118,7 +118,7 @@ if (empty($lang)) {
 $files = array();
 $d = dir($location.'res/values/');
 while (false !== ($entry = $d->read())) {
-  if ($entry == '.' or $entry == '..' or $entry == 'base.xml' or $entry == 'attrs.xml' or $entry == 'update.xml' or $entry == 'cwac_touchlist_attrs.xml') {
+  if ($entry == '.' or $entry == '..' or $entry == 'base.xml' or $entry == 'attrs.xml' or $entry == 'update.xml' or $entry == 'cwac_touchlist_attrs.xml' or $entry == 'dimen.xml') {
     continue;
   }
   $files[] = $entry;
