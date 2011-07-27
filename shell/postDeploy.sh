@@ -12,7 +12,7 @@ function add_logs {
 	sed -e 's:GOOGLE_SKIP = true:GOOGLE_SKIP = false:' -i $f
 }
 
-for lib in $PWD $(grep android.library.reference default.properties | cut -d= -f2) ; do
+for lib in $PWD $(grep android.library.reference default.properties | grep -Fv ActionBarSherlock | cut -d= -f2) ; do
 	add_logs $lib
 done
 
