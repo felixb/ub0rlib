@@ -10,6 +10,7 @@ $langnames = array(
   'el' => 'Greek',
   'es' => 'Spanish',
   'fr' => 'French',
+  'hr' => 'Croatian',
   'hu' => 'Hungarian',
   'it' => 'Italian',
   'iw' => 'Hebrew',
