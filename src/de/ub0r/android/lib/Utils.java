@@ -34,6 +34,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.widget.Toast;
@@ -64,6 +65,9 @@ public final class Utils {
 	public static final int K = 1024;
 	/** M aka 1024 * 1024. */
 	public static final int M = K * K;
+
+	/** Android API version. */
+	private static int apiVersion = -1;
 
 	/**
 	 * Default Constructor.
@@ -237,6 +241,31 @@ public final class Utils {
 		}
 		in.close();
 		out.close();
+	}
 
+	/**
+	 * Get Android's API version.
+	 * 
+	 * @return API version
+	 */
+	public static int getApiVersion() {
+		if (apiVersion < 0) {
+			apiVersion = Integer.parseInt(Build.VERSION.SDK);
+		}
+		return apiVersion;
+	}
+
+	/**
+	 * Is API supported?
+	 * 
+	 * @param api
+	 *            Android's API version
+	 * @return true, if api <= current API version
+	 */
+	public static boolean isApi(final int api) {
+		if (apiVersion < 0) {
+			apiVersion = Integer.parseInt(Build.VERSION.SDK);
+		}
+		return apiVersion >= api;
 	}
 }
