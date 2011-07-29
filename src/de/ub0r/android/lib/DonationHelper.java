@@ -49,6 +49,7 @@ import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.text.ClipboardManager;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;
@@ -86,7 +87,8 @@ public class DonationHelper extends Activity implements OnClickListener {
 	public static final String URL = "http://www.4.ub0r.de/donation/";
 
 	/** Bitcoin address. */
-	private static final String DONATE_BITCOIN = "1LvQe3ARrdKeMrzxkFn1MW3YrvbQKZsq5P";
+	private static final String DONATE_BITCOIN = // .
+	"1LvQe3ARrdKeMrzxkFn1MW3YrvbQKZsq5P";
 
 	/** Donator package. */
 	private static final String DONATOR_PACKAGE = "de.ub0r.android.donator";
@@ -262,8 +264,10 @@ public class DonationHelper extends Activity implements OnClickListener {
 	 */
 	@Override
 	public final void onCreate(final Bundle savedInstanceState) {
+		if (Utils.isApi(Build.VERSION_CODES.HONEYCOMB)) {
+			this.setTheme(android.R.style.Theme_Holo_Light);
+		}
 		super.onCreate(savedInstanceState);
-		this.setTheme(android.R.style.Theme_Light);
 		this.setContentView(R.layout.donation);
 
 		final Intent marketIntent = Market.getInstallAppIntent(this,
@@ -271,7 +275,7 @@ public class DonationHelper extends Activity implements OnClickListener {
 		if (marketIntent != null
 				&& marketIntent.getDataString().startsWith("market://")) {
 			this.findViewById(R.id.donate_market).setOnClickListener(this);
-		} else { // TODO: add android market here + change title
+		} else {
 			this.findViewById(R.id.donate_market).setVisibility(View.GONE);
 		}
 
@@ -325,6 +329,20 @@ public class DonationHelper extends Activity implements OnClickListener {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final boolean onOptionsItemSelected(final MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			this.finish();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+
+	/**
 	 * Show donation dialog for bitcoin donation.
 	 */
 	private void donateBitcoin() {
@@ -337,6 +355,7 @@ public class DonationHelper extends Activity implements OnClickListener {
 		b.setPositiveButton(android.R.string.ok, null);
 		b.setNeutralButton(R.string.donate_bitcoin_cb,
 				new DialogInterface.OnClickListener() {
+					@SuppressWarnings("deprecation")
 					@Override
 					public void onClick(final DialogInterface dialog,
 							final int which) {
