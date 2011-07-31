@@ -18,6 +18,7 @@
  */
 package de.ub0r.android.lib;
 
+import android.app.Activity;
 import android.content.Context;
 import android.preference.Preference;
 
@@ -42,4 +43,11 @@ public interface IPreferenceContainer {
 	 * @return {@link Context}
 	 */
 	Context getContext();
+
+	/**
+	 * Get {@link Activity}.
+	 * 
+	 * @return {@link Activity}
+	 */
+	Activity getActivity();
 }
