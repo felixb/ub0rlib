@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2010 Felix Bechstein
+ * Copyright (C) 2009-2011 Felix Bechstein
  * 
  * This file is part of ub0rlib.
  * 
@@ -29,11 +29,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -199,8 +201,12 @@ public final class Changelog extends ListActivity implements OnClickListener {
 	 */
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
+		if (Utils.isApi(Build.VERSION_CODES.HONEYCOMB)) {
+			this.setTheme(android.R.style.Theme_Holo_Light);
+		} else {
+			this.setTheme(android.R.style.Theme_Light);
+		}
 		super.onCreate(savedInstanceState);
-		this.setTheme(android.R.style.Theme_Light);
 		this.setContentView(R.layout.list);
 		final Intent intent = this.getIntent();
 
@@ -300,6 +306,21 @@ public final class Changelog extends ListActivity implements OnClickListener {
 			break;
 		default:
 			break;
+		}
+	}
+
+	/**
+	 *{@inheritDoc}
+	 */
+	@Override
+	public boolean onOptionsItemSelected(final MenuItem item) {
+		Log.d(TAG, "onOptionsItemSelected(" + item.getItemId() + ")");
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			this.finish();
+			return true;
+		default:
+			return false;
 		}
 	}
 }
