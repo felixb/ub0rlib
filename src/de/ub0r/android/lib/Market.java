@@ -40,6 +40,12 @@ public final class Market {
 	/** Tag for output. */
 	private static final String TAG = "ub0rlib";
 
+	/** Search all apps. */
+	public static final String SEARCH_APPS = "Felix+Bechstein";
+	/** Alternative link to all apps. */
+	public static final String ALT_APPS = // .
+	"http://code.google.com/u/felix.bechstein/";
+
 	/** Alternative link to SMSdroid. */
 	public static final String ALT_WEBSMS = "http://code.google.com/p"
 			+ "/websmsdroid/downloads/list?can=2&q=Product%3DSMSdroid";
@@ -271,6 +277,18 @@ public final class Market {
 					Toast.LENGTH_LONG).show();
 		}
 		return false;
+	}
+
+	/**
+	 * Open any market app to search for all my app.
+	 * 
+	 * @param activity
+	 *            {@link Activity} used to launch the intent
+	 * @return true if any intent was launched successfully
+	 */
+	public static boolean searchMoreApps(final Activity activity) {
+		Log.i(TAG, "searchMoreApps(" + activity + ")");
+		return searchApp(activity, SEARCH_APPS, ALT_APPS);
 	}
 
 	/**
