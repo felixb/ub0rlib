@@ -39,7 +39,7 @@ function clean_nl($s) {
   $ret = $s;
   $ret = str_replace("\r\n", '\n', $ret);
   $ret = str_replace("\n", '\n', $ret);
-  return $ret;
+  return trim($ret);
 }
 
 function clean_username($un) {
@@ -82,6 +82,8 @@ function sxmle_writexml($sxmle, $location, $lang, $file) {
   $xml = preg_replace('/.*\<item/', '    <item', $xml);
   $xml = preg_replace('/\>\<\/string/', '>'."\n".'  </string', $xml);
   $xml = preg_replace('/\>\<\/resources/', '>'."\n".'</resources', $xml);
+  $xml = preg_replace('/ orig=""/', '', $xml);
+  $xml = preg_replace('/ username=""/', '', $xml);
   $xml = preg_replace('/ notranslation=""/', '', $xml);
   $xml = preg_replace('/.*\<item\/\>/', '', $xml);
   $xml = preg_replace('/.*\<item\>\<\/item\>/', '', $xml);
@@ -93,6 +95,8 @@ function sxmle_writexml($sxmle, $location, $lang, $file) {
     }
     $parts = explode('>', $line, 2);
     if (count($parts) > 1) {
+      $parts[1] = str_ireplace("'", "\\'", $parts[1]);
+      $parts[1] = str_ireplace('\\\\', '\\', $parts[1]);
       $elems = 'b,i,u,big,small,sub,sup,strike';
       foreach (explode(',', $elems) as $e) {
 	$parts[1] = str_ireplace('&lt;'.$e.'&gt;', '<'.$e.'>', $parts[1]);
@@ -235,6 +239,9 @@ if (!empty($file)) {
 	}
 	echo '<!-- ' . $v . ' -->';
 	$v = clean_nl($v);
+        if (strlen($v) == 0)  {
+          continue;
+        }
 	$spos = strpos($string, 'http:');
 	$tpos = strpos($v, 'http:');
 	if (($spos === false && $tpos === false) || $spos !== false) {
@@ -347,6 +354,7 @@ if (!empty($file)) {
 
     $tstrings = $txml->xpath('//string[@name="' . $k . '"]');
     if (is_array($tstrings) && array_key_exists(0, $tstrings)) {
+      $tstring = array();
       $tstring = $tstrings[0];
       $tv =  $tstring;
       $decodedtv = decode_string($tv);
