@@ -238,12 +238,11 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 	 */
 	@Override
 	public String getContentWhere(final String filter) {
-		String f = DatabaseUtils
-				.sqlEscapeString('%' + filter.toUpperCase() + '%');
+		String f = DatabaseUtils.sqlEscapeString('%' + filter.toString() + '%');
 		StringBuilder s = new StringBuilder();
-		s.append("( UPPER(" + PeopleColumns.NAME + ") LIKE ");
+		s.append("(" + PeopleColumns.NAME + " LIKE ");
 		s.append(f);
-		s.append(") OR ( UPPER(" + PhonesColumns.NUMBER + ") LIKE ");
+		s.append(") OR (" + PhonesColumns.NUMBER + " LIKE ");
 		s.append(f);
 		s.append(")");
 		return s.toString();
