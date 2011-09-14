@@ -325,13 +325,13 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 			final boolean loadOnly, final boolean loadAvatar,
 			final Contact contact) {
 		if (contact == null) {
-			Log.w(TAG, "updateContactDetails(" + contact + ")");
+			Log.w(TAG, "updateContactDetails(null)");
 			return false;
 		}
 		Log.d(TAG, "updateContactDetails(" + contact.mRecipientId + ")");
-		Log.d(TAG, "id: " + contact.mPersonId + ")");
-		Log.d(TAG, "number: " + contact.mNumber + ")");
-		Log.d(TAG, "name: " + contact.mName + ")");
+		Log.d(TAG, "id: " + contact.mPersonId);
+		Log.d(TAG, "number: " + contact.mNumber);
+		Log.d(TAG, "name: " + contact.mName);
 		boolean changed = false;
 		final long rid = contact.mRecipientId;
 		final ContentResolver cr = context.getContentResolver();
@@ -366,6 +366,7 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 				final Cursor cursor = cr.query(PHONES_WITH_PRESENCE_URI,
 						CALLER_ID_PROJECTION, selection,
 						new String[] { number }, null);
+				Log.d(TAG, "result: " + cursor.getCount());
 
 				if (cursor.moveToFirst()) {
 					final long pid = cursor.getLong(INDEX_CALLER_ID_CONTACTID);
