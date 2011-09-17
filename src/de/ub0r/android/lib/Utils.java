@@ -268,4 +268,40 @@ public final class Utils {
 		}
 		return apiVersion >= api;
 	}
+
+	/**
+	 * Get the prefix from a telephone number (best approximation).
+	 * 
+	 * @param number
+	 *            number
+	 * @return prefix
+	 */
+	public static String getPrefixFromTelephoneNumber(final String number) {
+		String prefix = null;
+
+		if (number.startsWith("+10") || number.startsWith("+11")) {
+			prefix = "+1";
+		} else if (number.startsWith("+20") || number.startsWith("+27")) {
+			prefix = number.substring(0, 3);
+		} else if (number.startsWith("+2") || number.startsWith("+35")
+				|| number.startsWith("+37") || number.startsWith("+38")
+				|| number.startsWith("+42") || number.startsWith("+50")
+				|| number.startsWith("+59") || number.startsWith("+67")
+				|| number.startsWith("+68") || number.startsWith("+69")
+				|| number.startsWith("+85") || number.startsWith("+88")
+				|| number.startsWith("+96") || number.startsWith("+97")
+				|| number.startsWith("+99")) {
+			prefix = number.substring(0, 4);
+		} else if (number.startsWith("+3") || number.startsWith("+4")
+				|| number.startsWith("+5") || number.startsWith("+6")
+				|| number.startsWith("+8") || number.startsWith("+9")) {
+			prefix = number.substring(0, 3);
+		} else if (number.startsWith("+7")) {
+			prefix = number.substring(0, 2);
+		} else if (number.startsWith("+1")) {
+			prefix = number.substring(0, 6);
+		}
+
+		return prefix;
+	}
 }

@@ -250,6 +250,50 @@ public abstract class ContactsWrapper {
 			final String[] excludeMimes);
 
 	/**
+	 * Trigger a dialog that lists the various methods of interacting with the
+	 * requested Contacts entry. If QuickContact is unavailable, the contact app
+	 * gets started.
+	 * 
+	 * @param context
+	 *            The parent Context that may be used as the parent for this
+	 *            dialog.
+	 * @param target
+	 *            Specific View from your layout that this dialog should be
+	 *            centered around. In particular, if the dialog has a "callout"
+	 *            arrow, it will be pointed and centered around this View.
+	 * @param lookupUri
+	 *            A CONTENT_LOOKUP_URI style Uri that describes a specific
+	 *            contact to feature in this dialog.
+	 * @param mode
+	 *            Any of MODE_SMALL, MODE_MEDIUM, or MODE_LARGE, indicating the
+	 *            desired dialog size, when supported.
+	 * @param excludeMimes
+	 *            Optional list of MIMETYPE MIME-types to exclude when showing
+	 *            this dialog. For example, when already viewing the contact
+	 *            details card, this can be used to omit the details entry from
+	 *            the dialog.
+	 */
+	public final void showQuickContactFallBack(final Context context,
+			final View target, final Uri lookupUri, final int mode,
+			final String[] excludeMimes) {
+		if (lookupUri == null) {
+			return;
+		}
+		try {
+			ContactsWrapper.this.showQuickContact(context, target, lookupUri,
+					mode, null);
+		} catch (Exception e) {
+			Log.e(TAG, "error showing QuickContact", e);
+			try {
+				context
+						.startActivity(new Intent(Intent.ACTION_VIEW, lookupUri));
+			} catch (ActivityNotFoundException e1) {
+				Log.e(TAG, "error showing contact", e1);
+			}
+		}
+	}
+
+	/**
 	 * Update {@link Contact}'s details.
 	 * 
 	 * @param context
@@ -297,21 +341,8 @@ public abstract class ContactsWrapper {
 		final OnClickListener ret = new OnClickListener() {
 			@Override
 			public void onClick(final View v) {
-				Uri u = null;
-				try {
-					ContactsWrapper.this.showQuickContact(context, target, uri,
-							mode, null);
-				} catch (Exception e) {
-					Log.e(TAG, "error showing QuickContact", e);
-					if (u != null) {
-						try {
-							context.startActivity(new Intent(
-									Intent.ACTION_VIEW, u));
-						} catch (ActivityNotFoundException e1) {
-							Log.e(TAG, "error showing contact", e1);
-						}
-					}
-				}
+				ContactsWrapper.this.showQuickContactFallBack(context, target,
+						uri, mode, null);
 			}
 		};
 		return ret;
@@ -348,25 +379,10 @@ public abstract class ContactsWrapper {
 		final OnClickListener ret = new OnClickListener() {
 			@Override
 			public void onClick(final View v) {
-				Uri u = null;
-				try {
-					u = ContactsWrapper.this.getLookupKeyForNumber(context
-							.getContentResolver(), number);
-					if (u != null) {
-						ContactsWrapper.this.showQuickContact(context, target,
-								u, mode, null);
-					}
-				} catch (Exception e) {
-					Log.e(TAG, "error showing QuickContact", e);
-					if (u != null) {
-						try {
-							context.startActivity(new Intent(
-									Intent.ACTION_VIEW, u));
-						} catch (ActivityNotFoundException e1) {
-							Log.e(TAG, "error showing contact", e1);
-						}
-					}
-				}
+				Uri u = ContactsWrapper.this.getLookupKeyForNumber(context
+						.getContentResolver(), number);
+				ContactsWrapper.this.showQuickContactFallBack(context, target,
+						u, mode, null);
 			}
 		};
 		return ret;
