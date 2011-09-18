@@ -53,11 +53,14 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	private static final Uri PHONES_WITH_PRESENCE_URI = Data.CONTENT_URI;
 
 	/** Selection for getting {@link Contact} from number. */
+	// private static final String CALLER_ID_SELECTION = "PHONE_NUMBERS_EQUAL("
+	// + Phone.NUMBER + ",?) AND " + Data.MIMETYPE + "='"
+	// + Phone.CONTENT_ITEM_TYPE + "'" + " AND " + Data.RAW_CONTACT_ID
+	// + " IN " + "(SELECT raw_contact_id " + " FROM phone_lookup"
+	// + " WHERE normalized_number GLOB('+*'))";
 	private static final String CALLER_ID_SELECTION = "PHONE_NUMBERS_EQUAL("
 			+ Phone.NUMBER + ",?) AND " + Data.MIMETYPE + "='"
-			+ Phone.CONTENT_ITEM_TYPE + "'" + " AND " + Data.RAW_CONTACT_ID
-			+ " IN " + "(SELECT raw_contact_id " + " FROM phone_lookup"
-			+ " WHERE normalized_number GLOB('+*'))";
+			+ Phone.CONTENT_ITEM_TYPE + "'";
 
 	/** Projection for getting {@link Contact} from number. */
 	private static final String[] CALLER_ID_PROJECTION = new String[] {
