@@ -129,8 +129,7 @@ public final class Changelog extends ListActivity implements OnClickListener {
 		final String t = context.getString(R.string.changelog_notification_)
 				+ " " + appv;
 		final String tt = context
-				.getString(R.string.changelog_notification_text)
-				+ " " + appv;
+				.getString(R.string.changelog_notification_text) + " " + appv;
 
 		final Intent i = new Intent(context, Changelog.class);
 		i.setAction("changelog");
@@ -278,22 +277,22 @@ public final class Changelog extends ListActivity implements OnClickListener {
 	 */
 	@Override
 	public void onClick(final View v) {
-		switch (v.getId()) {
-		case R.id.ok:
+		if (v.getId() == R.id.ok) {
 			final SharedPreferences p = PreferenceManager
 					.getDefaultSharedPreferences(this);
 			final Editor ed = p.edit();
 			if (this.mode == MODE_CHANGELOG) {
-				ed.putBoolean(PREFS_HIDE, ((CheckBox) this
-						.findViewById(R.id.hide)).isChecked());
+				ed.putBoolean(PREFS_HIDE,
+						((CheckBox) this.findViewById(R.id.hide)).isChecked());
 			} else if (this.mode == MODE_NOTES) {
-				ed.putInt(PREFS_LAST_READ, this.getResources().getStringArray(
-						R.array.notes_from_dev).length);
+				ed.putInt(
+						PREFS_LAST_READ,
+						this.getResources().getStringArray(
+								R.array.notes_from_dev).length);
 			}
 			ed.commit();
 			this.finish();
-			break;
-		case R.id.extra:
+		} else if (v.getId() == R.id.extra) {
 			final Intent i = (Intent) this.getIntent().getParcelableExtra(
 					EXTRA_INTENT);
 			try {
@@ -303,14 +302,12 @@ public final class Changelog extends ListActivity implements OnClickListener {
 				Toast.makeText(this, "could not launch activity",
 						Toast.LENGTH_LONG).show();
 			}
-			break;
-		default:
-			break;
+		} else {
 		}
 	}
 
 	/**
-	 *{@inheritDoc}
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean onOptionsItemSelected(final MenuItem item) {

@@ -163,9 +163,9 @@ public class DonationHelper extends Activity implements OnClickListener {
 			} else {
 				this.mail = this.dh.etPaypalId.getText().toString().trim()
 						.toLowerCase();
-				this.dialog = ProgressDialog.show(this.dh, "", this.ctx
-						.getString(R.string.load_hash_)
-						+ "...", true, false);
+				this.dialog = ProgressDialog.show(this.dh, "",
+						this.ctx.getString(R.string.load_hash_) + "...", true,
+						false);
 				p.edit().putString(PREFS_DONATEMAIL, this.mail).commit();
 				this.dh.findViewById(R.id.send).setEnabled(false);
 			}
@@ -185,8 +185,8 @@ public class DonationHelper extends Activity implements OnClickListener {
 				long period = p.getLong(PREFS_PERIOD, INIT_PERIOD) * 2;
 				long lastCheck = System.currentTimeMillis();
 				if (!this.error) {
-					p.edit().putLong(PREFS_PERIOD, period).putLong(
-							PREFS_LASTCHECK, lastCheck).commit();
+					p.edit().putLong(PREFS_PERIOD, period)
+							.putLong(PREFS_LASTCHECK, lastCheck).commit();
 				}
 			} else {
 				if (this.msg != null) {
@@ -292,8 +292,7 @@ public class DonationHelper extends Activity implements OnClickListener {
 	 * {@inheritDoc}
 	 */
 	public final void onClick(final View v) {
-		switch (v.getId()) {
-		case R.id.donate_paypal:
+		if (v.getId() == R.id.donate_paypal) {
 			try {
 				this.startActivity(new Intent(Intent.ACTION_VIEW, Uri
 						.parse(this.getString(R.string.donate_url))));
@@ -302,13 +301,13 @@ public class DonationHelper extends Activity implements OnClickListener {
 				Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
 			}
 			return;
-		case R.id.donate_market:
+		} else if (v.getId() == R.id.donate_market) {
 			Market.installApp(this, DONATOR_PACKAGE, null);
 			return;
-		case R.id.donate_bitcoin:
+		} else if (v.getId() == R.id.donate_bitcoin) {
 			this.donateBitcoin();
 			return;
-		case R.id.send:
+		} else if (v.getId() == R.id.send) {
 			if (TextUtils.isEmpty(this.etPaypalId.getText())) {
 				Toast.makeText(this, R.string.donator_id_, Toast.LENGTH_LONG)
 						.show();
@@ -316,14 +315,13 @@ public class DonationHelper extends Activity implements OnClickListener {
 			}
 			final CheckBox cb = (CheckBox) this.findViewById(R.id.accept);
 			if (!cb.isChecked()) {
-				Toast
-						.makeText(this, R.string.accept_missing,
-								Toast.LENGTH_LONG).show();
+				Toast.makeText(this, R.string.accept_missing, Toast.LENGTH_LONG)
+						.show();
 				return;
 			}
 			new InnerTask(this, this, false).execute((Void[]) null);
 			return;
-		default:
+		} else {
 			return;
 		}
 	}
