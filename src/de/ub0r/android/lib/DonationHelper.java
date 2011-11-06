@@ -32,7 +32,6 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.app.AlertDialog.Builder;
 import android.content.ComponentName;
@@ -46,10 +45,11 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.MenuItem;
 import android.telephony.TelephonyManager;
 import android.text.ClipboardManager;
 import android.text.TextUtils;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;
@@ -61,7 +61,8 @@ import android.widget.Toast;
  * 
  * @author flx
  */
-public class DonationHelper extends Activity implements OnClickListener {
+public class DonationHelper extends FragmentActivity // .
+		implements OnClickListener {
 	/** Tag for output. */
 	private static final String TAG = "dh";
 

@@ -32,23 +32,27 @@ import android.content.SharedPreferences.Editor;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.MenuItem;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 /**
- * Display change log {@link ListActivity}.
+ * Display change log {@link FragmentActivity}.
  * 
  * @author flx
  */
-public final class Changelog extends ListActivity implements OnClickListener {
+public final class Changelog extends FragmentActivity implements
+		OnClickListener {
 	/** Tag for output. */
 	public static final String TAG = "cl";
 
@@ -270,6 +274,16 @@ public final class Changelog extends ListActivity implements OnClickListener {
 		} else {
 			this.finish();
 		}
+	}
+
+	/**
+	 * Set {@link ListView}'s adapter.
+	 * 
+	 * @param adapter
+	 *            {@link ListAdapter}
+	 */
+	private void setListAdapter(final ListAdapter adapter) {
+		((ListView) this.findViewById(android.R.id.list)).setAdapter(adapter);
 	}
 
 	/**
