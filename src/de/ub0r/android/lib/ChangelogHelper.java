@@ -128,7 +128,7 @@ public final class ChangelogHelper {
 							Toast.LENGTH_LONG).show();
 				}
 			} else {
-				// nothing to do
+				Log.w(TAG, "unexpected id in onClick()");
 			}
 		}
 	}
@@ -240,7 +240,7 @@ public final class ChangelogHelper {
 	 *            {@link Intent} fired when pressing the {@link Button}
 	 */
 	public static void showNotes(final Context context, final boolean icsStyle,
-			final String btnText, final String extraText,// .
+			final String btnText, final String extraText, // .
 			final Intent btnIntent) {
 		final SharedPreferences p = PreferenceManager
 				.getDefaultSharedPreferences(context);
