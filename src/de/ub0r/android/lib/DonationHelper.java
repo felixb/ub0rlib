@@ -32,6 +32,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.app.AlertDialog.Builder;
 import android.content.ComponentName;
@@ -61,8 +62,7 @@ import android.widget.Toast;
  * 
  * @author flx
  */
-public class DonationHelper extends FragmentActivity // .
-		implements OnClickListener {
+public class DonationHelper {
 	/** Tag for output. */
 	private static final String TAG = "dh";
 
@@ -108,18 +108,76 @@ public class DonationHelper extends FragmentActivity // .
 			+ "Y89+o2O0mW9NnBch3l8K/uJ3FRn+8Li75SqoTqFj3yCrd9IT"
 			+ "sOJC7PxcR5TvNpeXsogcyxxo3fMdJdjkafYwIDAQAB";
 
-	/** {@link EditText} for paypal id. */
-	private EditText etPaypalId;
-
 	/** Hashed IMEI. */
 	private static String imeiHash = null;
+
+	/**
+	 * Common {@link OnClickListener}.
+	 * 
+	 * @author flx
+	 */
+	static class InnerOnClickListener implements OnClickListener {
+		/** {@link OnClickListener}'s target. */
+		private final Activity activity;
+
+		/**
+		 * Default Constructor.
+		 * 
+		 * @param target
+		 *            target {@link Activity}
+		 */
+		public InnerOnClickListener(final Activity target) {
+			activity = target;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		public final void onClick(final View v) {
+			if (v.getId() == R.id.donate_paypal) {
+				try {
+					activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri
+							.parse(activity.getString(R.string.donate_url))));
+				} catch (Exception e) {
+					Log.e(TAG, "error launching paypal", e);
+					Toast.makeText(activity, e.getMessage(), Toast.LENGTH_LONG)
+							.show();
+				}
+				return;
+			} else if (v.getId() == R.id.donate_market) {
+				Market.installApp(activity, DONATOR_PACKAGE, null);
+				return;
+			} else if (v.getId() == R.id.donate_bitcoin) {
+				donateBitcoin(activity);
+				return;
+			} else if (v.getId() == R.id.send) {
+				if (TextUtils.isEmpty(((EditText) activity
+						.findViewById(R.id.paypalid)).getText())) {
+					Toast.makeText(activity, R.string.donator_id_,
+							Toast.LENGTH_LONG).show();
+					return;
+				}
+				final CheckBox cb = (CheckBox) activity
+						.findViewById(R.id.accept);
+				if (!cb.isChecked()) {
+					Toast.makeText(activity, R.string.accept_missing,
+							Toast.LENGTH_LONG).show();
+					return;
+				}
+				new InnerTask(activity, activity, false).execute((Void[]) null);
+				return;
+			} else {
+				return;
+			}
+		}
+	}
 
 	/**
 	 * Do all the IO.
 	 * 
 	 * @author flx
 	 */
-	private static class InnerTask extends AsyncTask<Void, Void, Void> {
+	static class InnerTask extends AsyncTask<Void, Void, Void> {
 		/** Mail address used. */
 		private String mail;
 		/** The progress dialog. */
@@ -131,7 +189,7 @@ public class DonationHelper extends FragmentActivity // .
 		/** Run in recheck mode. */
 		private final boolean doRecheck;
 		/** Instance of DonationHelper. */
-		private final DonationHelper dh;
+		private final Activity dh;
 		/** Context. */
 		private final Context ctx;
 
@@ -145,7 +203,7 @@ public class DonationHelper extends FragmentActivity // .
 		 * @param recheck
 		 *            run in recheck mode
 		 */
-		public InnerTask(final Context context, final DonationHelper helper,
+		public InnerTask(final Context context, final Activity helper,
 				final boolean recheck) {
 			this.ctx = context;
 			this.dh = helper;
@@ -162,8 +220,8 @@ public class DonationHelper extends FragmentActivity // .
 			if (this.doRecheck) {
 				this.mail = p.getString(PREFS_DONATEMAIL, "no@mail.local");
 			} else {
-				this.mail = this.dh.etPaypalId.getText().toString().trim()
-						.toLowerCase();
+				this.mail = ((EditText) this.dh.findViewById(R.id.paypalid))
+						.getText().toString().trim().toLowerCase();
 				this.dialog = ProgressDialog.show(this.dh, "",
 						this.ctx.getString(R.string.load_hash_) + "...", true,
 						false);
@@ -261,94 +319,51 @@ public class DonationHelper extends FragmentActivity // .
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Default Constructor.
 	 */
-	@Override
-	public final void onCreate(final Bundle savedInstanceState) {
-		if (Utils.isApi(Build.VERSION_CODES.HONEYCOMB)) {
-			this.setTheme(android.R.style.Theme_Holo_Light);
-		}
-		super.onCreate(savedInstanceState);
-		this.setContentView(R.layout.donation);
+	private DonationHelper() {
+		// nothing to do
+	}
 
-		final Intent marketIntent = Market.getInstallAppIntent(this,
+	/**
+	 * Common onCreate().
+	 * 
+	 * @param target
+	 *            {@link Activity}
+	 */
+	static final void onCreate(final Activity target) {
+		target.setContentView(R.layout.donation);
+
+		InnerOnClickListener ocl = new InnerOnClickListener(target);
+
+		final Intent marketIntent = Market.getInstallAppIntent(target,
 				DONATOR_PACKAGE, null);
 		if (marketIntent != null
 				&& marketIntent.getDataString().startsWith("market://")) {
-			this.findViewById(R.id.donate_market).setOnClickListener(this);
+			target.findViewById(R.id.donate_market).setOnClickListener(ocl);
 		} else {
-			this.findViewById(R.id.donate_market).setVisibility(View.GONE);
+			target.findViewById(R.id.donate_market).setVisibility(View.GONE);
 		}
 
-		this.findViewById(R.id.donate_paypal).setOnClickListener(this);
-		this.findViewById(R.id.donate_bitcoin).setOnClickListener(this);
-		this.findViewById(R.id.send).setOnClickListener(this);
-		this.etPaypalId = (EditText) this.findViewById(R.id.paypalid);
-		final String mail = PreferenceManager.getDefaultSharedPreferences(this)
-				.getString(PREFS_DONATEMAIL, "");
-		this.etPaypalId.setText(mail);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public final void onClick(final View v) {
-		if (v.getId() == R.id.donate_paypal) {
-			try {
-				this.startActivity(new Intent(Intent.ACTION_VIEW, Uri
-						.parse(this.getString(R.string.donate_url))));
-			} catch (Exception e) {
-				Log.e(TAG, "error launching paypal", e);
-				Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
-			}
-			return;
-		} else if (v.getId() == R.id.donate_market) {
-			Market.installApp(this, DONATOR_PACKAGE, null);
-			return;
-		} else if (v.getId() == R.id.donate_bitcoin) {
-			this.donateBitcoin();
-			return;
-		} else if (v.getId() == R.id.send) {
-			if (TextUtils.isEmpty(this.etPaypalId.getText())) {
-				Toast.makeText(this, R.string.donator_id_, Toast.LENGTH_LONG)
-						.show();
-				return;
-			}
-			final CheckBox cb = (CheckBox) this.findViewById(R.id.accept);
-			if (!cb.isChecked()) {
-				Toast.makeText(this, R.string.accept_missing, Toast.LENGTH_LONG)
-						.show();
-				return;
-			}
-			new InnerTask(this, this, false).execute((Void[]) null);
-			return;
-		} else {
-			return;
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public final boolean onOptionsItemSelected(final MenuItem item) {
-		switch (item.getItemId()) {
-		case android.R.id.home:
-			this.finish();
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
+		target.findViewById(R.id.donate_paypal).setOnClickListener(ocl);
+		target.findViewById(R.id.donate_bitcoin).setOnClickListener(ocl);
+		target.findViewById(R.id.send).setOnClickListener(ocl);
+		final String mail = PreferenceManager.getDefaultSharedPreferences(
+				target).getString(PREFS_DONATEMAIL, "");
+		((EditText) target.findViewById(R.id.paypalid)).setText(mail);
 	}
 
 	/**
 	 * Show donation dialog for bitcoin donation.
+	 * 
+	 * @param target
+	 *            target {@link Activity}
 	 */
-	private void donateBitcoin() {
-		final Builder b = new Builder(this);
+	static final void donateBitcoin(final Activity target) {
+		final Builder b = new Builder(target);
 		b.setCancelable(true);
 		b.setTitle(R.string.donate_bitcoin_);
-		String s = this.getString(R.string.donate_bitcoin);
+		String s = target.getString(R.string.donate_bitcoin);
 		s += "\n\n" + DONATE_BITCOIN;
 		b.setMessage(s);
 		b.setPositiveButton(android.R.string.ok, null);
@@ -359,19 +374,19 @@ public class DonationHelper extends FragmentActivity // .
 					public void onClick(final DialogInterface dialog,
 							final int which) {
 						ClipboardManager cbm = (ClipboardManager) //
-						DonationHelper.this.getSystemService(CLIPBOARD_SERVICE);
+						target.getSystemService(Activity.CLIPBOARD_SERVICE);
 						cbm.setText(DONATE_BITCOIN);
 					}
 				});
 		final Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("bitcoin:"
 				+ DONATE_BITCOIN));
-		if (i.resolveActivity(this.getPackageManager()) != null) {
+		if (i.resolveActivity(target.getPackageManager()) != null) {
 			b.setNegativeButton(R.string.donate_bitcoin_send,
 					new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(final DialogInterface dialog,
 								final int which) {
-							DonationHelper.this.startActivity(i);
+							target.startActivity(i);
 						}
 					});
 		}
@@ -389,7 +404,7 @@ public class DonationHelper extends FragmentActivity // .
 		if (imeiHash == null) {
 			// get imei
 			TelephonyManager mTelephonyMgr = (TelephonyManager) context
-					.getSystemService(TELEPHONY_SERVICE);
+					.getSystemService(Activity.TELEPHONY_SERVICE);
 			final String did = mTelephonyMgr.getDeviceId();
 			if (did != null) {
 				imeiHash = Utils.md5(did);
@@ -483,5 +498,23 @@ public class DonationHelper extends FragmentActivity // .
 			}
 		}
 		return ret;
+	}
+
+	/**
+	 * Start the Donation {@link Activity}.
+	 * 
+	 * @param context
+	 *            {@link Context}
+	 * @param icsStyle
+	 *            use HC/ICS Style
+	 */
+	public static final void startDonationActivity(final Context context,
+			final boolean icsStyle) {
+		if (icsStyle) {
+			context.startActivity(new Intent(context,
+					DonationFragmentActivity.class));
+		} else {
+			context.startActivity(new Intent(context, DonationActivity.class));
+		}
 	}
 }

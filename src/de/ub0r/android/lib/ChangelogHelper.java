@@ -20,7 +20,7 @@ package de.ub0r.android.lib;
 
 import java.util.ArrayList;
 
-import android.app.ListActivity;
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -29,11 +29,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.os.Build;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.MenuItem;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -42,17 +38,15 @@ import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 /**
- * Display change log {@link FragmentActivity}.
+ * Display change log.
  * 
  * @author flx
  */
-public final class Changelog extends FragmentActivity implements
-		OnClickListener {
+public final class ChangelogHelper {
 	/** Tag for output. */
 	public static final String TAG = "cl";
 
@@ -81,8 +75,87 @@ public final class Changelog extends FragmentActivity implements
 	/** Notification id: notes. */
 	private static final int NOTIFICATION_NOTES = 135;
 
-	/** Mode of operating. */
-	private int mode = 0;
+	/**
+	 * Common {@link OnClickListener}.
+	 * 
+	 * @author flx
+	 */
+	static class InnerOnClickListener implements OnClickListener {
+		/** Target {@link Activity}. */
+		private final Activity activity;
+		/** Mode of operating. */
+		private final int mode;
+
+		/**
+		 * Default Constructor.
+		 * 
+		 * @param target
+		 *            target {@link Activity}
+		 * @param m
+		 *            mode
+		 */
+		public InnerOnClickListener(final Activity target, final int m) {
+			activity = target;
+			mode = m;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void onClick(final View v) {
+			if (v.getId() == R.id.ok) {
+				final SharedPreferences p = PreferenceManager
+						.getDefaultSharedPreferences(activity);
+				final Editor ed = p.edit();
+				if (mode == MODE_CHANGELOG) {
+					ed.putBoolean(PREFS_HIDE, ((CheckBox) activity
+							.findViewById(R.id.hide)).isChecked());
+				} else if (mode == MODE_NOTES) {
+					ed.putInt(PREFS_LAST_READ, activity.getResources()
+							.getStringArray(R.array.notes_from_dev).length);
+				}
+				ed.commit();
+				activity.finish();
+			} else if (v.getId() == R.id.extra) {
+				final Intent i = (Intent) activity.getIntent()
+						.getParcelableExtra(EXTRA_INTENT);
+				try {
+					activity.startActivity(i);
+				} catch (ActivityNotFoundException e) {
+					Log.e(TAG, "could not launch intent: " + i);
+					Toast.makeText(activity, "could not launch activity",
+							Toast.LENGTH_LONG).show();
+				}
+			} else {
+				// nothing to do
+			}
+		}
+	}
+
+	/**
+	 * Default Constructor.
+	 */
+	private ChangelogHelper() {
+		// nothing to do
+	}
+
+	/**
+	 * Get {@link Intent} to Changelog {@link Activity}.
+	 * 
+	 * @param context
+	 *            {@link Context}
+	 * @param icsStyle
+	 *            use HC/ICS Style ~ @return {@link} {@link Intent}
+	 */
+	private static Intent getChangelogIntent(final Context context,
+			final boolean icsStyle) {
+		if (icsStyle) {
+			return new Intent(context, ChangelogFragmentActivity.class);
+		} else {
+			return new Intent(context, ChangelogActivity.class);
+		}
+	}
 
 	/**
 	 * Check if a new version of this app is running.
@@ -103,12 +176,15 @@ public final class Changelog extends FragmentActivity implements
 	}
 
 	/**
-	 * Show change log {@link ListActivity} if needed.
+	 * Show change log if needed.
 	 * 
 	 * @param context
 	 *            {@link Context}
+	 * @param icsStyle
+	 *            use HC/ICS Style
 	 */
-	public static void showChangelog(final Context context) {
+	public static void showChangelog(final Context context,
+			final boolean icsStyle) {
 		final SharedPreferences p = PreferenceManager
 				.getDefaultSharedPreferences(context);
 		final String v0 = p.getString(PREFS_LAST_RUN, "");
@@ -135,13 +211,13 @@ public final class Changelog extends FragmentActivity implements
 		final String tt = context
 				.getString(R.string.changelog_notification_text) + " " + appv;
 
-		final Intent i = new Intent(context, Changelog.class);
+		final Intent i = getChangelogIntent(context, icsStyle);
 		i.setAction("changelog");
 		i.putExtra(EXTRA_MODE, MODE_CHANGELOG);
 		final PendingIntent pi = PendingIntent.getActivity(context, 0, i,
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		final NotificationManager nmgr = (NotificationManager) context
-				.getSystemService(NOTIFICATION_SERVICE);
+				.getSystemService(Activity.NOTIFICATION_SERVICE);
 		final Notification n = new Notification(
 				android.R.drawable.stat_sys_warning, t, 0);
 		n.setLatestEventInfo(context, t, tt, pi);
@@ -150,10 +226,12 @@ public final class Changelog extends FragmentActivity implements
 	}
 
 	/**
-	 * Show notes from developer {@link ListActivity} if needed.
+	 * Show notes from developer if needed.
 	 * 
 	 * @param context
 	 *            {@link Context}
+	 * @param icsStyle
+	 *            use HC/ICS Style
 	 * @param btnText
 	 *            text of the extra {@link Button}
 	 * @param extraText
@@ -161,8 +239,9 @@ public final class Changelog extends FragmentActivity implements
 	 * @param btnIntent
 	 *            {@link Intent} fired when pressing the {@link Button}
 	 */
-	public static void showNotes(final Context context, final String btnText,
-			final String extraText, final Intent btnIntent) {
+	public static void showNotes(final Context context, final boolean icsStyle,
+			final String btnText, final String extraText,// .
+			final Intent btnIntent) {
 		final SharedPreferences p = PreferenceManager
 				.getDefaultSharedPreferences(context);
 		final int lastRead = p.getInt(PREFS_LAST_READ, 0);
@@ -178,7 +257,7 @@ public final class Changelog extends FragmentActivity implements
 		final String t = context.getString(R.string.notes_from_developer_);
 		final String tt = context.getString(R.string.notes_from_developer_text);
 
-		final Intent i = new Intent(context, Changelog.class);
+		final Intent i = getChangelogIntent(context, icsStyle);
 		i.setAction("notes");
 		i.putExtra(EXTRA_MODE, MODE_NOTES);
 		if (!TextUtils.isEmpty(btnText)) {
@@ -191,7 +270,7 @@ public final class Changelog extends FragmentActivity implements
 		final PendingIntent pi = PendingIntent.getActivity(context, 0, i,
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		final NotificationManager nmgr = (NotificationManager) context
-				.getSystemService(NOTIFICATION_SERVICE);
+				.getSystemService(Activity.NOTIFICATION_SERVICE);
 		final Notification n = new Notification(
 				android.R.drawable.stat_sys_warning, t, 0);
 		n.setLatestEventInfo(context, t, tt, pi);
@@ -200,22 +279,21 @@ public final class Changelog extends FragmentActivity implements
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Common onCreate().
+	 * 
+	 * @param target
+	 *            {@link Activity}
 	 */
-	@Override
-	public void onCreate(final Bundle savedInstanceState) {
-		if (Utils.isApi(Build.VERSION_CODES.HONEYCOMB)) {
-			this.setTheme(android.R.style.Theme_Holo_Light);
-		} else {
-			this.setTheme(android.R.style.Theme_Light);
-		}
-		super.onCreate(savedInstanceState);
-		this.setContentView(R.layout.list);
-		final Intent intent = this.getIntent();
+	static void onCreate(final Activity target) {
+		target.setContentView(R.layout.list);
+		final Intent intent = target.getIntent();
+		final int mode = intent.getIntExtra(EXTRA_MODE, 0);
 
-		this.findViewById(R.id.ok).setOnClickListener(this);
-		final Button btnExtra = (Button) this.findViewById(R.id.extra);
-		btnExtra.setOnClickListener(this);
+		InnerOnClickListener ocl = new InnerOnClickListener(target, mode);
+
+		target.findViewById(R.id.ok).setOnClickListener(ocl);
+		final Button btnExtra = (Button) target.findViewById(R.id.extra);
+		btnExtra.setOnClickListener(ocl);
 		String s = intent.getStringExtra(EXTRA_BUTTON);
 		if (TextUtils.isEmpty(s)) {
 			btnExtra.setVisibility(View.GONE);
@@ -225,13 +303,12 @@ public final class Changelog extends FragmentActivity implements
 		}
 		s = null;
 
-		this.mode = intent.getIntExtra(EXTRA_MODE, 0);
-		if (this.mode == MODE_CHANGELOG) {
-			final String appn = this.getString(R.string.app_name);
-			this.setTitle(this.getString(R.string.changelog_) + ": " + appn
-					+ " v" + this.getString(R.string.app_version));
+		if (mode == MODE_CHANGELOG) {
+			final String appn = target.getString(R.string.app_name);
+			target.setTitle(target.getString(R.string.changelog_) + ": " + appn
+					+ " v" + target.getString(R.string.app_version));
 
-			final String[] changes = this.getResources().getStringArray(
+			final String[] changes = target.getResources().getStringArray(
 					R.array.updates);
 			final int l = changes.length;
 			final Spanned[] schanges = new Spanned[l];
@@ -243,13 +320,14 @@ public final class Changelog extends FragmentActivity implements
 				schanges[i] = Html.fromHtml(s);
 			}
 			final ArrayAdapter<Spanned> adapter = new ArrayAdapter<Spanned>(
-					this, R.layout.list_item, schanges);
-			this.setListAdapter(adapter);
-		} else if (this.mode == MODE_NOTES) {
-			this.findViewById(R.id.hide).setVisibility(View.GONE);
-			this.setTitle(R.string.notes_from_developer_);
+					target, R.layout.list_item, schanges);
+			((ListView) target.findViewById(android.R.id.list))
+					.setAdapter(adapter);
+		} else if (mode == MODE_NOTES) {
+			target.findViewById(R.id.hide).setVisibility(View.GONE);
+			target.setTitle(R.string.notes_from_developer_);
 
-			final String[] notes = this.getResources().getStringArray(
+			final String[] notes = target.getResources().getStringArray(
 					R.array.notes_from_dev);
 			final int l = notes.length;
 			final ArrayList<Spanned> snotes = new ArrayList<Spanned>();
@@ -269,69 +347,11 @@ public final class Changelog extends FragmentActivity implements
 				snotes.add(0, Html.fromHtml(s));
 			}
 			final ArrayAdapter<Spanned> adapter = new ArrayAdapter<Spanned>(
-					this, R.layout.list_item, snotes);
-			this.setListAdapter(adapter);
+					target, R.layout.list_item, snotes);
+			((ListView) target.findViewById(android.R.id.list))
+					.setAdapter(adapter);
 		} else {
-			this.finish();
-		}
-	}
-
-	/**
-	 * Set {@link ListView}'s adapter.
-	 * 
-	 * @param adapter
-	 *            {@link ListAdapter}
-	 */
-	private void setListAdapter(final ListAdapter adapter) {
-		((ListView) this.findViewById(android.R.id.list)).setAdapter(adapter);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onClick(final View v) {
-		if (v.getId() == R.id.ok) {
-			final SharedPreferences p = PreferenceManager
-					.getDefaultSharedPreferences(this);
-			final Editor ed = p.edit();
-			if (this.mode == MODE_CHANGELOG) {
-				ed.putBoolean(PREFS_HIDE,
-						((CheckBox) this.findViewById(R.id.hide)).isChecked());
-			} else if (this.mode == MODE_NOTES) {
-				ed.putInt(
-						PREFS_LAST_READ,
-						this.getResources().getStringArray(
-								R.array.notes_from_dev).length);
-			}
-			ed.commit();
-			this.finish();
-		} else if (v.getId() == R.id.extra) {
-			final Intent i = (Intent) this.getIntent().getParcelableExtra(
-					EXTRA_INTENT);
-			try {
-				this.startActivity(i);
-			} catch (ActivityNotFoundException e) {
-				Log.e(TAG, "could not launch intent: " + i);
-				Toast.makeText(this, "could not launch activity",
-						Toast.LENGTH_LONG).show();
-			}
-		} else {
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean onOptionsItemSelected(final MenuItem item) {
-		Log.d(TAG, "onOptionsItemSelected(" + item.getItemId() + ")");
-		switch (item.getItemId()) {
-		case android.R.id.home:
-			this.finish();
-			return true;
-		default:
-			return false;
+			target.finish();
 		}
 	}
 }
