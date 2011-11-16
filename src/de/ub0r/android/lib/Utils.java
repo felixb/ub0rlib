@@ -77,6 +77,29 @@ public final class Utils {
 	}
 
 	/**
+	 * Parse {@link Boolean}.
+	 * 
+	 * @param value
+	 *            value a {@link String}
+	 * @param defValue
+	 *            default value
+	 * @return parsed {@link Boolean}
+	 */
+	public static boolean parseBoolean(final String value,
+			final boolean defValue) {
+		boolean ret = defValue;
+		if (value == null || value.length() == 0) {
+			return ret;
+		}
+		try {
+			ret = Boolean.parseBoolean(value);
+		} catch (NumberFormatException e) {
+			Log.w(TAG, "parseBoolean(" + value + ") failed: " + e.toString());
+		}
+		return ret;
+	}
+
+	/**
 	 * Parse {@link Integer}.
 	 * 
 	 * @param value
