@@ -44,10 +44,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.MenuItem;
 import android.telephony.TelephonyManager;
 import android.text.ClipboardManager;
 import android.text.TextUtils;
@@ -62,7 +59,7 @@ import android.widget.Toast;
  * 
  * @author flx
  */
-public class DonationHelper {
+public final class DonationHelper {
 	/** Tag for output. */
 	private static final String TAG = "dh";
 
@@ -331,7 +328,7 @@ public class DonationHelper {
 	 * @param target
 	 *            {@link Activity}
 	 */
-	static final void onCreate(final Activity target) {
+	static void onCreate(final Activity target) {
 		target.setContentView(R.layout.donation);
 
 		InnerOnClickListener ocl = new InnerOnClickListener(target);
@@ -359,7 +356,7 @@ public class DonationHelper {
 	 * @param target
 	 *            target {@link Activity}
 	 */
-	static final void donateBitcoin(final Activity target) {
+	static void donateBitcoin(final Activity target) {
 		final Builder b = new Builder(target);
 		b.setCancelable(true);
 		b.setTitle(R.string.donate_bitcoin_);
@@ -508,7 +505,7 @@ public class DonationHelper {
 	 * @param icsStyle
 	 *            use HC/ICS Style
 	 */
-	public static final void startDonationActivity(final Context context,
+	public static void startDonationActivity(final Context context,
 			final boolean icsStyle) {
 		if (icsStyle) {
 			context.startActivity(new Intent(context,
