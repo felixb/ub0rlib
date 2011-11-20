@@ -6,5 +6,7 @@ Currently this lib contains:
  * Wrapper for Telephony API
  * Some utils
 
-[1] http://github.com/felixb/
+You will need ActionBarSherlock [2] to compile this code.
 
+[1] http://github.com/felixb/
+[2] http://github.com/JakeWharton/ActionBarSherlock/
