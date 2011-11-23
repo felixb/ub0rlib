@@ -16,7 +16,7 @@ function remove_logs {
 	done
 }
 
-for lib in $PWD $(grep android.library.reference default.properties | grep -Fv ActionBarSherlock | cut -d= -f2) ; do
+for lib in $PWD $(grep android.library.reference default.properties | grep -Fve ActionBarSherlock -e Android-ViewPagerIndicator | cut -d= -f2) ; do
 	remove_logs $lib
 done
 
