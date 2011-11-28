@@ -33,8 +33,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.app.AlertDialog.Builder;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -343,7 +343,11 @@ public final class DonationHelper {
 		}
 
 		target.findViewById(R.id.donate_paypal).setOnClickListener(ocl);
-		target.findViewById(R.id.donate_bitcoin).setOnClickListener(ocl);
+		if (isBitcoinAvailable(target)) {
+			target.findViewById(R.id.donate_bitcoin).setOnClickListener(ocl);
+		} else {
+			target.findViewById(R.id.donate_bitcoin).setVisibility(View.GONE);
+		}
 		target.findViewById(R.id.send).setOnClickListener(ocl);
 		final String mail = PreferenceManager.getDefaultSharedPreferences(
 				target).getString(PREFS_DONATEMAIL, "");
@@ -388,6 +392,19 @@ public final class DonationHelper {
 					});
 		}
 		b.show();
+	}
+
+	/**
+	 * Check if some bitcoin app is available.
+	 * 
+	 * @param target
+	 *            target {@link Activity}
+	 * @return true, if a bitcoin client is available
+	 */
+	static boolean isBitcoinAvailable(final Activity target) {
+		final Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("bitcoin:"
+				+ DONATE_BITCOIN));
+		return i.resolveActivity(target.getPackageManager()) != null;
 	}
 
 	/**
