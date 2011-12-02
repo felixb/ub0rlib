@@ -25,6 +25,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.widget.Toast;
 
 /**
@@ -112,6 +113,24 @@ public final class Log {
 	 */
 	public static void d(final String tag, final String msg) {
 		android.util.Log.d(mTag, tag + ": " + msg);
+	}
+
+	/**
+	 * Send a DEBUG log message.
+	 * 
+	 * @param tag
+	 *            Used to identify the source of a log message. It usually
+	 *            identifies the class or activity where the log call occurs.
+	 * @param msg
+	 *            The message you would like logged.
+	 * @param startTime
+	 *            start of time measuring with SystemClock.elapsedRealtime()
+	 */
+	public static void d(final String tag, final String msg,
+			final long startTime) {
+		android.util.Log.d(mTag,
+				tag + ": " + msg + " / "
+						+ (SystemClock.elapsedRealtime() - startTime) + "ms");
 	}
 
 	/**
@@ -268,15 +287,16 @@ public final class Log {
 				.getLaunchIntentForPackage(SENDLOG_PACKAGE_NAME);
 		int title, message;
 		if (intent == null) {
-			intent = new Intent(Intent.ACTION_VIEW, Uri
-					.parse("market://search?q=pname:" + SENDLOG_PACKAGE_NAME));
+			intent = new Intent(
+					Intent.ACTION_VIEW,
+					Uri.parse("market://search?q=pname:" + SENDLOG_PACKAGE_NAME));
 			title = R.string.sendlog_install_;
 			message = R.string.sendlog_install;
 		} else {
 			intent.putExtra("filter", mTag + ":D *:W");
 			intent.setType("0||android@ub0r.de");
-			intent.putExtra(Intent.EXTRA_SUBJECT, "SendLog: "
-					+ activity.getString(R.string.app_name));
+			intent.putExtra(Intent.EXTRA_SUBJECT,
+					"SendLog: " + activity.getString(R.string.app_name));
 			title = R.string.sendlog_run_;
 			message = R.string.sendlog_run;
 		}
