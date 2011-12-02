@@ -60,6 +60,10 @@ public final class Utils {
 	public static final int MINUTES_IN_SECONDS = 60;
 	/** One minutes in milliseconds. */
 	public static final int MINUTES_IN_MILLIS = 60 * 1000;
+	/** One day in seconds. */
+	public static final long DAY_IN_SECONDS = 60L * 60L * 24L;
+	/** One day in milliseconds. */
+	public static final long DAY_IN_MILLIS = 60L * 60L * 24L * 1000L;
 
 	/** k aka 1024. */
 	public static final int K = 1024;
