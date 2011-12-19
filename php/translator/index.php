@@ -80,6 +80,9 @@ To prevent spam, usernames are shown only if this cookie is set.
 <p>
 <?
 foreach ($langs as $l) {
+  if (!$langnames[$l]) {
+    continue;
+  }
   echo '<a href="edit.php?lang='.$l.'">Edit '.$langnames[$l].'</a><br/>'."\n";
 }
 
