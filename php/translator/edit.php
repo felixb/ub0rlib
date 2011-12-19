@@ -162,6 +162,11 @@ if (empty($hidegreen) || $hidegreen != '1') {
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
+<?
+if (!file_exists($location . 'res/values-' . $lang)) {
+  echo '<meta HTTP-EQUIV="REFRESH" content="0; url=.">';
+}
+?>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
 <title>Edit Translations: <? echo $lang; ?></title>
 <script type="text/javascript">
