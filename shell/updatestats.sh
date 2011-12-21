@@ -20,7 +20,7 @@ for d in */res/ ; do
   for l in $(cut -d/ -f2 translation.stats  | sort -u) ; do
     #echo $l
     echo -n "res/${l}:" >> translation.stats.sum
-    expr $(grep ${l} translation.stats | cut -d: -f2 | xargs -n9999 | sed -e 's: : + :g') >> translation.stats.sum
+    expr $(grep ${l}/ translation.stats | cut -d: -f2 | xargs -n9999 | sed -e 's: : + :g') >> translation.stats.sum
   done
   cat translation.stats.sum >> translation.stats
   rm translation.stats.sum

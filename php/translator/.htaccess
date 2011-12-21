@@ -1,0 +1,9 @@
+RewriteEngine On
+RewriteRule ^(..)$ edit.php?lang=$1
+RewriteRule ^(..-r..)$ edit.php?lang=$1
+RewriteRule ^(..)/$ edit.php?lang=$1
+RewriteRule ^(..-r..)/$ edit.php?lang=$1
+RewriteRule ^(.*)/(.*xml)$ edit.php?lang=$1&file=$2
+RewriteRule ^(.*)/(.*xml)/$ edit.php?lang=$1&file=$2
+RewriteRule ^(.*)/(.*xml)/hidegreen$ edit.php?lang=$1&file=$2&hidegreen=1
+

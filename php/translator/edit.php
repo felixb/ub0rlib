@@ -156,6 +156,15 @@ if (empty($hidegreen) || $hidegreen != '1') {
   $hidegreen = 1;
 }
 
+// print_r($_GET);
+
+if (array_key_exists('file', $_GET)) {
+  $file = $_GET['file'];
+} else if (array_key_exists('file', $_POST)) {
+  $file = $_POST['file'];
+} else {
+  $file = '';
+}
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -188,23 +197,79 @@ if (!file_exists($location . 'res/values-' . $lang)) {
 <h1>Translate Strings for <? echo $appname; ?> / <? echo $lang; ?></h1>
 <p>
 Your username: <? echo htmlspecialchars($username); ?><br/><br/>
-Set username or select an other language on the <b><a href="./">index page</a></b>.
+Set username or select an other language on the <b>
+<?
+$redirect=false;
+$basedir='./';
+if (preg_match('/\.php/', $_SERVER['REQUEST_URI'])) {
+  $redirect=false;
+  $basedir='./';
+} else {
+  $redirect=true;
+  if (preg_match('/\/'.$file.'\//', $_SERVER['REQUEST_URI'])) {
+    $basedir='../../';
+  } else if (preg_match('/\/'.$lang.'\//', $_SERVER['REQUEST_URI'])) {
+    $basedir='../';
+  } else {
+    $basedir='./';
+  }
+}
+echo '<a href="' . $basedir . '">index page</a>';
+?>
+</b>.
 </p>
 
 <h3>Currently available files:</h3>
 <p>
 <?
 
-if (array_key_exists('file', $_GET)) {
-  $file = $_GET['file'];
-} else if (array_key_exists('file', $_POST)) {
-  $file = $_POST['file'];
+
+if ($hidegreen) {
+  if ($redirect) {
+    $hg='/hidegreen';
+  } else {
+    $hg='&amp;hidegreen=1';
+  }
+  $nhg='';
+  $hglinktext='[Show green strings]';
 } else {
-  $file = '';
+  $hg='';
+  if ($redirect) {
+    $nhg='/hidegreen';
+  } else {
+    $nhg='&amp;hidegreen=1';
+  }
+  $hglinktext='[Hide green strings]';
 }
 
+$stats=file_get_contents($location.'translation.stats');
+$sstats=explode("\n", $stats);
+
+echo '<ul>';
 foreach ($files as $f) {
-  echo '<a href="edit.php?lang='.$lang.'&amp;file='.$f.'&amp;hidegreen='.$hidegreen.'">';
+
+  $s='';
+  $g='';
+  foreach ($sstats as $ss) {
+    if (preg_match('/res\/values\/'.$f.':/', $ss)) {
+      $tmp=explode(':', $ss);
+      $g=$tmp[1].')*';
+    } else if (preg_match('/res\/values-'.$lang.'\/'.$f.':/', $ss)) {
+      $tmp=explode(':', $ss);
+      $s='('.$tmp[1].'/';
+    }
+  }
+  if ($s && $g) {
+    $s=$s.$g;
+  } else {
+    $s='';
+  }
+  echo '<li>';
+  if ($redirect) {
+    echo '<a href="'.$basedir.$lang.'/'.$f.$hg.'">';
+  } else {
+    echo '<a href="'.$basedir.'edit.php?lang='.$lang.'&amp;file='.$f.$hg.'">';
+  }
   if ($file == $f) {
     echo '<b>';
   }
@@ -212,20 +277,22 @@ foreach ($files as $f) {
   if ($file === $f) {
     echo '</b>';
   }
-  echo '</a><br/>';
-  echo "\n";
+  echo '</a> '.$s.'</li>'."\n";
 }
+echo '</ul>';
 ?>
+* Updated every 5min.
 </p>
 <?
 if (!empty($file)) {
   echo '<h3>Current file: '.$lang.'/'.$file."</h3>\n";
   echo '<p>';
   echo 'Color codes: <ul><li>green == ok</li><li>yellow == original text changed since last translation</li><li>red == missing string</li></ul>'."\n";
-  if ($hidegreen) {
-    echo '<a href="edit.php?lang='.$lang.'&amp;file='.$file.'">[Show green strings]</a>';
+
+  if ($redirect) {
+    echo '<a href="'.$basedir.$lang.'/'.$file.$nhg.'">' . $hglinktext . '</a>';
   } else {
-    echo '<a href="edit.php?lang='.$lang.'&amp;file='.$file.'&amp;hidegreen=1">[Hide green strings]</a>';
+    echo '<a href="'.$basedir.'edit.php?lang='.$lang.'&amp;file='.$file.$nhg.'">' . $hglinktext . '</a>';
   }
   echo "<br/>\n";
   echo "<br/>\n";
@@ -396,7 +463,12 @@ if (!empty($file)) {
     }
 
     $form = '';
-    $form = $form.'<form method="post" action="edit.php?lang='.$lang.'&amp;file='.$file.'&amp;hidegreen='.$hidegreen.'#'.$k.'" id="'.$k.'">'."\n";
+    if ($redirect) {
+      $action=$basedir.$lang.'/'.$file.$hg.'#'.$k.'" id="'.$k;
+    } else {
+      $action=$basedir.'edit.php?lang='.$lang.'&amp;file='.$file.$hg.'#'.$k.'" id="'.$k;
+    }
+    $form = $form.'<form method="post" action="'.$action.'">'."\n";
     $form = $form.'<p>';
     $form = $form.'  String name: <b>'.$k."</b><br/>\n";
     if (!empty($username) && !empty($tstring['username'])) {
@@ -424,7 +496,12 @@ if (!empty($file)) {
     
     $formcolor = $color_green;
     $form = '';
-    $form = $form.'<form method="post" action="edit.php?lang='.$lang.'&amp;file='.$file.'&amp;hidegreen='.$hidegreen.'#'.$k.'" id="'.$k.'">'."\n";
+    if ($redirect) {
+      $action=$basedir.$lang.'/'.$file.$hg.'#'.$k.'" id="'.$k;
+    } else {
+      $action=$basedir.'edit.php?lang='.$lang.'&amp;file='.$file.$hg.'#'.$k.'" id="'.$k;
+    }
+    $form = $form.'<form method="post" action="'.$action.'">'."\n";
     $form = $form.'  String name: <b>'.$k."</b><br/>\n";
     if (!empty($username) && !empty($tstringarray['username'])) {
       $form = $form.'  translator: <input type="text" disabled="disabled" value="'.clean_username($tstringarray['username']).'" size="50" />'."<br/>\n";
