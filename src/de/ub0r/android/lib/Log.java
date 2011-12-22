@@ -163,6 +163,24 @@ public final class Log {
 	}
 
 	/**
+	 * Send a ERROR log message.
+	 * 
+	 * @param tag
+	 *            Used to identify the source of a log message. It usually
+	 *            identifies the class or activity where the log call occurs.
+	 * @param msg
+	 *            The message you would like logged.
+	 * @param startTime
+	 *            start of time measuring with SystemClock.elapsedRealtime()
+	 */
+	public static void e(final String tag, final String msg,
+			final long startTime) {
+		android.util.Log.e(mTag,
+				tag + ": " + msg + " / "
+						+ (SystemClock.elapsedRealtime() - startTime) + "ms");
+	}
+
+	/**
 	 * Send a ERROR log message and log the exception.
 	 * 
 	 * @param tag
@@ -189,6 +207,24 @@ public final class Log {
 	 */
 	public static void i(final String tag, final String msg) {
 		android.util.Log.i(mTag, tag + ": " + msg);
+	}
+
+	/**
+	 * Send a INFO log message.
+	 * 
+	 * @param tag
+	 *            Used to identify the source of a log message. It usually
+	 *            identifies the class or activity where the log call occurs.
+	 * @param msg
+	 *            The message you would like logged.
+	 * @param startTime
+	 *            start of time measuring with SystemClock.elapsedRealtime()
+	 */
+	public static void i(final String tag, final String msg,
+			final long startTime) {
+		android.util.Log.i(mTag,
+				tag + ": " + msg + " / "
+						+ (SystemClock.elapsedRealtime() - startTime) + "ms");
 	}
 
 	/**
@@ -221,6 +257,24 @@ public final class Log {
 	}
 
 	/**
+	 * Send a VERBOSE log message.
+	 * 
+	 * @param tag
+	 *            Used to identify the source of a log message. It usually
+	 *            identifies the class or activity where the log call occurs.
+	 * @param msg
+	 *            The message you would like logged.
+	 * @param startTime
+	 *            start of time measuring with SystemClock.elapsedRealtime()
+	 */
+	public static void v(final String tag, final String msg,
+			final long startTime) {
+		android.util.Log.v(mTag,
+				tag + ": " + msg + " / "
+						+ (SystemClock.elapsedRealtime() - startTime) + "ms");
+	}
+
+	/**
 	 * Send a VERBOSE log message and log the exception.
 	 * 
 	 * @param tag
@@ -247,6 +301,24 @@ public final class Log {
 	 */
 	public static void w(final String tag, final String msg) {
 		android.util.Log.w(mTag, tag + ": " + msg);
+	}
+
+	/**
+	 * Send a WARN log message.
+	 * 
+	 * @param tag
+	 *            Used to identify the source of a log message. It usually
+	 *            identifies the class or activity where the log call occurs.
+	 * @param msg
+	 *            The message you would like logged.
+	 * @param startTime
+	 *            start of time measuring with SystemClock.elapsedRealtime()
+	 */
+	public static void w(final String tag, final String msg,
+			final long startTime) {
+		android.util.Log.w(mTag,
+				tag + ": " + msg + " / "
+						+ (SystemClock.elapsedRealtime() - startTime) + "ms");
 	}
 
 	/**
