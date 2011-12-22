@@ -36,6 +36,7 @@ public class DonationFragmentActivity extends FragmentActivity {
 		this.setTheme(R.style.Theme_SherlockUb0r_Light);
 		super.onCreate(savedInstanceState);
 		DonationHelper.onCreate(this);
+		this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
 	/**

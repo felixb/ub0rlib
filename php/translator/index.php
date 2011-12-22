@@ -73,20 +73,41 @@ Please use a format like "My Name &lt;myaddress@myprovider.tld&gt;".
 </form>
 * Your username will be saved on your computer as cookie.
 To prevent spam, usernames are shown only if this cookie is set.
+(Bad boys do not have this cookie set ;))
 <br/>
 </p>
 
+
 <h3>Currently available Languages:</h3>
-<p>
+<ul>
 <?
+$stats=file_get_contents($location.'translation.stats');
+$sstats=explode("\n", $stats);
+
 foreach ($langs as $l) {
-  if (!$langnames[$l]) {
-    continue;
+  if (array_key_exists($l, $langnames) && $langnames[$l]) {
+    $s='';
+    $g='';
+    foreach ($sstats as $ss) {
+      if (preg_match('/res\/values:/', $ss)) {
+        $tmp=explode(':', $ss);
+        $g=$tmp[1].')**';
+      } else if (preg_match('/res\/values-'.$l.':/', $ss)) {
+        $tmp=explode(':', $ss);
+        $s='('.$tmp[1].'/';
+      }
+    }
+    if ($s && $g) {
+      $s=$s.$g;
+    } else {
+      $s='';
+    }
+    echo '<li><a href="'.$l.'">Edit '.$langnames[$l].'</a> '.$s.'</li>'."\n";
   }
-  echo '<a href="edit.php?lang='.$l.'">Edit '.$langnames[$l].'</a><br/>'."\n";
 }
 
-echo '</p>';
+echo '</ul>';
+echo '<p>** Updated every 5min.</p>';
 echo '<p>';
 
 if (!empty($username)) {

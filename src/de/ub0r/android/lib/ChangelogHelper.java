@@ -251,6 +251,7 @@ public final class ChangelogHelper {
 		if (l == 0 || lastRead == l) {
 			// all notes are read
 			Log.d(TAG, "all news read: " + l);
+			p.edit().putInt(PREFS_LAST_READ, l).commit();
 			return;
 		}
 

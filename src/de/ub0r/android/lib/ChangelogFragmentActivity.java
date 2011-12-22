@@ -36,6 +36,7 @@ public final class ChangelogFragmentActivity extends FragmentActivity {
 		this.setTheme(R.style.Theme_SherlockUb0r_Light);
 		super.onCreate(savedInstanceState);
 		ChangelogHelper.onCreate(this);
+		this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
 	/**
