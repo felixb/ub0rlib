@@ -82,7 +82,7 @@ public final class DonationHelper {
 	private static final double CHECK_DONATOR_LIC = 0.05;
 
 	/** URL for checking hash. */
-	public static final String URL = "http://www.4.ub0r.de/donation/";
+	public static final String URL = "http://www.ub0r.de/donation/";
 
 	/** Bitcoin address. */
 	private static final String DONATE_BITCOIN = // .
