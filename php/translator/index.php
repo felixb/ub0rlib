@@ -32,6 +32,7 @@ $d->close();
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+<link rel="stylesheet" type="text/css" href="/default.css" />
 <title>Edit Translations</title>
 <script type="text/javascript">
 
@@ -48,6 +49,15 @@ $d->close();
 </script>
 </head>
 <body>
+
+<div class="top">
+<ul>
+<li><a href="/">ub0r apps</a></li>
+<li>&gt; <a href="/translate/">translate</a></li>
+<li>&gt; <a href="."><? echo $appname; ?></a></li>
+</ul>
+<span class="topright"><a href="/contact.html">contact</a></span>
+</div>
 
 <h1>Translate Strings for <? echo $appname; ?></h1>
 

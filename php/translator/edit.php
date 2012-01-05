@@ -74,8 +74,9 @@ function sxmle_readxml($location, $filename) {
 }
 
 function sxmle_writexml($sxmle, $location, $lang, $file) {
+  global $lang, $file;
   $xml = $sxmle->asXML();
-  $xml = preg_replace('/Visit http.*to edit the file./', 'Visit http://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'].'?lang='.$lang.'&file='.$file.' to edit the file.', $xml);
+  $xml = preg_replace('/Visit http.*to edit the file./', 'Visit http://ub0r.de'.preg_replace('/edit.php/', $lang.'/'.$file, $_SERVER['SCRIPT_NAME']).' to edit the file.', $xml);
   $xml = preg_replace('/\>\<string/', '>'."\n".'<string', $xml);
   $xml = preg_replace('/\>\<item/', '>'."\n".'<item', $xml);
   $xml = preg_replace('/.*\<string/', '  <string', $xml);
@@ -177,6 +178,7 @@ if (!file_exists($location . 'res/values-' . $lang)) {
 }
 ?>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+<link rel="stylesheet" type="text/css" href="/default.css" />
 <title>Edit Translations: <? echo $lang; ?></title>
 <script type="text/javascript">
 
@@ -194,10 +196,7 @@ if (!file_exists($location . 'res/values-' . $lang)) {
 </head>
 <body>
 
-<h1>Translate Strings for <? echo $appname; ?> / <? echo $lang; ?></h1>
-<p>
-Your username: <? echo htmlspecialchars($username); ?><br/><br/>
-Set username or select an other language on the <b>
+
 <?
 $redirect=false;
 $basedir='./';
@@ -214,6 +213,43 @@ if (preg_match('/\.php/', $_SERVER['REQUEST_URI'])) {
     $basedir='./';
   }
 }
+?>
+
+<div class="top">
+<ul>
+<li><a href="/">ub0r apps</a></li>
+<li>&gt; <a href="/translate/">translate</a></li>
+<li>&gt; <a href="<? echo $basedir; ?>"><? echo $appname; ?></a></li>
+<li>&gt; 
+<?
+  if ($redirect) {
+    echo '<a href="'.$basedir.$lang.'">';
+  } else {
+    echo '<a href="'.$basedir.'edit.php?lang='.$lang.'">';
+  }
+?>
+<? echo $lang; ?></a></li>
+<?
+  
+  if (!empty($file)) {
+    echo '<li>&gt; ';
+    if ($redirect) {
+      echo '<a href="'.$basedir.$lang.'/'.$file.$nhg.'">';
+    } else {
+      echo '<a href="'.$basedir.'edit.php?lang='.$lang.'&amp;file='.$file.$nhg.'">';
+    }
+    echo $file.'</a></li>';
+  }
+?>
+</ul>
+<span class="topright"><a href="/contact.html">contact</a></span>
+</div>
+
+<h1>Translate Strings for <? echo $appname; ?> / <? echo $lang; ?></h1>
+<p>
+Your username: <? echo htmlspecialchars($username); ?><br/><br/>
+Set username or select an other language on the <b>
+<?
 echo '<a href="' . $basedir . '">index page</a>';
 ?>
 </b>.
@@ -235,7 +271,7 @@ if ($hidegreen) {
 } else {
   $hg='';
   if ($redirect) {
-    $nhg='/hidegreen';
+    $nhg='/hidegreen" rel="nofollow';
   } else {
     $nhg='&amp;hidegreen=1';
   }
