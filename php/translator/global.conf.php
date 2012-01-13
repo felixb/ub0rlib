@@ -20,6 +20,7 @@ $langnames = array(
   'pl' => 'Polish',
   'pt' => 'Poruguese',
   'pt-rBR' => 'Poruguese (Brasil) - Please translate only non common strings!',
+  'ro' => 'Romanian',
   'ru' => 'Russian',
   'sk' => 'Slovak',
   'sv' => 'Swedish',
