@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Felix Bechstein, The Android Open Source Project
+ * Copyright (C) 2010-2012 Felix Bechstein, The Android Open Source Project
  * 
  * This file is part of ub0rlib.
  * 
@@ -25,6 +25,7 @@ import android.app.PendingIntent;
 import android.os.Build;
 import android.telephony.gsm.SmsManager;
 import android.util.Log;
+import de.ub0r.android.lib.Utils;
 
 /**
  * Wrap around Telephony API.
@@ -61,11 +62,10 @@ public abstract class TelephonyWrapper {
 	 */
 	public static final TelephonyWrapper getInstance() {
 		if (sInstance == null) {
-			int sdkVersion = Integer.parseInt(Build.VERSION.SDK);
-			if (sdkVersion < Build.VERSION_CODES.DONUT) {
-				sInstance = new TelephonyWrapper3();
-			} else {
+			if (Utils.isApi(Build.VERSION_CODES.DONUT)) {
 				sInstance = new TelephonyWrapper4();
+			} else {
+				sInstance = new TelephonyWrapper3();
 			}
 			Log.d(TAG, "getInstance(): " + sInstance.getClass().getName());
 		}

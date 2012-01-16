@@ -30,6 +30,7 @@ import android.os.Build;
 import android.view.View;
 import android.view.View.OnClickListener;
 import de.ub0r.android.lib.Log;
+import de.ub0r.android.lib.Utils;
 
 /**
  * Wrap around contacts API.
@@ -90,11 +91,10 @@ public abstract class ContactsWrapper {
 	 */
 	public static final ContactsWrapper getInstance() {
 		if (sInstance == null) {
-			int sdkVersion = Integer.parseInt(Build.VERSION.SDK);
-			if (sdkVersion < Build.VERSION_CODES.ECLAIR) {
-				sInstance = new ContactsWrapper3();
-			} else {
+			if (Utils.isApi(Build.VERSION_CODES.ECLAIR)) {
 				sInstance = new ContactsWrapper5();
+			} else {
+				sInstance = new ContactsWrapper3();
 			}
 			Log.d(TAG, "getInstance(): " + sInstance.getClass().getName());
 		}
@@ -285,8 +285,7 @@ public abstract class ContactsWrapper {
 		} catch (Exception e) {
 			Log.e(TAG, "error showing QuickContact", e);
 			try {
-				context
-						.startActivity(new Intent(Intent.ACTION_VIEW, lookupUri));
+				context.startActivity(new Intent(Intent.ACTION_VIEW, lookupUri));
 			} catch (ActivityNotFoundException e1) {
 				Log.e(TAG, "error showing contact", e1);
 			}
@@ -379,8 +378,8 @@ public abstract class ContactsWrapper {
 		final OnClickListener ret = new OnClickListener() {
 			@Override
 			public void onClick(final View v) {
-				Uri u = ContactsWrapper.this.getLookupKeyForNumber(context
-						.getContentResolver(), number);
+				Uri u = ContactsWrapper.this.getLookupKeyForNumber(
+						context.getContentResolver(), number);
 				ContactsWrapper.this.showQuickContactFallBack(context, target,
 						u, mode, null);
 			}
@@ -498,7 +497,7 @@ public abstract class ContactsWrapper {
 	 * 
 	 * @param number
 	 *            drity number
-	 *@return clean number
+	 * @return clean number
 	 */
 	public final String cleanNumber(final String number) {
 		if (number == null) {

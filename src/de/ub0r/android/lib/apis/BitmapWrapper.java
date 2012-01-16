@@ -25,6 +25,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.util.Log;
+import de.ub0r.android.lib.Utils;
 
 /**
  * Wrap around Bitmap Class.
@@ -48,11 +49,10 @@ public abstract class BitmapWrapper {
 	 */
 	public static final BitmapWrapper getInstance() {
 		if (sInstance == null) {
-			int sdkVersion = Integer.parseInt(Build.VERSION.SDK);
-			if (sdkVersion < Build.VERSION_CODES.DONUT) {
-				sInstance = new BitmapWrapper3();
-			} else {
+			if (Utils.isApi(Build.VERSION_CODES.DONUT)) {
 				sInstance = new BitmapWrapper4();
+			} else {
+				sInstance = new BitmapWrapper3();
 			}
 			Log.d(TAG, "getInstance(): " + sInstance.getClass().getName());
 		}
