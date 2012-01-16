@@ -18,7 +18,8 @@ rm commit.log
 
 ret=0
 if [ $(git diff --shortstat | wc -l) != 0 ] ; then
-	git commit -am "auto commit for translation" --author "ub0r bot <noreply@ub0r.de>" > commit.log 2> commit.log
+	/home/flx/dev/android/ub0rlib/shell/updatestats.sh > commit.log 2> commit.log
+	git commit -am "auto commit for translation" --author "ub0r bot <noreply@ub0r.de>" >> commit.log 2>> commit.log
 	rc=$?
 	if [ $rc != 0 ] ; then
 		ret=$rc
@@ -31,8 +32,12 @@ if [ $rc != 0 ] ; then
 	ret=$rc
 	echo rc=$ret | tee -a commit.log
 fi
-[ -n "$2" ] && git merge $2 >> commit.log 2>> commit.log
-rc=$?
+if [ -n "$2" ] ; then
+	git merge $2 >> commit.log 2>> commit.log
+	rc=$?
+	/home/flx/dev/android/ub0rlib/shell/updatestats.sh >> commit.log 2>> commit.log
+	git commit -am "update translation stats" --author "ub0r bot <noreply@ub0r.de>" >> commit.log 2>> commit.log
+fi
 if [ $rc != 0 ] ; then
 	ret=$rc
 	echo rc=$ret | tee -a commit.log

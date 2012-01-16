@@ -14,7 +14,7 @@ for d in */res/ ; do
       echo "skip: ${f}"
     else
       echo -n ${f}: >> translation.stats
-      grep -Fe '<string' -e'<item' ${f} | grep -v 'notranslation="true"' | wc -l >> translation.stats
+      grep -Fe '<string' -e'<item' ${f} | grep -ve 'notranslation="true"' -e 'name="action"' | wc -l >> translation.stats
     fi
   done
   for l in $(cut -d/ -f2 translation.stats  | sort -u) ; do
