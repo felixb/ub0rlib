@@ -3,18 +3,16 @@
  * 
  * This file is part of ub0rlib.
  * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 3 of the License, or (at your option) any later
- * version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with
- * this program; If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program; If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 package de.ub0r.android.lib;
 
@@ -83,14 +81,12 @@ public final class Log {
 		/**
 		 * {@inheritDoc}
 		 */
-		public void onClick(final DialogInterface dialog, // .
-				final int whichButton) {
+		public void onClick(final DialogInterface dialog, final int whichButton) {
 			try {
 				this.a.startActivity(this.i);
 			} catch (ActivityNotFoundException e) {
 				e(TAG, "activity not found", e);
-				Toast.makeText(this.a, "no activity found", Toast.LENGTH_LONG)
-						.show();
+				Toast.makeText(this.a, "no activity found", Toast.LENGTH_LONG).show();
 			}
 		}
 	}
@@ -106,8 +102,8 @@ public final class Log {
 	 * Send a DEBUG log message.
 	 * 
 	 * @param tag
-	 *            Used to identify the source of a log message. It usually
-	 *            identifies the class or activity where the log call occurs.
+	 *            Used to identify the source of a log message. It usually identifies the class or
+	 *            activity where the log call occurs.
 	 * @param msg
 	 *            The message you would like logged.
 	 */
@@ -119,33 +115,30 @@ public final class Log {
 	 * Send a DEBUG log message.
 	 * 
 	 * @param tag
-	 *            Used to identify the source of a log message. It usually
-	 *            identifies the class or activity where the log call occurs.
+	 *            Used to identify the source of a log message. It usually identifies the class or
+	 *            activity where the log call occurs.
 	 * @param msg
 	 *            The message you would like logged.
 	 * @param startTime
 	 *            start of time measuring with SystemClock.elapsedRealtime()
 	 */
-	public static void d(final String tag, final String msg,
-			final long startTime) {
-		android.util.Log.d(mTag,
-				tag + ": " + msg + " / "
-						+ (SystemClock.elapsedRealtime() - startTime) + "ms");
+	public static void d(final String tag, final String msg, final long startTime) {
+		android.util.Log.d(mTag, tag + ": " + msg + " / "
+				+ (SystemClock.elapsedRealtime() - startTime) + "ms");
 	}
 
 	/**
 	 * Send a DEBUG log message and log the exception.
 	 * 
 	 * @param tag
-	 *            Used to identify the source of a log message. It usually
-	 *            identifies the class or activity where the log call occurs.
+	 *            Used to identify the source of a log message. It usually identifies the class or
+	 *            activity where the log call occurs.
 	 * @param msg
 	 *            The message you would like logged.
 	 * @param tr
 	 *            An exception to log.
 	 */
-	public static void d(final String tag, final String msg, // .
-			final Throwable tr) {
+	public static void d(final String tag, final String msg, final Throwable tr) {
 		android.util.Log.d(mTag, tag + ": " + msg, tr);
 	}
 
@@ -153,8 +146,8 @@ public final class Log {
 	 * Send a ERROR log message.
 	 * 
 	 * @param tag
-	 *            Used to identify the source of a log message. It usually
-	 *            identifies the class or activity where the log call occurs.
+	 *            Used to identify the source of a log message. It usually identifies the class or
+	 *            activity where the log call occurs.
 	 * @param msg
 	 *            The message you would like logged.
 	 */
@@ -166,33 +159,30 @@ public final class Log {
 	 * Send a ERROR log message.
 	 * 
 	 * @param tag
-	 *            Used to identify the source of a log message. It usually
-	 *            identifies the class or activity where the log call occurs.
+	 *            Used to identify the source of a log message. It usually identifies the class or
+	 *            activity where the log call occurs.
 	 * @param msg
 	 *            The message you would like logged.
 	 * @param startTime
 	 *            start of time measuring with SystemClock.elapsedRealtime()
 	 */
-	public static void e(final String tag, final String msg,
-			final long startTime) {
-		android.util.Log.e(mTag,
-				tag + ": " + msg + " / "
-						+ (SystemClock.elapsedRealtime() - startTime) + "ms");
+	public static void e(final String tag, final String msg, final long startTime) {
+		android.util.Log.e(mTag, tag + ": " + msg + " / "
+				+ (SystemClock.elapsedRealtime() - startTime) + "ms");
 	}
 
 	/**
 	 * Send a ERROR log message and log the exception.
 	 * 
 	 * @param tag
-	 *            Used to identify the source of a log message. It usually
-	 *            identifies the class or activity where the log call occurs.
+	 *            Used to identify the source of a log message. It usually identifies the class or
+	 *            activity where the log call occurs.
 	 * @param msg
 	 *            The message you would like logged.
 	 * @param tr
 	 *            An exception to log.
 	 */
-	public static void e(final String tag, final String msg, // .
-			final Throwable tr) {
+	public static void e(final String tag, final String msg, final Throwable tr) {
 		android.util.Log.e(mTag, tag + ": " + msg, tr);
 	}
 
@@ -200,8 +190,8 @@ public final class Log {
 	 * Send a INFO log message.
 	 * 
 	 * @param tag
-	 *            Used to identify the source of a log message. It usually
-	 *            identifies the class or activity where the log call occurs.
+	 *            Used to identify the source of a log message. It usually identifies the class or
+	 *            activity where the log call occurs.
 	 * @param msg
 	 *            The message you would like logged.
 	 */
@@ -213,33 +203,30 @@ public final class Log {
 	 * Send a INFO log message.
 	 * 
 	 * @param tag
-	 *            Used to identify the source of a log message. It usually
-	 *            identifies the class or activity where the log call occurs.
+	 *            Used to identify the source of a log message. It usually identifies the class or
+	 *            activity where the log call occurs.
 	 * @param msg
 	 *            The message you would like logged.
 	 * @param startTime
 	 *            start of time measuring with SystemClock.elapsedRealtime()
 	 */
-	public static void i(final String tag, final String msg,
-			final long startTime) {
-		android.util.Log.i(mTag,
-				tag + ": " + msg + " / "
-						+ (SystemClock.elapsedRealtime() - startTime) + "ms");
+	public static void i(final String tag, final String msg, final long startTime) {
+		android.util.Log.i(mTag, tag + ": " + msg + " / "
+				+ (SystemClock.elapsedRealtime() - startTime) + "ms");
 	}
 
 	/**
 	 * Send a INFO log message and log the exception.
 	 * 
 	 * @param tag
-	 *            Used to identify the source of a log message. It usually
-	 *            identifies the class or activity where the log call occurs.
+	 *            Used to identify the source of a log message. It usually identifies the class or
+	 *            activity where the log call occurs.
 	 * @param msg
 	 *            The message you would like logged.
 	 * @param tr
 	 *            An exception to log.
 	 */
-	public static void i(final String tag, final String msg, // .
-			final Throwable tr) {
+	public static void i(final String tag, final String msg, final Throwable tr) {
 		android.util.Log.i(mTag, tag + ": " + msg, tr);
 	}
 
@@ -247,8 +234,8 @@ public final class Log {
 	 * Send a VERBOSE log message.
 	 * 
 	 * @param tag
-	 *            Used to identify the source of a log message. It usually
-	 *            identifies the class or activity where the log call occurs.
+	 *            Used to identify the source of a log message. It usually identifies the class or
+	 *            activity where the log call occurs.
 	 * @param msg
 	 *            The message you would like logged.
 	 */
@@ -260,33 +247,30 @@ public final class Log {
 	 * Send a VERBOSE log message.
 	 * 
 	 * @param tag
-	 *            Used to identify the source of a log message. It usually
-	 *            identifies the class or activity where the log call occurs.
+	 *            Used to identify the source of a log message. It usually identifies the class or
+	 *            activity where the log call occurs.
 	 * @param msg
 	 *            The message you would like logged.
 	 * @param startTime
 	 *            start of time measuring with SystemClock.elapsedRealtime()
 	 */
-	public static void v(final String tag, final String msg,
-			final long startTime) {
-		android.util.Log.v(mTag,
-				tag + ": " + msg + " / "
-						+ (SystemClock.elapsedRealtime() - startTime) + "ms");
+	public static void v(final String tag, final String msg, final long startTime) {
+		android.util.Log.v(mTag, tag + ": " + msg + " / "
+				+ (SystemClock.elapsedRealtime() - startTime) + "ms");
 	}
 
 	/**
 	 * Send a VERBOSE log message and log the exception.
 	 * 
 	 * @param tag
-	 *            Used to identify the source of a log message. It usually
-	 *            identifies the class or activity where the log call occurs.
+	 *            Used to identify the source of a log message. It usually identifies the class or
+	 *            activity where the log call occurs.
 	 * @param msg
 	 *            The message you would like logged.
 	 * @param tr
 	 *            An exception to log.
 	 */
-	public static void v(final String tag, final String msg, // .
-			final Throwable tr) {
+	public static void v(final String tag, final String msg, final Throwable tr) {
 		android.util.Log.v(mTag, tag + ": " + msg, tr);
 	}
 
@@ -294,8 +278,8 @@ public final class Log {
 	 * Send a WARN log message.
 	 * 
 	 * @param tag
-	 *            Used to identify the source of a log message. It usually
-	 *            identifies the class or activity where the log call occurs.
+	 *            Used to identify the source of a log message. It usually identifies the class or
+	 *            activity where the log call occurs.
 	 * @param msg
 	 *            The message you would like logged.
 	 */
@@ -307,33 +291,30 @@ public final class Log {
 	 * Send a WARN log message.
 	 * 
 	 * @param tag
-	 *            Used to identify the source of a log message. It usually
-	 *            identifies the class or activity where the log call occurs.
+	 *            Used to identify the source of a log message. It usually identifies the class or
+	 *            activity where the log call occurs.
 	 * @param msg
 	 *            The message you would like logged.
 	 * @param startTime
 	 *            start of time measuring with SystemClock.elapsedRealtime()
 	 */
-	public static void w(final String tag, final String msg,
-			final long startTime) {
-		android.util.Log.w(mTag,
-				tag + ": " + msg + " / "
-						+ (SystemClock.elapsedRealtime() - startTime) + "ms");
+	public static void w(final String tag, final String msg, final long startTime) {
+		android.util.Log.w(mTag, tag + ": " + msg + " / "
+				+ (SystemClock.elapsedRealtime() - startTime) + "ms");
 	}
 
 	/**
 	 * Send a WARN log message and log the exception.
 	 * 
 	 * @param tag
-	 *            Used to identify the source of a log message. It usually
-	 *            identifies the class or activity where the log call occurs.
+	 *            Used to identify the source of a log message. It usually identifies the class or
+	 *            activity where the log call occurs.
 	 * @param msg
 	 *            The message you would like logged.
 	 * @param tr
 	 *            An exception to log.
 	 */
-	public static void w(final String tag, final String msg, // .
-			final Throwable tr) {
+	public static void w(final String tag, final String msg, final Throwable tr) {
 		android.util.Log.w(mTag, tag + ": " + msg, tr);
 	}
 
@@ -355,13 +336,11 @@ public final class Log {
 	 */
 	public static void collectAndSendLog(final Activity activity) {
 		final PackageManager packageManager = activity.getPackageManager();
-		Intent intent = packageManager
-				.getLaunchIntentForPackage(SENDLOG_PACKAGE_NAME);
+		Intent intent = packageManager.getLaunchIntentForPackage(SENDLOG_PACKAGE_NAME);
 		int title, message;
 		if (intent == null) {
-			intent = new Intent(
-					Intent.ACTION_VIEW,
-					Uri.parse("market://search?q=pname:" + SENDLOG_PACKAGE_NAME));
+			intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=pname:"
+					+ SENDLOG_PACKAGE_NAME));
 			title = R.string.sendlog_install_;
 			message = R.string.sendlog_install;
 		} else {
@@ -377,8 +356,7 @@ public final class Log {
 		b.setIcon(android.R.drawable.ic_dialog_info);
 		b.setTitle(title);
 		b.setMessage(message);
-		b.setPositiveButton(android.R.string.ok, new FireIntent(activity,
-				intent));
+		b.setPositiveButton(android.R.string.ok, new FireIntent(activity, intent));
 		b.setNegativeButton(android.R.string.cancel, null);
 		b.show();
 	}

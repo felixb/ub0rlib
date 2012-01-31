@@ -3,18 +3,16 @@
  * 
  * This file is part of ub0rlib.
  * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 3 of the License, or (at your option) any later
- * version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with
- * this program; If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program; If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 package de.ub0r.android.lib;
 
@@ -89,8 +87,7 @@ public final class Utils {
 	 *            default value
 	 * @return parsed {@link Boolean}
 	 */
-	public static boolean parseBoolean(final String value,
-			final boolean defValue) {
+	public static boolean parseBoolean(final String value, final boolean defValue) {
 		boolean ret = defValue;
 		if (value == null || value.length() == 0) {
 			return ret;
@@ -179,8 +176,7 @@ public final class Utils {
 	public static String md5(final String s) {
 		try {
 			// Create MD5 Hash
-			MessageDigest digest = java.security.MessageDigest
-					.getInstance("MD5");
+			MessageDigest digest = java.security.MessageDigest.getInstance("MD5");
 			digest.update(s.getBytes());
 			byte[] messageDigest = digest.digest();
 			// Create Hex String
@@ -208,8 +204,7 @@ public final class Utils {
 	 *            {@link Context}
 	 */
 	public static void setLocale(final Context context) {
-		final SharedPreferences p = PreferenceManager
-				.getDefaultSharedPreferences(context);
+		final SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(context);
 		final String lc = p.getString("morelocale", null);
 		if (TextUtils.isEmpty(lc)) {
 			return;
@@ -237,9 +232,8 @@ public final class Utils {
 		} catch (ActivityNotFoundException e) {
 			try {
 				Log.e(TAG, "no morelocale2", e);
-				context.startActivity(new Intent(Intent.ACTION_VIEW, // .
-						Uri.parse("market://details?id="
-								+ "jp.co.c_lis.ccl.morelocale")));
+				context.startActivity(new Intent(Intent.ACTION_VIEW, Uri
+						.parse("market://details?id=" + "jp.co.c_lis.ccl.morelocale")));
 			} catch (ActivityNotFoundException e1) {
 				Log.e(TAG, "no market", e1);
 				Toast.makeText(context, "no market", Toast.LENGTH_LONG).show();
@@ -257,8 +251,7 @@ public final class Utils {
 	 * @throws IOException
 	 *             File not found or any other IO Exception.
 	 */
-	public static void copyFile(final String source, final String destination)
-			throws IOException {
+	public static void copyFile(final String source, final String destination) throws IOException {
 		final InputStream in = new FileInputStream(source);
 		final OutputStream out = new FileOutputStream(destination);
 		byte[] buf = new byte[K];
@@ -310,18 +303,14 @@ public final class Utils {
 			prefix = "+1";
 		} else if (number.startsWith("+20") || number.startsWith("+27")) {
 			prefix = number.substring(0, 3);
-		} else if (number.startsWith("+2") || number.startsWith("+35")
-				|| number.startsWith("+37") || number.startsWith("+38")
-				|| number.startsWith("+42") || number.startsWith("+50")
-				|| number.startsWith("+59") || number.startsWith("+67")
-				|| number.startsWith("+68") || number.startsWith("+69")
-				|| number.startsWith("+85") || number.startsWith("+88")
-				|| number.startsWith("+96") || number.startsWith("+97")
-				|| number.startsWith("+99")) {
+		} else if (number.startsWith("+2") || number.startsWith("+35") || number.startsWith("+37")
+				|| number.startsWith("+38") || number.startsWith("+42") || number.startsWith("+50")
+				|| number.startsWith("+59") || number.startsWith("+67") || number.startsWith("+68")
+				|| number.startsWith("+69") || number.startsWith("+85") || number.startsWith("+88")
+				|| number.startsWith("+96") || number.startsWith("+97") || number.startsWith("+99")) {
 			prefix = number.substring(0, 4);
-		} else if (number.startsWith("+3") || number.startsWith("+4")
-				|| number.startsWith("+5") || number.startsWith("+6")
-				|| number.startsWith("+8") || number.startsWith("+9")) {
+		} else if (number.startsWith("+3") || number.startsWith("+4") || number.startsWith("+5")
+				|| number.startsWith("+6") || number.startsWith("+8") || number.startsWith("+9")) {
 			prefix = number.substring(0, 3);
 		} else if (number.startsWith("+7")) {
 			prefix = number.substring(0, 2);

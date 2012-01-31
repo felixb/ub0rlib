@@ -32,12 +32,10 @@ public class AmbilWarnaKotak extends View {
 		this(context, attrs, 0);
 	}
 
-	public AmbilWarnaKotak(final Context context, final AttributeSet attrs,
-			final int defStyle) {
+	public AmbilWarnaKotak(final Context context, final AttributeSet attrs, final int defStyle) {
 		super(context, attrs, defStyle);
 
-		this.satudp = context.getResources().getDimension(
-				R.dimen.ambilwarna_satudp);
+		this.satudp = context.getResources().getDimension(R.dimen.ambilwarna_satudp);
 		this.ukuranUiPx = this.ukuranUiDp * this.satudp;
 	}
 
@@ -47,18 +45,17 @@ public class AmbilWarnaKotak extends View {
 
 		if (this.paint == null) {
 			this.paint = new Paint();
-			this.luar = new LinearGradient(0.f, 0.f, 0.f, this.ukuranUiPx,
-					0xffffffff, 0xff000000, TileMode.CLAMP);
+			this.luar = new LinearGradient(0.f, 0.f, 0.f, this.ukuranUiPx, 0xffffffff, 0xff000000,
+					TileMode.CLAMP);
 		}
 
 		this.tmp00[1] = this.tmp00[2] = 1.f;
 		this.tmp00[0] = this.hue;
 		int rgb = Color.HSVToColor(this.tmp00);
 
-		this.dalam = new LinearGradient(0.f, 0.f, this.ukuranUiPx, 0.f,
-				0xffffffff, rgb, TileMode.CLAMP);
-		ComposeShader shader = new ComposeShader(this.luar, this.dalam,
-				PorterDuff.Mode.MULTIPLY);
+		this.dalam = new LinearGradient(0.f, 0.f, this.ukuranUiPx, 0.f, 0xffffffff, rgb,
+				TileMode.CLAMP);
+		ComposeShader shader = new ComposeShader(this.luar, this.dalam, PorterDuff.Mode.MULTIPLY);
 
 		this.paint.setShader(shader);
 

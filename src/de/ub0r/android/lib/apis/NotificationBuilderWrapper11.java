@@ -3,18 +3,16 @@
  * 
  * This file is part of ub0rlib.
  * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 3 of the License, or (at your option) any later
- * version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with
- * this program; If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program; If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 package de.ub0r.android.lib.apis;
 
@@ -132,8 +130,7 @@ public class NotificationBuilderWrapper11 extends NotificationBuilderWrapper {
 		/**
 		 * {@inheritDoc}
 		 */
-		public Builder setFullScreenIntent(final PendingIntent intent,
-				final boolean highPriority) {
+		public Builder setFullScreenIntent(final PendingIntent intent, final boolean highPriority) {
 			this.mBuilder.setFullScreenIntent(intent, highPriority);
 			return this;
 		}
@@ -149,8 +146,7 @@ public class NotificationBuilderWrapper11 extends NotificationBuilderWrapper {
 		/**
 		 * {@inheritDoc}
 		 */
-		public Builder setLights(final int argb, final int onMs, // .
-				final int offMs) {
+		public Builder setLights(final int argb, final int onMs, final int offMs) {
 			this.mBuilder.setLights(argb, onMs, offMs);
 			return this;
 		}
@@ -182,8 +178,7 @@ public class NotificationBuilderWrapper11 extends NotificationBuilderWrapper {
 		/**
 		 * {@inheritDoc}
 		 */
-		public Builder setProgress(final int max, final int progress,
-				final boolean indeterminate) {
+		public Builder setProgress(final int max, final int progress, final boolean indeterminate) {
 			// NOT AVAILABLE FOR THIS API LEVEL
 			// drop it
 			return this;
@@ -224,8 +219,7 @@ public class NotificationBuilderWrapper11 extends NotificationBuilderWrapper {
 		/**
 		 * {@inheritDoc}
 		 */
-		public Builder setTicker(final CharSequence tickerText,
-				final RemoteViews views) {
+		public Builder setTicker(final CharSequence tickerText, final RemoteViews views) {
 			this.mBuilder.setTicker(tickerText, views);
 			return this;
 		}
@@ -255,10 +249,8 @@ public class NotificationBuilderWrapper11 extends NotificationBuilderWrapper {
 		}
 
 		@Override
-		public Builder setLatestEventInfo(final Context context,
-				final CharSequence contentTitle,
-				final CharSequence contentText,
-				final PendingIntent contentIntent) {
+		public Builder setLatestEventInfo(final Context context, final CharSequence contentTitle,
+				final CharSequence contentText, final PendingIntent contentIntent) {
 			this.mBuilder.setContentTitle(contentTitle);
 			this.mBuilder.setContentText(contentText);
 			this.mBuilder.setContentIntent(contentIntent);

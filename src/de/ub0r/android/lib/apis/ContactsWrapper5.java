@@ -3,18 +3,16 @@
  * 
  * This file is part of ub0rlib.
  * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 3 of the License, or (at your option) any later
- * version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with
- * this program; If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program; If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 package de.ub0r.android.lib.apis;
 
@@ -32,9 +30,9 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
 import android.view.View;
@@ -58,13 +56,11 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	// + Phone.CONTENT_ITEM_TYPE + "'" + " AND " + Data.RAW_CONTACT_ID
 	// + " IN " + "(SELECT raw_contact_id " + " FROM phone_lookup"
 	// + " WHERE normalized_number GLOB('+*'))";
-	private static final String CALLER_ID_SELECTION = "PHONE_NUMBERS_EQUAL("
-			+ Phone.NUMBER + ",?) AND " + Data.MIMETYPE + "='"
-			+ Phone.CONTENT_ITEM_TYPE + "'";
+	private static final String CALLER_ID_SELECTION = "PHONE_NUMBERS_EQUAL(" + Phone.NUMBER
+			+ ",?) AND " + Data.MIMETYPE + "='" + Phone.CONTENT_ITEM_TYPE + "'";
 
 	/** Projection for getting {@link Contact} from number. */
-	private static final String[] CALLER_ID_PROJECTION = new String[] {
-			Phone.NUMBER, // 0
+	private static final String[] CALLER_ID_PROJECTION = new String[] { Phone.NUMBER, // 0
 			Phone.DISPLAY_NAME, // 1
 			Phone.CONTACT_ID, // 2
 			Phone.CONTACT_PRESENCE, // 3
@@ -86,44 +82,38 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	private static final int INDEX_CALLER_ID_LOOKUP_KEY = 5;
 
 	/** Projection for persons query, filter. */
-	private static final String[] PROJECTION_FILTER = // .
-	new String[] { Phone.LOOKUP_KEY, // 0
+	private static final String[] PROJECTION_FILTER = new String[] { Phone.LOOKUP_KEY, // 0
 			Data.DISPLAY_NAME, // 1
 			Phone.NUMBER, // 2
 			Phone.TYPE // 3
 	};
 
 	/** Projection for persons query, show. */
-	private static final String[] PROJECTION_CONTENT = // .
-	new String[] { BaseColumns._ID, // 0
+	private static final String[] PROJECTION_CONTENT = new String[] { BaseColumns._ID, // 0
 			Data.DISPLAY_NAME, // 1
 			Phone.NUMBER, // 2
 			Phone.TYPE // 3
 	};
 
 	/** SQL to select mobile numbers only. */
-	private static final String MOBILES_ONLY = // .
-	Phone.TYPE + " = " + Phone.TYPE_MOBILE;
+	private static final String MOBILES_ONLY = Phone.TYPE + " = " + Phone.TYPE_MOBILE;
 
 	/** Sort Order. */
-	private static final String SORT_ORDER = // .
-	Phone.STARRED + " DESC, " + Phone.TIMES_CONTACTED + " DESC, "
-			+ Phone.DISPLAY_NAME + " ASC, " + Phone.TYPE;
+	private static final String SORT_ORDER = Phone.STARRED + " DESC, " + Phone.TIMES_CONTACTED
+			+ " DESC, " + Phone.DISPLAY_NAME + " ASC, " + Phone.TYPE;
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Bitmap loadContactPhoto(final Context context, // .
-			final Uri contactUri) {
+	public Bitmap loadContactPhoto(final Context context, final Uri contactUri) {
 		Log.d(TAG, "loadContactPhoto(ctx, " + contactUri + ")");
 		if (contactUri == null) {
 			return null;
 		}
 		try {
 			final ContentResolver cr = context.getContentResolver();
-			InputStream is = Contacts.openContactPhotoInputStream(cr,
-					contactUri);
+			InputStream is = Contacts.openContactPhotoInputStream(cr, contactUri);
 			if (is == null) {
 				Log.d(TAG, "no photo for: " + contactUri);
 				return null;
@@ -153,8 +143,8 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 		}
 		Log.d(TAG, "getContactUri(cr, " + id + ")");
 		try {
-			final Uri ret = Contacts.lookupContact(cr, Uri.withAppendedPath(
-					Contacts.CONTENT_LOOKUP_URI, id));
+			final Uri ret = Contacts.lookupContact(cr,
+					Uri.withAppendedPath(Contacts.CONTENT_LOOKUP_URI, id));
 			Log.d(TAG, "found uri: " + ret);
 			return ret;
 		} catch (IllegalArgumentException e) {
@@ -173,10 +163,9 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 			return null;
 		}
 		Uri ret = null;
-		final Cursor c = cr.query(Uri.withAppendedPath(
-				Contacts.CONTENT_LOOKUP_URI, id), new String[] {
-				Contacts.LOOKUP_KEY, BaseColumns._ID }, null, null,
-				BaseColumns._ID + " ASC");
+		final Cursor c = cr.query(Uri.withAppendedPath(Contacts.CONTENT_LOOKUP_URI, id),
+				new String[] { Contacts.LOOKUP_KEY, BaseColumns._ID }, null, null, BaseColumns._ID
+						+ " ASC");
 		if (c.moveToFirst()) {
 			ret = Contacts.getLookupUri(c.getLong(1), id);
 		}
@@ -192,8 +181,7 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Cursor getContact(final ContentResolver cr, // .
-			final String number) {
+	public Cursor getContact(final ContentResolver cr, final String number) {
 		final String n = this.cleanNumber(number);
 		if (n == null || n.length() == 0) {
 			return null;
@@ -209,11 +197,10 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 		c = new ContactsWrapper3().getContact(cr, n);
 		if (c != null && c.moveToFirst()) {
 			// get orig API5 cursor for the real number
-			final String where = PROJECTION_FILTER[FILTER_INDEX_NUMBER]
-					+ " = '" + c.getString(FILTER_INDEX_NUMBER) + "'";
+			final String where = PROJECTION_FILTER[FILTER_INDEX_NUMBER] + " = '"
+					+ c.getString(FILTER_INDEX_NUMBER) + "'";
 			Log.d(TAG, "query: " + Phone.CONTENT_URI + " # " + where);
-			Cursor c0 = cr.query(Phone.CONTENT_URI, PROJECTION_FILTER, where,
-					null, null);
+			Cursor c0 = cr.query(Phone.CONTENT_URI, PROJECTION_FILTER, where, null, null);
 			if (c0 != null && c0.moveToFirst()) {
 				Log.d(TAG, "id: " + c0.getString(FILTER_INDEX_ID));
 				Log.d(TAG, "name: " + c0.getString(FILTER_INDEX_NAME));
@@ -228,8 +215,7 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected Cursor getContact(final ContentResolver cr, // .
-			final Uri uri) {
+	protected Cursor getContact(final ContentResolver cr, final Uri uri) {
 		// FIXME: this is broken in android os; issue #8255
 		Log.d(TAG, "query: " + uri);
 		try {
@@ -305,8 +291,7 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 		final Intent i = new Intent(Intent.ACTION_INSERT_OR_EDIT);
 		i.setType(ContactsContract.Contacts.CONTENT_ITEM_TYPE);
 		i.putExtra(ContactsContract.Intents.Insert.PHONE, address);
-		i.putExtra(ContactsContract.Intents.Insert.PHONE_TYPE,
-				Phone.TYPE_MOBILE);
+		i.putExtra(ContactsContract.Intents.Insert.PHONE_TYPE, Phone.TYPE_MOBILE);
 		return i;
 	}
 
@@ -314,19 +299,18 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void showQuickContact(final Context context, final View target,
-			final Uri lookupUri, final int mode, final String[] excludeMimes) {
-		ContactsContract.QuickContact.showQuickContact(context, target,
-				lookupUri, mode, excludeMimes);
+	public void showQuickContact(final Context context, final View target, final Uri lookupUri,
+			final int mode, final String[] excludeMimes) {
+		ContactsContract.QuickContact.showQuickContact(context, target, lookupUri, mode,
+				excludeMimes);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean updateContactDetails(final Context context,
-			final boolean loadOnly, final boolean loadAvatar,
-			final Contact contact) {
+	public boolean updateContactDetails(final Context context, final boolean loadOnly,
+			final boolean loadAvatar, final Contact contact) {
 		if (contact == null) {
 			Log.w(TAG, "updateContactDetails(null)");
 			return false;
@@ -343,12 +327,11 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 		String number = contact.mNumber;
 		boolean changedNameAndNumber = false;
 		if (rid > 0L && (!loadOnly || number == null)) {
-			final Cursor cursor = cr.query(ContentUris.withAppendedId(
-					CANONICAL_ADDRESS, rid), null, null, null, null);
+			final Cursor cursor = cr.query(ContentUris.withAppendedId(CANONICAL_ADDRESS, rid),
+					null, null, null, null);
 			if (cursor.moveToFirst()) {
 				number = cursor.getString(0);
-				if (number != null && !number.startsWith("000")
-						&& number.startsWith("00")) {
+				if (number != null && !number.startsWith("000") && number.startsWith("00")) {
 					number = number.replaceFirst("^00", "+");
 				}
 				Log.d(TAG, "found address for " + rid + ": " + number);
@@ -360,21 +343,18 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 		}
 
 		// mName + mPersonId + mLookupKey + mPresenceState + mPresenceText
-		if (number != null && (!loadOnly || contact.mName == null || // .
-				contact.mPersonId < 0L)) {
+		if (number != null && (!loadOnly || contact.mName == null || contact.mPersonId < 0L)) {
 			final String n = PhoneNumberUtils.toCallerIDMinMatch(number);
 			if (!TextUtils.isEmpty(n)) {
 				final String selection = CALLER_ID_SELECTION.replace("+", n);
 				Log.d(TAG, "sel: " + selection);
-				final Cursor cursor = cr.query(PHONES_WITH_PRESENCE_URI,
-						CALLER_ID_PROJECTION, selection,
-						new String[] { number }, null);
+				final Cursor cursor = cr.query(PHONES_WITH_PRESENCE_URI, CALLER_ID_PROJECTION,
+						selection, new String[] { number }, null);
 				Log.d(TAG, "result: " + cursor.getCount());
 
 				if (cursor.moveToFirst()) {
 					final long pid = cursor.getLong(INDEX_CALLER_ID_CONTACTID);
-					final String lookup = cursor
-							.getString(INDEX_CALLER_ID_LOOKUP_KEY);
+					final String lookup = cursor.getString(INDEX_CALLER_ID_LOOKUP_KEY);
 					final String na = cursor.getString(INDEX_CALLER_ID_NAME);
 					final String nu = cursor.getString(INDEX_CALLER_ID_NUMBER);
 					final int prs = cursor.getInt(INDEX_CALLER_ID_PRESENCE);
@@ -415,8 +395,7 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 			contact.updateNameAndNumer();
 		}
 
-		if (loadAvatar && contact.mAvatarData == null
-				&& contact.mAvatar == null) {
+		if (loadAvatar && contact.mAvatarData == null && contact.mAvatar == null) {
 			final byte[] data = this.loadAvatarData(context, contact);
 			synchronized (contact) {
 				if (data != null) {
@@ -429,11 +408,10 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	}
 
 	/**
-	 * Load the avatar data from the cursor into memory. Don't decode the data
-	 * until someone calls for it (see getAvatar). Hang onto the raw data so
-	 * that we can compare it when the data is reloaded. TODO: consider
-	 * comparing a checksum so that we don't have to hang onto the raw bytes
-	 * after the image is decoded.
+	 * Load the avatar data from the cursor into memory. Don't decode the data until someone calls
+	 * for it (see getAvatar). Hang onto the raw data so that we can compare it when the data is
+	 * reloaded. TODO: consider comparing a checksum so that we don't have to hang onto the raw
+	 * bytes after the image is decoded.
 	 * 
 	 * @param context
 	 *            {@link Context}
@@ -441,20 +419,17 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	 *            {@link Contact}
 	 * @return avatar as byte[]
 	 */
-	private byte[] loadAvatarData(final Context context, // .
-			final Contact contact) {
+	private byte[] loadAvatarData(final Context context, final Contact contact) {
 		byte[] data = null;
 
 		if (contact.mPersonId <= 0L || contact.mAvatar != null) {
 			return null;
 		}
 
-		final Uri contactUri = ContentUris.withAppendedId(Contacts.CONTENT_URI,
-				contact.mPersonId);
+		final Uri contactUri = ContentUris.withAppendedId(Contacts.CONTENT_URI, contact.mPersonId);
 
-		final InputStream avatarDataStream = Contacts
-				.openContactPhotoInputStream(context.getContentResolver(),
-						contactUri);
+		final InputStream avatarDataStream = Contacts.openContactPhotoInputStream(
+				context.getContentResolver(), contactUri);
 		try {
 			if (avatarDataStream != null) {
 				data = new byte[avatarDataStream.available()];

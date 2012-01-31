@@ -3,18 +3,16 @@
  * 
  * This file is part of ub0rlib.
  * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 3 of the License, or (at your option) any later
- * version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with
- * this program; If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program; If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 package de.ub0r.android.lib.apis;
 
@@ -40,17 +38,19 @@ public abstract class NotificationBuilderWrapper {
 	 */
 	public interface Builder {
 		/**
-		 * Combine all of the options that have been set and return a new
-		 * Notification object.
+		 * Combine all of the options that have been set and return a new Notification object.
+		 * 
+		 * @return {@link Notification}
 		 */
 		Notification getNotification();
 
 		/**
-		 * Setting this flag will make it so the notification is automatically
-		 * canceled when the user clicks it in the panel.
+		 * Setting this flag will make it so the notification is automatically canceled when the
+		 * user clicks it in the panel.
 		 * 
 		 * @param autoCancel
-		 * @return
+		 *            auto cancel
+		 * @return the {@link Builder}
 		 */
 		Builder setAutoCancel(boolean autoCancel);
 
@@ -58,9 +58,24 @@ public abstract class NotificationBuilderWrapper {
 		 * Supply a custom RemoteViews to use instead of the standard one.
 		 * 
 		 * @param views
-		 * @return
+		 *            views
+		 * @return the {@link Builder}
 		 */
 		Builder setContent(RemoteViews views);
+
+		/**
+		 * Call {@link Notification}.setLatestEventInfo().
+		 * 
+		 * @param context
+		 *            {@link Context}
+		 * @param contentTitle
+		 *            content title
+		 * @param contentText
+		 *            content text
+		 * @param contentIntent
+		 *            content {@link PendingIntent}
+		 * @return the {@link Builder}
+		 */
 
 		Builder setLatestEventInfo(Context context, CharSequence contentTitle,
 				CharSequence contentText, PendingIntent contentIntent);
@@ -69,7 +84,8 @@ public abstract class NotificationBuilderWrapper {
 		 * Set the large text at the right-hand side of the notification.
 		 * 
 		 * @param info
-		 * @return
+		 *            content info
+		 * @return the {@link Builder}
 		 */
 		Builder setContentInfo(CharSequence info);
 
@@ -77,7 +93,8 @@ public abstract class NotificationBuilderWrapper {
 		 * Supply a PendingIntent to send when the notification is clicked.
 		 * 
 		 * @param intent
-		 * @return
+		 *            content {@link PendingIntent}
+		 * @return the {@link Builder}
 		 */
 		Builder setContentIntent(PendingIntent intent);
 
@@ -85,26 +102,29 @@ public abstract class NotificationBuilderWrapper {
 		 * Set the default notification options that will be used.
 		 * 
 		 * @param defaults
-		 * @return
+		 *            defaults
+		 * @return the {@link Builder}
 		 */
 		Builder setDefaults(int defaults);
 
 		/**
-		 * Supply a PendingIntent to send when the notification is cleared by
-		 * the user directly from the notification panel.
+		 * Supply a PendingIntent to send when the notification is cleared by the user directly from
+		 * the notification panel.
 		 * 
 		 * @param intent
-		 * @return
+		 *            delete {@link PendingIntent}
+		 * @return the {@link Builder}
 		 */
 		Builder setDeleteIntent(PendingIntent intent);
 
 		/**
-		 * An intent to launch instead of posting the notification to the status
-		 * bar.
+		 * An intent to launch instead of posting the notification to the status bar.
 		 * 
 		 * @param intent
+		 *            full screen {@link PendingIntent}
 		 * @param highPriority
-		 * @return
+		 *            high priority
+		 * @return the {@link Builder}
 		 */
 		Builder setFullScreenIntent(PendingIntent intent, boolean highPriority);
 
@@ -112,18 +132,22 @@ public abstract class NotificationBuilderWrapper {
 		 * Set the large icon that is shown in the ticker and notification.
 		 * 
 		 * @param icon
-		 * @return
+		 *            icon
+		 * @return the {@link Builder}
 		 */
 		Builder setLargeIcon(Bitmap icon);
 
 		/**
-		 * Set the argb value that you would like the LED on the device to blnk,
-		 * as well as the rate.
+		 * Set the argb value that you would like the LED on the device to blnk, as well as the
+		 * rate.
 		 * 
 		 * @param argb
+		 *            alpha, red, green, blue
 		 * @param onMs
+		 *            on ms
 		 * @param offMs
-		 * @return
+		 *            off ms
+		 * @return the {@link Builder}
 		 */
 		Builder setLights(int argb, int onMs, int offMs);
 
@@ -131,7 +155,8 @@ public abstract class NotificationBuilderWrapper {
 		 * Set the large number at the right-hand side of the notification.
 		 * 
 		 * @param number
-		 * @return
+		 *            number
+		 * @return the {@link Builder}
 		 */
 		Builder setNumber(int number);
 
@@ -139,37 +164,43 @@ public abstract class NotificationBuilderWrapper {
 		 * Set whether this is an ongoing notification.
 		 * 
 		 * @param ongoing
-		 * @return
+		 *            ongoing
+		 * @return the {@link Builder}
 		 */
 		Builder setOngoing(boolean ongoing);
 
 		/**
-		 * Set this flag if you would only like the sound, vibrate and ticker to
-		 * be played if the notification is not already showing.
+		 * Set this flag if you would only like the sound, vibrate and ticker to be played if the
+		 * notification is not already showing.
 		 * 
 		 * @param onlyAlertOnce
-		 * @return
+		 *            only alert once
+		 * @return the {@link Builder}
 		 */
 		Builder setOnlyAlertOnce(boolean onlyAlertOnce);
 
 		/**
-		 * Set the progress this notification represents, which may be
-		 * represented as a ProgressBar.
+		 * Set the progress this notification represents, which may be represented as a ProgressBar.
 		 * 
 		 * @param max
+		 *            maximum
 		 * @param progress
+		 *            progress
 		 * @param indeterminate
-		 * @return
+		 *            indeterminate
+		 * @return the {@link Builder}
 		 */
 		Builder setProgress(int max, int progress, boolean indeterminate);
 
 		/**
-		 * A variant of setSmallIcon(int) that takes an additional level
-		 * parameter for when the icon is a LevelListDrawable.
+		 * A variant of setSmallIcon(int) that takes an additional level parameter for when the icon
+		 * is a LevelListDrawable.
 		 * 
 		 * @param icon
+		 *            icon
 		 * @param level
-		 * @return
+		 *            level
+		 * @return the {@link Builder}
 		 */
 		Builder setSmallIcon(int icon, int level);
 
@@ -178,7 +209,8 @@ public abstract class NotificationBuilderWrapper {
 		 Set the small icon to use in the notification layouts.
 		 * 
 		 * @param icon
-		 * @return
+		 *            icon
+		 * @return the {@link Builder}
 		 */
 		Builder setSmallIcon(int icon);
 
@@ -186,7 +218,8 @@ public abstract class NotificationBuilderWrapper {
 		 * Set the sound to play.
 		 * 
 		 * @param sound
-		 * @return
+		 *            {@link Uri} to sound
+		 * @return the {@link Builder}
 		 */
 		Builder setSound(Uri sound);
 
@@ -194,28 +227,31 @@ public abstract class NotificationBuilderWrapper {
 		 * Set the sound to play.
 		 * 
 		 * @param sound
+		 *            {@link Uri} to sound
 		 * @param streamType
-		 * @return
+		 *            stream type
+		 * @return the {@link Builder}
 		 */
 		Builder setSound(Uri sound, int streamType);
 
 		/**
-		 * Set the text that is displayed in the status bar when the
-		 * notification first arrives, and also a RemoteViews object that may be
-		 * displayed instead on some devices.
+		 * Set the text that is displayed in the status bar when the notification first arrives, and
+		 * also a RemoteViews object that may be displayed instead on some devices.
 		 * 
 		 * @param tickerText
+		 *            ticker text
 		 * @param views
-		 * @return
+		 *            views
+		 * @return the {@link Builder}
 		 */
 		Builder setTicker(CharSequence tickerText, RemoteViews views);
 
 		/**
-		 * Set the text that is displayed in the status bar when the
-		 * notification first arrives.
+		 * Set the text that is displayed in the status bar when the notification first arrives.
 		 * 
 		 * @param tickerText
-		 * @return
+		 *            ticker text
+		 * @return the {@link Builder}
 		 */
 		Builder setTicker(CharSequence tickerText);
 
@@ -223,7 +259,8 @@ public abstract class NotificationBuilderWrapper {
 		 * Set the vibration pattern to use.
 		 * 
 		 * @param pattern
-		 * @return
+		 *            vibrate pattern
+		 * @return the {@link Builder}
 		 */
 		Builder setVibrate(long[] pattern);
 
@@ -231,7 +268,8 @@ public abstract class NotificationBuilderWrapper {
 		 * Set the time that the event occurred.
 		 * 
 		 * @param when
-		 * @return
+		 *            timestamp
+		 * @return the {@link Builder}
 		 */
 		Builder setWhen(long when);
 	}
@@ -240,8 +278,8 @@ public abstract class NotificationBuilderWrapper {
 	private static final String TAG = "nw";
 
 	/**
-	 * Static singleton instance of {@link Notification.Builder} holding the
-	 * SDK-specific implementation of the class.
+	 * Static singleton instance of {@link Notification.Builder} holding the SDK-specific
+	 * implementation of the class.
 	 */
 	private static NotificationBuilderWrapper sInstance;
 

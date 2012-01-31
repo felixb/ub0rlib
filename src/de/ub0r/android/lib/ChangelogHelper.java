@@ -3,18 +3,16 @@
  * 
  * This file is part of ub0rlib.
  * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 3 of the License, or (at your option) any later
- * version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with
- * this program; If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program; If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 package de.ub0r.android.lib;
 
@@ -95,8 +93,8 @@ public final class ChangelogHelper {
 		 *            mode
 		 */
 		public InnerOnClickListener(final Activity target, final int m) {
-			activity = target;
-			mode = m;
+			this.activity = target;
+			this.mode = m;
 		}
 
 		/**
@@ -106,26 +104,27 @@ public final class ChangelogHelper {
 		public void onClick(final View v) {
 			if (v.getId() == R.id.ok) {
 				final SharedPreferences p = PreferenceManager
-						.getDefaultSharedPreferences(activity);
+						.getDefaultSharedPreferences(this.activity);
 				final Editor ed = p.edit();
-				if (mode == MODE_CHANGELOG) {
-					ed.putBoolean(PREFS_HIDE, ((CheckBox) activity
-							.findViewById(R.id.hide)).isChecked());
-				} else if (mode == MODE_NOTES) {
-					ed.putInt(PREFS_LAST_READ, activity.getResources()
-							.getStringArray(R.array.notes_from_dev).length);
+				if (this.mode == MODE_CHANGELOG) {
+					ed.putBoolean(PREFS_HIDE,
+							((CheckBox) this.activity.findViewById(R.id.hide)).isChecked());
+				} else if (this.mode == MODE_NOTES) {
+					ed.putInt(
+							PREFS_LAST_READ,
+							this.activity.getResources().getStringArray(R.array.notes_from_dev).length);
 				}
 				ed.commit();
-				activity.finish();
+				this.activity.finish();
 			} else if (v.getId() == R.id.extra) {
-				final Intent i = (Intent) activity.getIntent()
+				final Intent i = (Intent) this.activity.getIntent()
 						.getParcelableExtra(EXTRA_INTENT);
 				try {
-					activity.startActivity(i);
+					this.activity.startActivity(i);
 				} catch (ActivityNotFoundException e) {
 					Log.e(TAG, "could not launch intent: " + i);
-					Toast.makeText(activity, "could not launch activity",
-							Toast.LENGTH_LONG).show();
+					Toast.makeText(this.activity, "could not launch activity", Toast.LENGTH_LONG)
+							.show();
 				}
 			} else {
 				Log.w(TAG, "unexpected id in onClick()");
@@ -148,8 +147,7 @@ public final class ChangelogHelper {
 	 * @param icsStyle
 	 *            use HC/ICS Style ~ @return {@link} {@link Intent}
 	 */
-	private static Intent getChangelogIntent(final Context context,
-			final boolean icsStyle) {
+	private static Intent getChangelogIntent(final Context context, final boolean icsStyle) {
 		if (icsStyle) {
 			return new Intent(context, ChangelogFragmentActivity.class);
 		} else {
@@ -165,8 +163,7 @@ public final class ChangelogHelper {
 	 * @return true on first run after update.
 	 */
 	public static boolean isNewVersion(final Context context) {
-		final SharedPreferences p = PreferenceManager
-				.getDefaultSharedPreferences(context);
+		final SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(context);
 		final String v0 = p.getString(PREFS_LAST_RUN, "");
 		final String v1 = context.getString(R.string.app_version);
 		if (v0.equals(v1)) {
@@ -183,10 +180,8 @@ public final class ChangelogHelper {
 	 * @param icsStyle
 	 *            use HC/ICS Style
 	 */
-	public static void showChangelog(final Context context,
-			final boolean icsStyle) {
-		final SharedPreferences p = PreferenceManager
-				.getDefaultSharedPreferences(context);
+	public static void showChangelog(final Context context, final boolean icsStyle) {
+		final SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(context);
 		final String v0 = p.getString(PREFS_LAST_RUN, "");
 		final String v1 = context.getString(R.string.app_version);
 
@@ -206,10 +201,8 @@ public final class ChangelogHelper {
 
 		final String appv = context.getString(R.string.app_name) + " v"
 				+ context.getString(R.string.app_version);
-		final String t = context.getString(R.string.changelog_notification_)
-				+ " " + appv;
-		final String tt = context
-				.getString(R.string.changelog_notification_text) + " " + appv;
+		final String t = context.getString(R.string.changelog_notification_) + " " + appv;
+		final String tt = context.getString(R.string.changelog_notification_text) + " " + appv;
 
 		final Intent i = getChangelogIntent(context, icsStyle);
 		i.setAction("changelog");
@@ -217,9 +210,8 @@ public final class ChangelogHelper {
 		final PendingIntent pi = PendingIntent.getActivity(context, 0, i,
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		final NotificationManager nmgr = (NotificationManager) context
-				.getSystemService(Activity.NOTIFICATION_SERVICE);
-		final Notification n = new Notification(
-				android.R.drawable.stat_sys_warning, t, 0);
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+		final Notification n = new Notification(android.R.drawable.stat_sys_warning, t, 0);
 		n.setLatestEventInfo(context, t, tt, pi);
 		n.flags |= Notification.FLAG_AUTO_CANCEL;
 		nmgr.notify(NOTIFICATION_CHANGELOG, n);
@@ -240,13 +232,10 @@ public final class ChangelogHelper {
 	 *            {@link Intent} fired when pressing the {@link Button}
 	 */
 	public static void showNotes(final Context context, final boolean icsStyle,
-			final String btnText, final String extraText, // .
-			final Intent btnIntent) {
-		final SharedPreferences p = PreferenceManager
-				.getDefaultSharedPreferences(context);
+			final String btnText, final String extraText, final Intent btnIntent) {
+		final SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(context);
 		final int lastRead = p.getInt(PREFS_LAST_READ, 0);
-		final String[] notes = context.getResources().getStringArray(
-				R.array.notes_from_dev);
+		final String[] notes = context.getResources().getStringArray(R.array.notes_from_dev);
 		final int l = notes.length;
 		if (l == 0 || lastRead == l) {
 			// all notes are read
@@ -271,9 +260,8 @@ public final class ChangelogHelper {
 		final PendingIntent pi = PendingIntent.getActivity(context, 0, i,
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		final NotificationManager nmgr = (NotificationManager) context
-				.getSystemService(Activity.NOTIFICATION_SERVICE);
-		final Notification n = new Notification(
-				android.R.drawable.stat_sys_warning, t, 0);
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+		final Notification n = new Notification(android.R.drawable.stat_sys_warning, t, 0);
 		n.setLatestEventInfo(context, t, tt, pi);
 		n.flags |= Notification.FLAG_AUTO_CANCEL;
 		nmgr.notify(NOTIFICATION_NOTES, n);
@@ -286,7 +274,7 @@ public final class ChangelogHelper {
 	 *            {@link Activity}
 	 */
 	static void onCreate(final Activity target) {
-		target.setContentView(R.layout.list);
+		target.setContentView(R.layout.changelog_list);
 		final Intent intent = target.getIntent();
 		final int mode = intent.getIntExtra(EXTRA_MODE, 0);
 
@@ -306,11 +294,10 @@ public final class ChangelogHelper {
 
 		if (mode == MODE_CHANGELOG) {
 			final String appn = target.getString(R.string.app_name);
-			target.setTitle(target.getString(R.string.changelog_) + ": " + appn
-					+ " v" + target.getString(R.string.app_version));
+			target.setTitle(target.getString(R.string.changelog_) + ": " + appn + " v"
+					+ target.getString(R.string.app_version));
 
-			final String[] changes = target.getResources().getStringArray(
-					R.array.updates);
+			final String[] changes = target.getResources().getStringArray(R.array.updates);
 			final int l = changes.length;
 			final Spanned[] schanges = new Spanned[l];
 			for (int i = 0; i < l; i++) {
@@ -320,16 +307,14 @@ public final class ChangelogHelper {
 				s = s.replaceAll(", ", "<br>\n* ");
 				schanges[i] = Html.fromHtml(s);
 			}
-			final ArrayAdapter<Spanned> adapter = new ArrayAdapter<Spanned>(
-					target, R.layout.list_item, schanges);
-			((ListView) target.findViewById(android.R.id.list))
-					.setAdapter(adapter);
+			final ArrayAdapter<Spanned> adapter = new ArrayAdapter<Spanned>(target,
+					R.layout.changelog_list_item, schanges);
+			((ListView) target.findViewById(android.R.id.list)).setAdapter(adapter);
 		} else if (mode == MODE_NOTES) {
 			target.findViewById(R.id.hide).setVisibility(View.GONE);
 			target.setTitle(R.string.notes_from_developer_);
 
-			final String[] notes = target.getResources().getStringArray(
-					R.array.notes_from_dev);
+			final String[] notes = target.getResources().getStringArray(R.array.notes_from_dev);
 			final int l = notes.length;
 			final ArrayList<Spanned> snotes = new ArrayList<Spanned>();
 			s = intent.getStringExtra(EXTRA_TEXT);
@@ -347,10 +332,9 @@ public final class ChangelogHelper {
 				s = s.replaceFirst(": ", "</b><br>\n");
 				snotes.add(0, Html.fromHtml(s));
 			}
-			final ArrayAdapter<Spanned> adapter = new ArrayAdapter<Spanned>(
-					target, R.layout.list_item, snotes);
-			((ListView) target.findViewById(android.R.id.list))
-					.setAdapter(adapter);
+			final ArrayAdapter<Spanned> adapter = new ArrayAdapter<Spanned>(target,
+					R.layout.changelog_list_item, snotes);
+			((ListView) target.findViewById(android.R.id.list)).setAdapter(adapter);
 		} else {
 			target.finish();
 		}

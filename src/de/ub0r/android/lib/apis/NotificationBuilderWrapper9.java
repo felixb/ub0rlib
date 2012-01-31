@@ -3,22 +3,19 @@
  * 
  * This file is part of ub0rlib.
  * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 3 of the License, or (at your option) any later
- * version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with
- * this program; If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program; If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 package de.ub0r.android.lib.apis;
 
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import de.ub0r.android.lib.apis.NotificationBuilderWrapper3.Builder3;
@@ -30,7 +27,7 @@ import de.ub0r.android.lib.apis.NotificationBuilderWrapper3.Builder3;
  */
 public class NotificationBuilderWrapper9 extends NotificationBuilderWrapper {
 	/**
-	 * API3+ wrapper around {@link Notification.Builder}.
+	 * API3+ wrapper around Notification.Builder.
 	 * 
 	 * @author flx
 	 */
@@ -48,8 +45,7 @@ public class NotificationBuilderWrapper9 extends NotificationBuilderWrapper {
 		/**
 		 * {@inheritDoc}
 		 */
-		public Builder setFullScreenIntent(final PendingIntent intent,
-				final boolean highPriority) {
+		public Builder setFullScreenIntent(final PendingIntent intent, final boolean highPriority) {
 			this.getNotification().fullScreenIntent = intent;
 			return this;
 		}

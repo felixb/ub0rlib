@@ -3,8 +3,7 @@ package de.ub0r.android.lib;
 /**
  * A Base64 Encoder/Decoder.
  * <p>
- * This class is used to encode and decode data in Base64 format as described in
- * RFC 1521.
+ * This class is used to encode and decode data in Base64 format as described in RFC 1521.
  * <p>
  * This is "Open Source" software and released under the <a
  * href="http://www.gnu.org/licenses/lgpl.html">GNU/LGPL</a> license.<br>
@@ -52,8 +51,7 @@ public final class Base64Coder {
 	}
 
 	/**
-	 * Encodes a string into Base64 format. No blanks or line breaks are
-	 * inserted.
+	 * Encodes a string into Base64 format. No blanks or line breaks are inserted.
 	 * 
 	 * @param s
 	 *            a String to be encoded.
@@ -64,8 +62,7 @@ public final class Base64Coder {
 	}
 
 	/**
-	 * Encodes a byte array into Base64 format. No blanks or line breaks are
-	 * inserted.
+	 * Encodes a byte array into Base64 format. No blanks or line breaks are inserted.
 	 * 
 	 * @param in
 	 *            an array containing the data bytes to be encoded.
@@ -76,8 +73,7 @@ public final class Base64Coder {
 	}
 
 	/**
-	 * Encodes a byte array into Base64 format. No blanks or line breaks are
-	 * inserted.
+	 * Encodes a byte array into Base64 format. No blanks or line breaks are inserted.
 	 * 
 	 * @param in
 	 *            an array containing the data bytes to be encoded.
@@ -132,8 +128,8 @@ public final class Base64Coder {
 	}
 
 	/**
-	 * Decodes a byte array from Base64 format. No blanks or line breaks are
-	 * allowed within the Base64 encoded data.
+	 * Decodes a byte array from Base64 format. No blanks or line breaks are allowed within the
+	 * Base64 encoded data.
 	 * 
 	 * @param in
 	 *            a character array containing the Base64 encoded data.
@@ -158,16 +154,14 @@ public final class Base64Coder {
 			int i2 = ip < iLen ? in[ip++] : 'A';
 			int i3 = ip < iLen ? in[ip++] : 'A';
 			if (i0 > 127 || i1 > 127 || i2 > 127 || i3 > 127) {
-				throw new IllegalArgumentException(
-						"Illegal character in Base64 encoded data.");
+				throw new IllegalArgumentException("Illegal character in Base64 encoded data.");
 			}
 			int b0 = map2[i0];
 			int b1 = map2[i1];
 			int b2 = map2[i2];
 			int b3 = map2[i3];
 			if (b0 < 0 || b1 < 0 || b2 < 0 || b3 < 0) {
-				throw new IllegalArgumentException(
-						"Illegal character in Base64 encoded data.");
+				throw new IllegalArgumentException("Illegal character in Base64 encoded data.");
 			}
 			int o0 = (b0 << 2) | (b1 >>> 4);
 			int o1 = ((b1 & 0xf) << 4) | (b2 >>> 2);

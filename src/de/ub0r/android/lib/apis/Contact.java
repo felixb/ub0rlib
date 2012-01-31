@@ -3,18 +3,16 @@
  * 
  * This file is part of ub0rlib.
  * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 3 of the License, or (at your option) any later
- * version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License along with
- * this program; If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program; If
+ * not, see <http://www.gnu.org/licenses/>.
  */
 package de.ub0r.android.lib.apis;
 
@@ -68,8 +66,7 @@ public final class Contact {
 	private Uri mLookupUri = null;
 
 	/**
-	 * Get default {@link Drawable} resource id for {@link Contact}'s presence
-	 * state.
+	 * Get default {@link Drawable} resource id for {@link Contact}'s presence state.
 	 * 
 	 * @param presenceState
 	 *            presence state
@@ -142,11 +139,10 @@ public final class Contact {
 	 *            load avatar?
 	 * @return true if {@link Contact}'s details where changed
 	 */
-	public boolean update(final Context context, final boolean loadOnly,
-			final boolean loadAvatar) {
+	public boolean update(final Context context, final boolean loadOnly, final boolean loadAvatar) {
 		Log.d(TAG, "update()");
-		return ContactsWrapper.getInstance().updateContactDetails(context,
-				loadOnly, loadAvatar, this);
+		return ContactsWrapper.getInstance().updateContactDetails(context, loadOnly, loadAvatar,
+				this);
 	}
 
 	/**
@@ -183,8 +179,7 @@ public final class Contact {
 			if (TextUtils.isEmpty(number)) {
 				this.mNameAndNumber = name;
 			} else {
-				this.mNameAndNumber = name + " <"
-						+ PhoneNumberUtils.formatNumber(number) + ">";
+				this.mNameAndNumber = name + " <" + PhoneNumberUtils.formatNumber(number) + ">";
 			}
 		}
 	}
@@ -208,8 +203,7 @@ public final class Contact {
 	}
 
 	/**
-	 * @return {@link Contact}'s name and number formated like "name
-	 *         &lt;number&gt;
+	 * @return {@link Contact}'s name and number formated like "name &lt;number&gt;
 	 */
 	public String getNameAndNumber() {
 		return this.mNameAndNumber;
@@ -256,8 +250,7 @@ public final class Contact {
 	 */
 	public Uri getUri() {
 		if (this.mContactUri == null && this.mPersonId > 0L) {
-			this.mContactUri = ContactsWrapper.getInstance().getContactUri(
-					this.mPersonId);
+			this.mContactUri = ContactsWrapper.getInstance().getContactUri(this.mPersonId);
 		}
 		return this.mContactUri;
 	}
@@ -269,8 +262,7 @@ public final class Contact {
 	 */
 	public Uri getLookUpUri(final ContentResolver cr) {
 		if (this.mLookupUri == null && this.mLookupKey != null) {
-			this.mLookupUri = ContactsWrapper.getInstance().getLookupUri(cr,
-					this.mLookupKey);
+			this.mLookupUri = ContactsWrapper.getInstance().getLookupUri(cr, this.mLookupKey);
 		}
 		return this.mLookupUri;
 	}
@@ -298,8 +290,7 @@ public final class Contact {
 	 *            default {@link Drawable}
 	 * @return {@link Contact}'s avatar
 	 */
-	public Drawable getAvatar(final Context context, // .
-			final Drawable defaultValue) {
+	public Drawable getAvatar(final Context context, final Drawable defaultValue) {
 		Log.d(TAG, "getAvatar()");
 		if (this.mAvatar == null) {
 			if (this.mAvatarData != null) {

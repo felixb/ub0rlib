@@ -51,17 +51,14 @@ public class AmbilWarnaDialog {
 		this.sat = this.tmp01[1];
 		this.val = this.tmp01[2];
 
-		this.satudp = context.getResources().getDimension(
-				R.dimen.ambilwarna_satudp);
+		this.satudp = context.getResources().getDimension(R.dimen.ambilwarna_satudp);
 		this.ukuranUiPx = this.ukuranUiDp * this.satudp;
 		Log.d(TAG, "satudp = " + this.satudp);
 		Log.d(TAG, "ukuranUiPx=" + this.ukuranUiPx);
 
-		View view = LayoutInflater.from(context).inflate(
-				R.layout.ambilwarna_dialog, null);
+		View view = LayoutInflater.from(context).inflate(R.layout.ambilwarna_dialog, null);
 		this.viewHue = view.findViewById(R.id.ambilwarna_viewHue);
-		this.viewKotak = (AmbilWarnaKotak) view
-				.findViewById(R.id.ambilwarna_viewKotak);
+		this.viewKotak = (AmbilWarnaKotak) view.findViewById(R.id.ambilwarna_viewKotak);
 		this.panah = (ImageView) view.findViewById(R.id.ambilwarna_panah);
 		this.viewWarnaLama = view.findViewById(R.id.ambilwarna_warnaLama);
 		this.viewWarnaBaru = view.findViewById(R.id.ambilwarna_warnaBaru);
@@ -88,17 +85,15 @@ public class AmbilWarnaDialog {
 						y = AmbilWarnaDialog.this.ukuranUiPx - 0.001f;
 					}
 
-					AmbilWarnaDialog.this.hue = 360.f - 360.f
-							/ AmbilWarnaDialog.this.ukuranUiPx * y;
+					AmbilWarnaDialog.this.hue = 360.f - 360.f / AmbilWarnaDialog.this.ukuranUiPx
+							* y;
 					if (AmbilWarnaDialog.this.hue == 360.f) {
 						AmbilWarnaDialog.this.hue = 0.f;
 					}
 
-					AmbilWarnaDialog.this.warnaBaru = AmbilWarnaDialog.this
-							.hitungWarna();
+					AmbilWarnaDialog.this.warnaBaru = AmbilWarnaDialog.this.hitungWarna();
 					// update view
-					AmbilWarnaDialog.this.viewKotak
-							.setHue(AmbilWarnaDialog.this.hue);
+					AmbilWarnaDialog.this.viewKotak.setHue(AmbilWarnaDialog.this.hue);
 					AmbilWarnaDialog.this.letakkanPanah();
 					AmbilWarnaDialog.this.viewWarnaBaru
 							.setBackgroundColor(AmbilWarnaDialog.this.warnaBaru);
@@ -134,8 +129,7 @@ public class AmbilWarnaDialog {
 					AmbilWarnaDialog.this.sat = (1.f / AmbilWarnaDialog.this.ukuranUiPx * x);
 					AmbilWarnaDialog.this.val = 1.f - (1.f / AmbilWarnaDialog.this.ukuranUiPx * y);
 
-					AmbilWarnaDialog.this.warnaBaru = AmbilWarnaDialog.this
-							.hitungWarna();
+					AmbilWarnaDialog.this.warnaBaru = AmbilWarnaDialog.this.hitungWarna();
 					// update view
 					AmbilWarnaDialog.this.letakkanKeker();
 					AmbilWarnaDialog.this.viewWarnaBaru
@@ -147,39 +141,32 @@ public class AmbilWarnaDialog {
 			}
 		});
 
-		this.dialog = new AlertDialog.Builder(context).setView(view)
-				.setPositiveButton(android.R.string.ok,
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(final DialogInterface dialog,
-									final int which) {
-								if (AmbilWarnaDialog.this.listener != null) {
-									AmbilWarnaDialog.this.listener.onOk(
-											AmbilWarnaDialog.this,
-											AmbilWarnaDialog.this.warnaBaru);
-								}
-							}
-						}).setNegativeButton(android.R.string.cancel,
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(final DialogInterface dialog,
-									final int which) {
-								if (AmbilWarnaDialog.this.listener != null) {
-									AmbilWarnaDialog.this.listener
-											.onCancel(AmbilWarnaDialog.this);
-								}
-							}
-						}).setNeutralButton(R.string.reset,
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(final DialogInterface dialog,
-									final int which) {
-								if (AmbilWarnaDialog.this.listener != null) {
-									AmbilWarnaDialog.this.listener
-											.onReset(AmbilWarnaDialog.this);
-								}
-							}
-						}).create();
+		this.dialog = new AlertDialog.Builder(context)
+				.setView(view)
+				.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(final DialogInterface dialog, final int which) {
+						if (AmbilWarnaDialog.this.listener != null) {
+							AmbilWarnaDialog.this.listener.onOk(AmbilWarnaDialog.this,
+									AmbilWarnaDialog.this.warnaBaru);
+						}
+					}
+				})
+				.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(final DialogInterface dialog, final int which) {
+						if (AmbilWarnaDialog.this.listener != null) {
+							AmbilWarnaDialog.this.listener.onCancel(AmbilWarnaDialog.this);
+						}
+					}
+				}).setNeutralButton(R.string.reset, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(final DialogInterface dialog, final int which) {
+						if (AmbilWarnaDialog.this.listener != null) {
+							AmbilWarnaDialog.this.listener.onReset(AmbilWarnaDialog.this);
+						}
+					}
+				}).create();
 
 	}
 
