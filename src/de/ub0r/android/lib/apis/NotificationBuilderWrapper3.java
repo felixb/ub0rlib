@@ -227,7 +227,6 @@ public class NotificationBuilderWrapper3 extends NotificationBuilderWrapper {
 		public Builder setTicker(final CharSequence tickerText,
 				final RemoteViews views) {
 			this.mNotification.tickerText = tickerText;
-			this.mNotification.tickerView = views;
 			return this;
 		}
 
