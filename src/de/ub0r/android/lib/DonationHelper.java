@@ -494,10 +494,6 @@ public final class DonationHelper {
 	 *            use HC/ICS Style
 	 */
 	public static void startDonationActivity(final Context context, final boolean icsStyle) {
-		if (icsStyle) {
-			context.startActivity(new Intent(context, DonationFragmentActivity.class));
-		} else {
-			context.startActivity(new Intent(context, DonationActivity.class));
-		}
+		context.startActivity(new Intent(context, DonationActivity.class));
 	}
 }

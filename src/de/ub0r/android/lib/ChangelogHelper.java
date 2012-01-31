@@ -148,11 +148,7 @@ public final class ChangelogHelper {
 	 *            use HC/ICS Style ~ @return {@link} {@link Intent}
 	 */
 	private static Intent getChangelogIntent(final Context context, final boolean icsStyle) {
-		if (icsStyle) {
-			return new Intent(context, ChangelogFragmentActivity.class);
-		} else {
-			return new Intent(context, ChangelogActivity.class);
-		}
+		return new Intent(context, ChangelogActivity.class);
 	}
 
 	/**
