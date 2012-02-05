@@ -44,6 +44,8 @@ public final class Utils {
 	/** Tag for output. */
 	private static final String TAG = "utls";
 
+	/** 10. */
+	public static final int N_10 = 10;
 	/** 100. */
 	public static final int N_100 = 100;
 	/** 1000. */
@@ -261,6 +263,30 @@ public final class Utils {
 		}
 		in.close();
 		out.close();
+	}
+
+	/**
+	 * Concatenate byte arrays.
+	 * 
+	 * @param bytes
+	 *            array of byte arrays
+	 * @return byte array
+	 */
+	public static byte[] concatByteArrays(final byte[][] bytes) {
+		final int l = bytes.length;
+		int rl = 0;
+		for (int i = 0; i < l; i++) {
+			rl += bytes[i].length;
+		}
+		final byte[] ret = new byte[rl];
+		int pos = 0;
+		for (int i = 0; i < l; i++) {
+			byte[] b = bytes[i];
+			int bl = b.length;
+			System.arraycopy(b, 0, ret, pos, bl);
+			pos += bl;
+		}
+		return ret;
 	}
 
 	/**
