@@ -18,7 +18,7 @@
        -->
 <!--
                This file is generated automatically by ub0rlib/php.
-               Visit http://ub0r.de/translate/ub0rlib/edit.php?lang=de&file=donation.xml to edit the file.
+               Visit http://ub0r.de/translate/ub0rlib/de/donation.xml to edit the file.
        -->
 <resources>
   <string name="donate_paypal_" formatted="false" username="flx &lt;f+translator@ub0r.de&gt;" orig="Donate (Paypal)">Spenden (Paypal)</string>
