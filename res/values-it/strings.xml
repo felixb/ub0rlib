@@ -18,7 +18,7 @@
        -->
 <!--
                This file is generated automatically by ub0rlib/php.
-               Visit http://ub0r.de/translate/ub0rlib/edit.php?lang=it&file=strings.xml to edit the file.
+               Visit http://ub0r.de/translate/ub0rlib/it/strings.xml to edit the file.
        -->
 <resources>
   <string name="author_" formatted="false" username="carloraudino@fedoraproject.org" orig="Author:">Autore:</string>
