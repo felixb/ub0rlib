@@ -27,6 +27,7 @@
         android:paddingRight="5dip" >
 
         <TextView
+            android:id="@+id/predonate"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:autoLink="email"
@@ -59,45 +60,58 @@
                 android:text="@string/donate_bitcoin_" />
         </LinearLayout>
 
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:autoLink="web"
-            android:paddingTop="10dip"
-            android:text="@string/postdonate" />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:autoLink="web"
-            android:paddingTop="5dip"
-            android:text="@string/donator_id_" />
-
-        <EditText
-            android:id="@+id/paypalid"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/donator_id_hint"
-            android:singleLine="true" />
-
-        <Button
-            android:id="@+id/send"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/load_hash_" />
-
         <CheckBox
-            android:id="@+id/accept"
+            android:id="@+id/did_paypal_donation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/accept_" />
+            android:text="@string/did_paypal_donation" />
 
-        <TextView
+        <LinearLayout
+            android:id="@+id/layout_nonmarket"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:autoLink="web"
-            android:paddingTop="5dip"
-            android:text="@string/terms" />
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:autoLink="web"
+                android:paddingTop="10dip"
+                android:text="@string/postdonate" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:autoLink="web"
+                android:paddingTop="5dip"
+                android:text="@string/donator_id_" />
+
+            <EditText
+                android:id="@+id/paypalid"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/donator_id_hint"
+                android:singleLine="true" />
+
+            <Button
+                android:id="@+id/send"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/load_hash_" />
+
+            <CheckBox
+                android:id="@+id/accept"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/accept_" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:autoLink="web"
+                android:paddingTop="5dip"
+                android:text="@string/terms" />
+        </LinearLayout>
     </LinearLayout>
 
 </ScrollView>
