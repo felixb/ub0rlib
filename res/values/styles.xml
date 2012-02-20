@@ -32,15 +32,9 @@
     </style>
 
     <style name="Theme.SherlockUb0r" parent="style/Theme.Sherlock">
-        <item name="abBackground">@color/actionbar_background_color</item>
-        <item name="actionMenuTextColor">@color/actionbar_text_color</item>
-        <item name="ubButtonBarBackground">@color/ubActionBarBackgroundDark</item>
     </style>
 
-    <style name="Theme.SherlockUb0r_Light" parent="style/Theme.Sherlock.Light">
-        <item name="abBackground">@color/actionbar_background_color</item>
-        <item name="actionMenuTextColor">@color/actionbar_text_color</item>
-        <item name="ubButtonBarBackground">@color/ubActionBarBackgroundLight</item>
+    <style name="Theme.SherlockUb0r_Light" parent="style/Theme.Sherlock.Light.DarkActionBar">
     </style>
 
     <style name="TextAppearance.Widget.Title" parent="@android:style/TextAppearance.Medium">
