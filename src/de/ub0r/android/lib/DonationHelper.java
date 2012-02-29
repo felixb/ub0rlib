@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2011 Felix Bechstein
+ * Copyright (C) 2010-2012 Felix Bechstein
  * 
  * This file is part of ub0rlib.
  * 
@@ -49,7 +49,10 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -104,6 +107,37 @@ public final class DonationHelper {
 
 	/** Hashed IMEI. */
 	private static String imeiHash = null;
+
+	/**
+	 * Common {@link OnCheckedChangeListener}.
+	 * 
+	 * @author flx
+	 */
+	static class InnerOnCheckedChangeListener implements OnCheckedChangeListener {
+		/** {@link OnClickListener}'s target. */
+		private final Activity activity;
+
+		/**
+		 * Default Constructor.
+		 * 
+		 * @param target
+		 *            target {@link Activity}
+		 */
+		public InnerOnCheckedChangeListener(final Activity target) {
+			this.activity = target;
+		}
+
+		@Override
+		public void onCheckedChanged(final CompoundButton buttonView, final boolean isChecked) {
+			if (isChecked) {
+				this.activity.findViewById(R.id.layout_nonmarket).setVisibility(View.VISIBLE);
+				this.activity.findViewById(R.id.did_paypal_donation).setVisibility(View.GONE);
+			} else {
+				this.activity.findViewById(R.id.layout_nonmarket).setVisibility(View.GONE);
+			}
+		}
+
+	}
 
 	/**
 	 * Common {@link OnClickListener}.
@@ -318,14 +352,27 @@ public final class DonationHelper {
 
 		InnerOnClickListener ocl = new InnerOnClickListener(target);
 
+		CheckBox cb = (CheckBox) target.findViewById(R.id.did_paypal_donation);
+		cb.setOnCheckedChangeListener(new InnerOnCheckedChangeListener(target));
+
 		final Intent marketIntent = Market.getInstallAppIntent(target, DONATOR_PACKAGE, null);
-		if (marketIntent != null && marketIntent.getDataString().startsWith("market://")) {
+		boolean isMarketInstalled = marketIntent != null
+				&& marketIntent.getDataString().startsWith("market://");
+		if (isMarketInstalled) {
+			((TextView) target.findViewById(R.id.predonate)).setText(R.string.predonate_market);
 			target.findViewById(R.id.donate_market).setOnClickListener(ocl);
+			target.findViewById(R.id.donate_paypal).setVisibility(View.GONE);
+			if (!cb.isChecked()) {
+				target.findViewById(R.id.layout_nonmarket).setVisibility(View.GONE);
+			}
 		} else {
+			((TextView) target.findViewById(R.id.predonate)).setText(R.string.predonate);
 			target.findViewById(R.id.donate_market).setVisibility(View.GONE);
+			target.findViewById(R.id.donate_paypal).setOnClickListener(ocl);
+			target.findViewById(R.id.layout_nonmarket).setVisibility(View.VISIBLE);
+			cb.setVisibility(View.GONE);
 		}
 
-		target.findViewById(R.id.donate_paypal).setOnClickListener(ocl);
 		if (isBitcoinAvailable(target)) {
 			target.findViewById(R.id.donate_bitcoin).setOnClickListener(ocl);
 		} else {
