@@ -76,7 +76,7 @@ function sxmle_readxml($location, $filename) {
 function sxmle_writexml($sxmle, $location, $lang, $file) {
   global $lang, $file;
   $xml = $sxmle->asXML();
-  $xml = preg_replace('/Visit http.*to edit the file./', 'Visit http://ub0r.de'.preg_replace('/edit.php/', $lang.'/'.$file, $_SERVER['SCRIPT_NAME']).' to edit the file.', $xml);
+  $xml = preg_replace('/\/android\/translate\//', '/translate/', preg_replace('/Visit http.*to edit the file./', 'Visit http://ub0r.de'.preg_replace('/edit.php/', $lang.'/'.$file, $_SERVER['SCRIPT_NAME']).' to edit the file.', $xml));
   $xml = preg_replace('/\>\<string/', '>'."\n".'<string', $xml);
   $xml = preg_replace('/\>\<item/', '>'."\n".'<item', $xml);
   $xml = preg_replace('/.*\<string/', '  <string', $xml);
@@ -345,7 +345,7 @@ if (!empty($file)) {
   } else if (array_key_exists('action', $_GET)) {
     $action = $_GET['action'];
   }
-  if (!empty($action)) {
+  if (!empty($action) && !empty($username)) {
     if ($action == 'edit-string') {
       foreach ($_POST as $k => $v) {
 	if ($k == 'action' or $k == 'lang' or $k == 'file') {
@@ -508,12 +508,16 @@ if (!empty($file)) {
     $form = $form.'<p>';
     $form = $form.'  String name: <b>'.$k."</b><br/>\n";
     if (!empty($username) && !empty($tstring['username'])) {
-      $form = $form.'  translator: <input type="text" disabled="disabled" value="'.clean_username($tstring['username']).'" size="50" />'."<br/>\n";
+      $form = $form.'  Translator: <input type="text" disabled="disabled" value="'.clean_username($tstring['username']).'" size="50" />'."<br/>\n";
     }
     $form = $form.'  <input name="action" value="edit-string" type="hidden" />'."\n";
     $form = $form.'  en: <textarea disabled="disabled" cols="80" rows="'.$numlines.'">'.$decodedv.'</textarea>'."<br/>\n";
     $form = $form.'  '.$lang.': <textarea name="'.$k.'" cols="80" rows="'.$numlines.'" '.$color.'>'.$decodedtv.'</textarea>'."<br/>\n";
-    $form = $form.'  <input type="submit" />'."<br/>\n";
+    if (empty($username)) {
+      $form = $form.'  <input type="submit" disabled="disabled" /> To prevent spam, you must set your username on the <a href="'.$basedir.'">index page</a> before submitting translation.'."<br/>\n";
+    } else {
+      $form = $form.'  <input type="submit" />'."<br/>\n";
+    }
     $form = $form.'</p>';
     $form = $form.'</form>'."\n";
     $form = $form."<hr/>\n";
@@ -582,7 +586,11 @@ if (!empty($file)) {
 	$i++;
       }
       $form = $form.'  </table>';
-      $form = $form.'  <input type="submit" />'."<br/>\n";
+      if (empty($username)) {
+        $form = $form.'  <input type="submit" disabled="disabled" /> To prevent spam, you must set your username on the <a href="'.$basedir.'">index page</a> before submitting translation.'."<br/>\n";
+      } else {
+        $form = $form.'  <input type="submit" />'."<br/>\n";
+      }
       $form = $form.'</form>'."\n";
       $form = $form."<hr/>\n";
 

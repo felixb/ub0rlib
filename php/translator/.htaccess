@@ -7,3 +7,6 @@ RewriteRule ^(.*)/(.*xml)$ edit.php?lang=$1&file=$2
 RewriteRule ^(.*)/(.*xml)/$ edit.php?lang=$1&file=$2
 RewriteRule ^(.*)/(.*xml)/hidegreen$ edit.php?lang=$1&file=$2&hidegreen=1
 
+order allow,deny
+deny from 109.230.216.
+allow from all
