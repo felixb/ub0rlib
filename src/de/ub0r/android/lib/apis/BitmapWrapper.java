@@ -29,6 +29,7 @@ import de.ub0r.android.lib.Utils;
  * 
  * @author flx
  */
+@Deprecated
 public abstract class BitmapWrapper {
 	/** Tag for output. */
 	private static final String TAG = "bw";

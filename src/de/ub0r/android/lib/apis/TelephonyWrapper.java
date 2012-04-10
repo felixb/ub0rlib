@@ -31,6 +31,7 @@ import de.ub0r.android.lib.Utils;
  * @author flx
  */
 @SuppressWarnings("deprecation")
+@Deprecated
 public abstract class TelephonyWrapper {
 	/** Tag for output. */
 	private static final String TAG = "tw";

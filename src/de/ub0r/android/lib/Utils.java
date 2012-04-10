@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Felix Bechstein
+ * Copyright (C) 2010-2012 Felix Bechstein
  * 
  * This file is part of ub0rlib.
  * 
@@ -31,11 +31,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Shader.TileMode;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.widget.Toast;
+
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 /**
  * @author flx
@@ -69,9 +74,6 @@ public final class Utils {
 	public static final int K = 1024;
 	/** M aka 1024 * 1024. */
 	public static final int M = K * K;
-
-	/** Android API version. */
-	private static int apiVersion = -1;
 
 	/**
 	 * Default Constructor.
@@ -294,11 +296,9 @@ public final class Utils {
 	 * 
 	 * @return API version
 	 */
+	@Deprecated
 	public static int getApiVersion() {
-		if (apiVersion < 0) {
-			apiVersion = Integer.parseInt(Build.VERSION.SDK);
-		}
-		return apiVersion;
+		return Build.VERSION.SDK_INT;
 	}
 
 	/**
@@ -308,11 +308,9 @@ public final class Utils {
 	 *            Android's API version
 	 * @return true, if api <= current API version
 	 */
+	@Deprecated
 	public static boolean isApi(final int api) {
-		if (apiVersion < 0) {
-			apiVersion = Integer.parseInt(Build.VERSION.SDK);
-		}
-		return apiVersion >= api;
+		return Build.VERSION.SDK_INT >= api;
 	}
 
 	/**
@@ -345,5 +343,59 @@ public final class Utils {
 		}
 
 		return prefix;
+	}
+
+	/**
+	 * Fix ActionBar background. See http://b.android.com/15340.
+	 * 
+	 * @param a
+	 *            {@link SherlockActivity}
+	 * @param bg
+	 *            res id of background {@link BitmapDrawable}
+	 * @param bgSplit
+	 *            res id of background {@link BitmapDrawable} in split mode
+	 */
+	public static void fixActionBarBackground(final SherlockActivity a, final int bg,
+			final int bgSplit) {
+		// This is a workaround for http://b.android.com/15340 from
+		// http://stackoverflow.com/a/5852198/132047
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+			BitmapDrawable d = (BitmapDrawable) a.getResources().getDrawable(bg);
+			d.setTileModeXY(TileMode.REPEAT, TileMode.REPEAT);
+			a.getSupportActionBar().setBackgroundDrawable(d);
+
+			if (bgSplit >= 0) {
+				d = (BitmapDrawable) a.getResources().getDrawable(bgSplit);
+				d.setTileModeXY(TileMode.REPEAT, TileMode.REPEAT);
+				a.getSupportActionBar().setSplitBackgroundDrawable(d);
+			}
+		}
+	}
+
+	/**
+	 * Fix ActionBar background. See http://b.android.com/15340.
+	 * 
+	 * @param a
+	 *            {@link SherlockActivity}
+	 * @param bg
+	 *            res id of background {@link BitmapDrawable}
+	 * @param bgSplit
+	 *            res id of background {@link BitmapDrawable} in split mode
+	 */
+	public static void fixActionBarBackground(final SherlockFragmentActivity a, final int bg,
+			final int bgSplit) {
+		// This is a workaround for http://b.android.com/15340 from
+		// http://stackoverflow.com/a/5852198/132047
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+			BitmapDrawable d = (BitmapDrawable) a.getResources().getDrawable(bg);
+			d.setTileModeXY(TileMode.REPEAT, TileMode.REPEAT);
+			a.getSupportActionBar().setBackgroundDrawable(d);
+
+			if (bgSplit >= 0) {
+				d = (BitmapDrawable) a.getResources().getDrawable(bgSplit);
+				d.setTileModeXY(TileMode.REPEAT, TileMode.REPEAT);
+				a.getSupportActionBar().setSplitBackgroundDrawable(d);
+			}
+		}
 	}
 }
