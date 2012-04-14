@@ -31,6 +31,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Shader.TileMode;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -39,8 +40,7 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.app.ActionBar;
 
 /**
  * @author flx
@@ -348,54 +348,26 @@ public final class Utils {
 	/**
 	 * Fix ActionBar background. See http://b.android.com/15340.
 	 * 
-	 * @param a
-	 *            {@link SherlockActivity}
+	 * @param ab
+	 *            {@link ActionBar}
+	 * @param r
+	 *            {@link Resources}
 	 * @param bg
 	 *            res id of background {@link BitmapDrawable}
 	 * @param bgSplit
 	 *            res id of background {@link BitmapDrawable} in split mode
 	 */
-	public static void fixActionBarBackground(final SherlockActivity a, final int bg,
+	public static void fixActionBarBackground(final ActionBar ab, final Resources r, final int bg,
 			final int bgSplit) {
 		// This is a workaround for http://b.android.com/15340 from
 		// http://stackoverflow.com/a/5852198/132047
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-			BitmapDrawable d = (BitmapDrawable) a.getResources().getDrawable(bg);
+		BitmapDrawable d = (BitmapDrawable) r.getDrawable(bg);
+		d.setTileModeXY(TileMode.REPEAT, TileMode.REPEAT);
+		ab.setBackgroundDrawable(d);
+		if (bgSplit >= 0) {
+			d = (BitmapDrawable) r.getDrawable(bgSplit);
 			d.setTileModeXY(TileMode.REPEAT, TileMode.REPEAT);
-			a.getSupportActionBar().setBackgroundDrawable(d);
-
-			if (bgSplit >= 0) {
-				d = (BitmapDrawable) a.getResources().getDrawable(bgSplit);
-				d.setTileModeXY(TileMode.REPEAT, TileMode.REPEAT);
-				a.getSupportActionBar().setSplitBackgroundDrawable(d);
-			}
-		}
-	}
-
-	/**
-	 * Fix ActionBar background. See http://b.android.com/15340.
-	 * 
-	 * @param a
-	 *            {@link SherlockActivity}
-	 * @param bg
-	 *            res id of background {@link BitmapDrawable}
-	 * @param bgSplit
-	 *            res id of background {@link BitmapDrawable} in split mode
-	 */
-	public static void fixActionBarBackground(final SherlockFragmentActivity a, final int bg,
-			final int bgSplit) {
-		// This is a workaround for http://b.android.com/15340 from
-		// http://stackoverflow.com/a/5852198/132047
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-			BitmapDrawable d = (BitmapDrawable) a.getResources().getDrawable(bg);
-			d.setTileModeXY(TileMode.REPEAT, TileMode.REPEAT);
-			a.getSupportActionBar().setBackgroundDrawable(d);
-
-			if (bgSplit >= 0) {
-				d = (BitmapDrawable) a.getResources().getDrawable(bgSplit);
-				d.setTileModeXY(TileMode.REPEAT, TileMode.REPEAT);
-				a.getSupportActionBar().setSplitBackgroundDrawable(d);
-			}
+			ab.setSplitBackgroundDrawable(d);
 		}
 	}
 }
