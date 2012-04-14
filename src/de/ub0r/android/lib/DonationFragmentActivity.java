@@ -32,7 +32,6 @@ public class DonationFragmentActivity extends SherlockActivity {
 	 */
 	@Override
 	public final void onCreate(final Bundle savedInstanceState) {
-		this.setTheme(R.style.Theme_SherlockUb0r_Light);
 		super.onCreate(savedInstanceState);
 		DonationHelper.onCreate(this);
 		this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 		Copyright (C) 2009-2012 Felix Bechstein -->
+<!-- Copyright (C) 2009-2012 Felix Bechstein -->
 <!--
 		This file is part of ub0rlib. This program is free software; you can
 		redistribute it and/or modify it under the terms of the GNU General
@@ -21,7 +21,7 @@
 
     <LinearLayout
         android:id="@+id/buttons"
-        style="@android:style/ButtonBar"
+        style="@style/ButtonBar"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -40,6 +40,7 @@
 
             <Button
                 android:id="@+id/ok"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

@@ -32,7 +32,6 @@ public final class ChangelogFragmentActivity extends SherlockActivity {
 	 */
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
-		this.setTheme(R.style.Theme_SherlockUb0r_Light);
 		super.onCreate(savedInstanceState);
 		ChangelogHelper.onCreate(this);
 		this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);

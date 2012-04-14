@@ -3,7 +3,7 @@
 function remove_logs {
 	echo "remove logs from source: $(basename $1)"
 
-	for f in $(find $1/src/ -name \*.java | grep -ve 'support/v4') ; do
+	for f in $(find $1/src/ -name \*.java | grep -ve 'support/v4' -e 'com/actionbarsherlock') ; do
 		sed \
 			-e 's: Log\.v: //Log.v:' \
 			-e 's: Log\.d: //Log.d:' \
