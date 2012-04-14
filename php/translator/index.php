@@ -7,9 +7,9 @@ include('global.conf.php');
 if (array_key_exists('username', $_POST)) {
   $username = $_POST['username'];
   if (empty($username)) {
-    setcookie('username', '', time()-60*60);
+    setcookie('username', '', time()-60*60, '/', '.'.$_SERVER['HTTP_HOST']);
   } else {
-    setcookie('username', $username, time()+60*60*24*356, '/');
+    setcookie('username', $username, time()+60*60*24*356, '/', '.'.$_SERVER['HTTP_HOST']);
   }
 }
 
