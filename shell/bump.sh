@@ -25,8 +25,9 @@ if [ -z "${msdk}" ] ; then
 fi
 vv="${msdk}${vv}"
 avv=$(grep -o 'versionCode="[0-9]*"' AndroidManifest.xml | cut -d\" -f2)
-if [ ${vv} -le ${avv} ] ;
+if [ ${vv} -le ${avv} ] ; then
   vv=$((${avv} + 1))
+fi
 
 echo v    $v
 echo vn   $vn
@@ -35,8 +36,6 @@ echo vv   $vv
 echo n    $n
 echo tag  ${tag}
 echo tagm  "$(echo ${n} | tr '-' ' ' | sed -e 's/Connector /Connector: /') v${vn}"
-
-exit 5
 
 sed -i -e "s/android:versionName=\"[^\"]*/android:versionName=\"${vn}/" AndroidManifest.xml
 sed -i -e "s/android:versionCode=\"[^\"]*/android:versionCode=\"${vv}/" AndroidManifest.xml
