@@ -296,8 +296,7 @@ public final class Contact {
 			if (this.mAvatarData != null) {
 				Bitmap b = BitmapFactory.decodeByteArray(this.mAvatarData, 0,
 						this.mAvatarData.length);
-				this.mAvatar = BitmapWrapper.getInstance().getBitmapDrawable(
-						context.getResources(), b);
+				this.mAvatar = new BitmapDrawable(context.getResources(), b);
 			}
 		}
 		if (this.mAvatar == null) {
