@@ -16,8 +16,7 @@
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="?android:attr/colorBackground" >
+    android:layout_height="fill_parent" >
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -51,13 +50,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/donate_paypal_" />
-
-            <Button
-                android:id="@+id/donate_bitcoin"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/donate_bitcoin_" />
         </LinearLayout>
 
         <CheckBox
