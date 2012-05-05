@@ -558,7 +558,7 @@ if (!empty($file)) {
     } else {
       $action=$basedir.'edit.php?lang='.$lang.'&amp;file='.$file.'#'.$k.'" id="'.$k;
     }
-    $form = $form.'<form method="post" action="'.$action.'" class="stringblock'.hidegreenclass($color == $color_green).'">'."\n";
+    $form = $form.'<form method="post" action="'.$action.'" class="stringblock'.hidegreenclass($color == $color_green).'">'."\n"; // FIXME
     $form = $form.'  String name: <b>'.$k."</b><br/>\n";
     if (!empty($username) && !empty($tstringarray['username'])) {
       $form = $form.'  translator: <input type="text" disabled="disabled" value="'.clean_username($tstringarray['username']).'" size="50" />'."<br/>\n";

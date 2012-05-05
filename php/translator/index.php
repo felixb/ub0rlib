@@ -11,10 +11,10 @@ if (array_key_exists('username', $_POST)) {
   } else {
     setcookie('username', $username, time()+60*60*24*356, '/', '.'.$_SERVER['HTTP_HOST']);
   }
-}
-
-if (empty($username)) {
+} else if (array_key_exists('username', $_COOKIE)) {
   $username = $_COOKIE['username'];
+} else {
+  $username = '';
 }
 
 $langs = array();
