@@ -16,13 +16,13 @@
 -->
 <resources>
 
-    <string name="app_name">ub0rlib</string>
-    <string name="app_version">0</string>
-    <string name="lang">en</string>
-    <string name="changelog_">Changelog</string>
-    <string name="donate_url">https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=WNHJLLJ6DGG8W</string>
+    <string name="app_name" translatable="false">ub0rlib</string>
+    <string name="app_version" translatable="false">0</string>
+    <string name="lang" translatable="false">en</string>
+    <string name="changelog_" translatable="false">Changelog</string>
+    <string name="donate_url" translatable="false">https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=WNHJLLJ6DGG8W</string>
 
-    <string-array name="updates"></string-array>
-    <string-array name="notes_from_dev"></string-array>
+    <string-array name="updates" translatable="false"></string-array>
+    <string-array name="notes_from_dev" translatable="false"></string-array>
 
 </resources>
