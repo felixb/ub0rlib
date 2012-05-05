@@ -25,6 +25,7 @@ $langnames = array(
   'sk' => 'Slovak',
   'sv' => 'Swedish',
   'tr' => 'Turkish',
+  'uk' => 'Ukrainian',
   'zh' => 'Chinese',
  );
 ?>

@@ -6,13 +6,15 @@ include('global.conf.php');
 
 if (array_key_exists('username', $_POST)) {
   $username = $_POST['username'];
-  if (!empty($username)) {
-    setcookie('username', $username, time()+60*60*24*356, '/');
+  if (empty($username)) {
+    setcookie('username', '', time()-60*60, '/', '.'.$_SERVER['HTTP_HOST']);
+  } else {
+    setcookie('username', $username, time()+60*60*24*356, '/', '.'.$_SERVER['HTTP_HOST']);
   }
-}
-
-if (empty($username)) {
+} else if (array_key_exists('username', $_COOKIE)) {
   $username = $_COOKIE['username'];
+} else {
+  $username = '';
 }
 
 $langs = array();
@@ -119,9 +121,11 @@ foreach ($langs as $l) {
 echo '</ul>';
 echo '<p>** Updated every 5min.</p>';
 echo '<p>';
+echo "<br/>\n";
 
-if (!empty($username)) {
-	echo "<br/>\n";
+if (empty($username)) {
+	echo 'If your language is missing drop me a mail. To prevent spam, the adress is only shown after setting a username.';
+} else {
 	echo 'If your language is missing drop me a <a href="mailto:'.$contactmail.'">mail</a>.';
 }
 

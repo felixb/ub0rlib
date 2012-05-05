@@ -76,7 +76,7 @@ function sxmle_readxml($location, $filename) {
 function sxmle_writexml($sxmle, $location, $lang, $file) {
   global $lang, $file;
   $xml = $sxmle->asXML();
-  $xml = preg_replace('/Visit http.*to edit the file./', 'Visit http://ub0r.de'.preg_replace('/edit.php/', $lang.'/'.$file, $_SERVER['SCRIPT_NAME']).' to edit the file.', $xml);
+  $xml = preg_replace('/\/android\/translate\//', '/translate/', preg_replace('/Visit http.*to edit the file./', 'Visit http://ub0r.de'.preg_replace('/edit.php/', $lang.'/'.$file, $_SERVER['SCRIPT_NAME']).' to edit the file.', $xml));
   $xml = preg_replace('/\>\<string/', '>'."\n".'<string', $xml);
   $xml = preg_replace('/\>\<item/', '>'."\n".'<item', $xml);
   $xml = preg_replace('/.*\<string/', '  <string', $xml);
@@ -111,9 +111,25 @@ function sxmle_writexml($sxmle, $location, $lang, $file) {
   file_put_contents($location.'res/values-'.$lang.'/'.$file, $xml);
 }
 
-$color_green='style="background:#A0FFA0"';
-$color_red='style="background:#FFA0A0"';
-$color_yellow='style="background:#FFFFA0"';
+function hidegreen() {
+  if (array_key_exists('hidegreen', $_POST) && $_POST['hidegreen'] == 1) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+function hidegreenclass($isgreen) {
+  if (hidegreen() && $isgreen) {
+    return ' hide';
+  } else {
+    return '';
+  }
+}
+
+$color_green='class="greenbg"';
+$color_red='class="redbg"';
+$color_yellow='class="yellowbg"';
 
 if (array_key_exists('username', $_COOKIE)) {
   $username = $_COOKIE['username'];
@@ -147,15 +163,6 @@ while (false !== ($entry = $d->read())) {
   $langs[] = $entry;
 }
 $d->close();
-
-if (array_key_exists('hidegreen', $_GET)) {
-  $hidegreen = $_GET['hidegreen'];
-}
-if (empty($hidegreen) || $hidegreen != '1') {
-  $hidegreen = 0;
-} else {
-  $hidegreen = 1;
-}
 
 // print_r($_GET);
 
@@ -193,6 +200,34 @@ if (!file_exists($location . 'res/values-' . $lang)) {
   })();
 
 </script>
+<script type = "text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" ></script>
+<script type = "text/javascript">
+  $(document).ready(function(){
+    $("#hidegreen").click(function(event) {
+      $(".greenbg").parent().parent('form').hide();
+      $(".greenbg").parent().parent().parent().parent().parent('form').hide();
+      $("#hidegreen").hide();
+      $("#showgreen").show();
+      $('input[name="hidegreen"]').val("1");
+      event.preventDefault();
+    });
+    $("#showgreen").click(function(event) {
+      $(".greenbg").parent().parent('form').show();
+      $(".greenbg").parent().parent().parent().parent().parent('form').show();
+      $("#showgreen").hide();
+      $("#hidegreen").show();
+      $('input[name="hidegreen"]').val("0");
+      event.preventDefault();
+    });
+  });
+</script>
+<style type="text/css">
+  .greenbg  { background: #A0FFA0; }
+  .redbg    { background: #FFA0A0; }
+  .yellowbg { background: #FFFFA0; } 
+  .hide     { display: none; }
+  .stringblock { border-top: 2px dashed grey; }
+</style>
 </head>
 <body>
 
@@ -234,9 +269,9 @@ if (preg_match('/\.php/', $_SERVER['REQUEST_URI'])) {
   if (!empty($file)) {
     echo '<li>&gt; ';
     if ($redirect) {
-      echo '<a href="'.$basedir.$lang.'/'.$file.$nhg.'">';
+      echo '<a href="'.$basedir.$lang.'/'.$file.'">';
     } else {
-      echo '<a href="'.$basedir.'edit.php?lang='.$lang.'&amp;file='.$file.$nhg.'">';
+      echo '<a href="'.$basedir.'edit.php?lang='.$lang.'&amp;file='.$file.'">';
     }
     echo $file.'</a></li>';
   }
@@ -244,6 +279,8 @@ if (preg_match('/\.php/', $_SERVER['REQUEST_URI'])) {
 </ul>
 <span class="topright"><a href="/contact.html">contact</a></span>
 </div>
+
+<div class="left">
 
 <h1>Translate Strings for <? echo $appname; ?> / <? echo $lang; ?></h1>
 <p>
@@ -259,24 +296,6 @@ echo '<a href="' . $basedir . '">index page</a>';
 <p>
 <?
 
-
-if ($hidegreen) {
-  if ($redirect) {
-    $hg='/hidegreen';
-  } else {
-    $hg='&amp;hidegreen=1';
-  }
-  $nhg='';
-  $hglinktext='[Show green strings]';
-} else {
-  $hg='';
-  if ($redirect) {
-    $nhg='/hidegreen" rel="nofollow';
-  } else {
-    $nhg='&amp;hidegreen=1';
-  }
-  $hglinktext='[Hide green strings]';
-}
 
 $stats=file_get_contents($location.'translation.stats');
 $sstats=explode("\n", $stats);
@@ -302,9 +321,9 @@ foreach ($files as $f) {
   }
   echo '<li>';
   if ($redirect) {
-    echo '<a href="'.$basedir.$lang.'/'.$f.$hg.'">';
+    echo '<a href="'.$basedir.$lang.'/'.$f.'">';
   } else {
-    echo '<a href="'.$basedir.'edit.php?lang='.$lang.'&amp;file='.$f.$hg.'">';
+    echo '<a href="'.$basedir.'edit.php?lang='.$lang.'&amp;file='.$f.'">';
   }
   if ($file == $f) {
     echo '<b>';
@@ -325,15 +344,16 @@ if (!empty($file)) {
   echo '<p>';
   echo 'Color codes: <ul><li>green == ok</li><li>yellow == original text changed since last translation</li><li>red == missing string</li></ul>'."\n";
 
-  if ($redirect) {
-    echo '<a href="'.$basedir.$lang.'/'.$file.$nhg.'">' . $hglinktext . '</a>';
+  if (hidegreen()) {
+    echo '<a href="#" id="hidegreen" class="hide">[ Hide green strings ]</a>';
+    echo '<a href="#" id="showgreen">[ Show green strings ]</a>';
   } else {
-    echo '<a href="'.$basedir.'edit.php?lang='.$lang.'&amp;file='.$file.$nhg.'">' . $hglinktext . '</a>';
+    echo '<a href="#" id="hidegreen">[ Hide green strings ]</a>';
+    echo '<a href="#" id="showgreen" class="hide">[ Show green strings ]</a>';
   }
   echo "<br/>\n";
   echo "<br/>\n";
   echo '</p>';
-  echo "<hr/>\n";
   
   // load source strings
   $sxml = sxmle_readxml($location, 'res/values/'.$file);
@@ -345,7 +365,7 @@ if (!empty($file)) {
   } else if (array_key_exists('action', $_GET)) {
     $action = $_GET['action'];
   }
-  if (!empty($action)) {
+  if (!empty($action) && !empty($username)) {
     if ($action == 'edit-string') {
       foreach ($_POST as $k => $v) {
 	if ($k == 'action' or $k == 'lang' or $k == 'file') {
@@ -489,9 +509,6 @@ if (!empty($file)) {
 	$color = $color_green;
 	$alltext = $alltext . "\n\n" . $decodedtv;
       }
-      if ($hidegreen && $color == $color_green) {
-	continue;
-      }
     } else {
       $tv = '';
       $decodedtv = decode_string($tv);
@@ -500,23 +517,27 @@ if (!empty($file)) {
 
     $form = '';
     if ($redirect) {
-      $action=$basedir.$lang.'/'.$file.$hg.'#'.$k.'" id="'.$k;
+      $action=$basedir.$lang.'/'.$file.'#'.$k.'" id="'.$k;
     } else {
-      $action=$basedir.'edit.php?lang='.$lang.'&amp;file='.$file.$hg.'#'.$k.'" id="'.$k;
+      $action=$basedir.'edit.php?lang='.$lang.'&amp;file='.$file.'#'.$k.'" id="'.$k;
     }
-    $form = $form.'<form method="post" action="'.$action.'">'."\n";
+    $form = $form.'<form method="post" action="'.$action.'" class="stringblock'.hidegreenclass($color == $color_green).'">'."\n";
     $form = $form.'<p>';
     $form = $form.'  String name: <b>'.$k."</b><br/>\n";
     if (!empty($username) && !empty($tstring['username'])) {
-      $form = $form.'  translator: <input type="text" disabled="disabled" value="'.clean_username($tstring['username']).'" size="50" />'."<br/>\n";
+      $form = $form.'  Translator: <input type="text" disabled="disabled" value="'.clean_username($tstring['username']).'" size="50" />'."<br/>\n";
     }
     $form = $form.'  <input name="action" value="edit-string" type="hidden" />'."\n";
     $form = $form.'  en: <textarea disabled="disabled" cols="80" rows="'.$numlines.'">'.$decodedv.'</textarea>'."<br/>\n";
     $form = $form.'  '.$lang.': <textarea name="'.$k.'" cols="80" rows="'.$numlines.'" '.$color.'>'.$decodedtv.'</textarea>'."<br/>\n";
-    $form = $form.'  <input type="submit" />'."<br/>\n";
+    $form = $form.'  <input name="hidegreen" value="'.hidegreen().'" type="hidden" />'."\n";
+    if (empty($username)) {
+      $form = $form.'  <input type="submit" disabled="disabled" /> To prevent spam, you must set your username on the <a href="'.$basedir.'">index page</a> before submitting translation.'."<br/>\n";
+    } else {
+      $form = $form.'  <input type="submit" />'."<br/>\n";
+    }
     $form = $form.'</p>';
     $form = $form.'</form>'."\n";
-    $form = $form."<hr/>\n";
     echo $form;
   }
 
@@ -533,11 +554,11 @@ if (!empty($file)) {
     $formcolor = $color_green;
     $form = '';
     if ($redirect) {
-      $action=$basedir.$lang.'/'.$file.$hg.'#'.$k.'" id="'.$k;
+      $action=$basedir.$lang.'/'.$file.'#'.$k.'" id="'.$k;
     } else {
-      $action=$basedir.'edit.php?lang='.$lang.'&amp;file='.$file.$hg.'#'.$k.'" id="'.$k;
+      $action=$basedir.'edit.php?lang='.$lang.'&amp;file='.$file.'#'.$k.'" id="'.$k;
     }
-    $form = $form.'<form method="post" action="'.$action.'">'."\n";
+    $form = $form.'<form method="post" action="'.$action.'" class="stringblock'.hidegreenclass($color == $color_green).'">'."\n"; // FIXME
     $form = $form.'  String name: <b>'.$k."</b><br/>\n";
     if (!empty($username) && !empty($tstringarray['username'])) {
       $form = $form.'  translator: <input type="text" disabled="disabled" value="'.clean_username($tstringarray['username']).'" size="50" />'."<br/>\n";
@@ -582,13 +603,14 @@ if (!empty($file)) {
 	$i++;
       }
       $form = $form.'  </table>';
-      $form = $form.'  <input type="submit" />'."<br/>\n";
-      $form = $form.'</form>'."\n";
-      $form = $form."<hr/>\n";
-
-      if ($hidegreen and $formcolor == $color_green) {
-	continue;
+      $form = $form.'  <input name="hidegreen" value="'.hidegreen().'" type="hidden" />'."\n";
+      if (empty($username)) {
+        $form = $form.'  <input type="submit" disabled="disabled" /> To prevent spam, you must set your username on the <a href="'.$basedir.'">index page</a> before submitting translation.'."<br/>\n";
+      } else {
+        $form = $form.'  <input type="submit" />'."<br/>\n";
       }
+      $form = $form.'</form>'."\n";
+
       echo $form;
   }
   
@@ -604,6 +626,8 @@ if (!empty($file)) {
   }
 }
 ?>
+
+</div>
 
 </body>
 </html>

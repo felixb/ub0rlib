@@ -20,4 +20,8 @@
 	<string name="donator_postdonate">Thank you very much for your donation.\n\nTo remove ads in all my apps, you just need to let this tiny app installed on your phone. Install it on any number of your devices to remove ads on them too.\nRemoving the donator app, will bring back ads again.</string>
   <string name="donator_license_fail_">Failed checking license!</string>
 	<string name="donator_license_fail">Please load a licensed copy of this donator app.</string>
+	<string name="donator_terms">The app will send your paypal address along with the md5-hash of your google address id to the server (http://ub0r.de/donation/). The data is needed to verify your donation.\nThe data is never given to third party and used only for verifying your donation.</string>
+	<string name="donator_checking">Checking license...</string>
+	<string name="donator_check_ok">License checked: OK</string>
+	<string name="donator_check_failed">License check failed</string>
 </resources>
