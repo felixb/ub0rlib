@@ -484,7 +484,7 @@ public final class DonationHelper {
 
 		Log.d(TAG, "TEST: match=" + match);
 		if (match != PackageManager.SIGNATURE_UNKNOWN_PACKAGE) {
-			if (Math.random() < CHECK_DONATOR_LIC * 100f) { // FIXME
+			if (Math.random() < CHECK_DONATOR_LIC) {
 				// verify donator license
 				ComponentName cn = context.startService(donationCheck);
 				Log.d(TAG, "Started service: " + cn);
