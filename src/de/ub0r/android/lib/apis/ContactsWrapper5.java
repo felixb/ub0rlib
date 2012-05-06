@@ -159,17 +159,19 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 	@Override
 	public Uri getLookupUri(final ContentResolver cr, final String id) {
 		Log.d(TAG, "getLookupUri(cr, " + id + ")");
-		if (id == null) {
+		if (TextUtils.isEmpty(id)) {
 			return null;
 		}
 		Uri ret = null;
 		final Cursor c = cr.query(Uri.withAppendedPath(Contacts.CONTENT_LOOKUP_URI, id),
 				new String[] { Contacts.LOOKUP_KEY, BaseColumns._ID }, null, null, BaseColumns._ID
 						+ " ASC");
-		if (c.moveToFirst()) {
-			ret = Contacts.getLookupUri(c.getLong(1), id);
+		if (c != null) {
+			if (c.moveToFirst()) {
+				ret = Contacts.getLookupUri(c.getLong(1), id);
+			}
+			c.close();
 		}
-		c.close();
 		if (ret == null) {
 			ret = Uri.withAppendedPath(Contacts.CONTENT_LOOKUP_URI, id);
 		}
