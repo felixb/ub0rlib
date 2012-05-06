@@ -39,6 +39,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -173,9 +174,6 @@ public final class DonationHelper {
 				return;
 			} else if (v.getId() == R.id.donate_market) {
 				Market.installApp(this.activity, DONATOR_PACKAGE, null);
-				return;
-			} else if (v.getId() == R.id.donate_bitcoin) {
-				donateBitcoin(this.activity);
 				return;
 			} else if (v.getId() == R.id.send) {
 				if (TextUtils.isEmpty(((EditText) this.activity.findViewById(R.id.paypalid))
@@ -373,62 +371,10 @@ public final class DonationHelper {
 			cb.setVisibility(View.GONE);
 		}
 
-		if (isBitcoinAvailable(target)) {
-			target.findViewById(R.id.donate_bitcoin).setOnClickListener(ocl);
-		} else {
-			target.findViewById(R.id.donate_bitcoin).setVisibility(View.GONE);
-		}
 		target.findViewById(R.id.send).setOnClickListener(ocl);
 		final String mail = PreferenceManager.getDefaultSharedPreferences(target).getString(
 				PREFS_DONATEMAIL, "");
 		((EditText) target.findViewById(R.id.paypalid)).setText(mail);
-	}
-
-	/**
-	 * Show donation dialog for bitcoin donation.
-	 * 
-	 * @param target
-	 *            target {@link Activity}
-	 */
-	static void donateBitcoin(final Activity target) {
-		final Builder b = new Builder(target);
-		b.setCancelable(true);
-		b.setTitle(R.string.donate_bitcoin_);
-		String s = target.getString(R.string.donate_bitcoin);
-		s += "\n\n" + DONATE_BITCOIN;
-		b.setMessage(s);
-		b.setPositiveButton(android.R.string.ok, null);
-		b.setNeutralButton(R.string.donate_bitcoin_cb, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(final DialogInterface dialog, final int which) {
-				ClipboardManager cbm = (ClipboardManager) target
-						.getSystemService(Context.CLIPBOARD_SERVICE);
-				cbm.setText(DONATE_BITCOIN);
-			}
-		});
-		final Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("bitcoin:" + DONATE_BITCOIN));
-		if (i.resolveActivity(target.getPackageManager()) != null) {
-			b.setNegativeButton(R.string.donate_bitcoin_send,
-					new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(final DialogInterface dialog, final int which) {
-							target.startActivity(i);
-						}
-					});
-		}
-		b.show();
-	}
-
-	/**
-	 * Check if some bitcoin app is available.
-	 * 
-	 * @param target
-	 *            target {@link Activity}
-	 * @return true, if a bitcoin client is available
-	 */
-	static boolean isBitcoinAvailable(final Activity target) {
-		final Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("bitcoin:" + DONATE_BITCOIN));
-		return i.resolveActivity(target.getPackageManager()) != null;
 	}
 
 	/**
@@ -460,16 +406,17 @@ public final class DonationHelper {
 	 *            {@link Context}
 	 * @param s
 	 *            signature
+	 * @param h
+	 *            hash
 	 * @return true if ads should be hidden
 	 */
-	public static boolean checkSig(final Context context, final String s) {
-		Log.d(TAG, "checkSig(ctx, " + s + ")");
+	public static boolean checkSig(final Context context, final String s, final String h) {
+		Log.d(TAG, "checkSig(ctx, " + s + ", " + h + ")");
 		boolean ret = false;
 		try {
 			final byte[] publicKey = Base64Coder.decode(KEY);
 			final KeyFactory keyFactory = KeyFactory.getInstance(ALGO);
 			PublicKey pk = keyFactory.generatePublic(new X509EncodedKeySpec(publicKey));
-			final String h = getImeiHash(context);
 			Log.d(TAG, "hash: " + h);
 			final String cs = s.replaceAll(" |\n|\t", "");
 			Log.d(TAG, "read sig: " + cs);
@@ -493,6 +440,20 @@ public final class DonationHelper {
 	}
 
 	/**
+	 * Check for signature updates.
+	 * 
+	 * @param context
+	 *            {@link Context}
+	 * @param s
+	 *            signature
+	 * @return true if ads should be hidden
+	 */
+	public static boolean checkSig(final Context context, final String s) {
+		Log.d(TAG, "checkSig(ctx, " + s + ")");
+		return checkSig(context, s, getImeiHash(context));
+	}
+
+	/**
 	 * Check if ads should be hidden.
 	 * 
 	 * @param context
@@ -501,12 +462,35 @@ public final class DonationHelper {
 	 */
 	public static boolean hideAds(final Context context) {
 		PackageManager pm = context.getPackageManager();
-		final int match = pm.checkSignatures(context.getPackageName(), DONATOR_PACKAGE);
+		Intent donationCheck = new Intent(DONATOR_BROADCAST_CHECK);
+		ResolveInfo ri = pm.resolveService(donationCheck, 0);
+		Log.d(TAG, "ri: " + ri);
+		int match = PackageManager.SIGNATURE_UNKNOWN_PACKAGE;
+		if (ri != null) {
+			Log.d(TAG, "TEST: found package: " + ri.serviceInfo.packageName);
+			ComponentName cn = new ComponentName(ri.serviceInfo.packageName, ri.serviceInfo.name);
+			Log.d(TAG, "component name: " + cn);
+			int i = pm.getComponentEnabledSetting(cn);
+			Log.d(TAG, "component status: " + i);
+			Log.w(TAG, "package status: " + ri.serviceInfo.enabled);
+			if (i == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+					|| i == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
+					&& ri.serviceInfo.enabled) {
+				match = pm.checkSignatures(context.getPackageName(), ri.serviceInfo.packageName);
+			} else {
+				Log.w(TAG, ri.serviceInfo.packageName + ": " + ri.serviceInfo.enabled);
+			}
+		}
+
+		Log.d(TAG, "TEST: match=" + match);
 		if (match != PackageManager.SIGNATURE_UNKNOWN_PACKAGE) {
 			if (Math.random() < CHECK_DONATOR_LIC) {
 				// verify donator license
-				ComponentName cn = context.startService(new Intent(DONATOR_BROADCAST_CHECK));
+				ComponentName cn = context.startService(donationCheck);
 				Log.d(TAG, "Started service: " + cn);
+				if (cn == null) {
+					return false;
+				}
 			}
 			if (match == PackageManager.SIGNATURE_MATCH) {
 				return true;
@@ -515,7 +499,9 @@ public final class DonationHelper {
 		}
 		pm = null;
 
-		// no donator installed, check donation traditionally
+		// no donator app installed, check donation traditionally
+		// TODO: remove this!
+		// TODO: return false;
 		final SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(context);
 		final boolean ret = p.getBoolean(PREFS_HIDEADS, false);
 		if (ret && p.getString(PREFS_DONATEMAIL, null) != null) {

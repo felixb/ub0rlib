@@ -17,7 +17,6 @@
 package de.ub0r.android.lib;
 
 import android.app.Activity;
-import android.os.Build;
 import android.os.Bundle;
 
 /**
@@ -31,11 +30,6 @@ public class DonationActivity extends Activity {
 	 */
 	@Override
 	public final void onCreate(final Bundle savedInstanceState) {
-		if (Utils.isApi(Build.VERSION_CODES.HONEYCOMB)) {
-			this.setTheme(android.R.style.Theme_Holo_Light);
-		} else {
-			this.setTheme(android.R.style.Theme_Light);
-		}
 		super.onCreate(savedInstanceState);
 		DonationHelper.onCreate(this);
 	}

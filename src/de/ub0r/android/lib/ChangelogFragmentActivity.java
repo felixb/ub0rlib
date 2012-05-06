@@ -17,21 +17,21 @@
 package de.ub0r.android.lib;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.MenuItem;
+
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
 
 /**
- * Display change log {@link FragmentActivity}.
+ * Display change log {@link SherlockActivity}.
  * 
  * @author flx
  */
-public final class ChangelogFragmentActivity extends FragmentActivity {
+public final class ChangelogFragmentActivity extends SherlockActivity {
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
-		this.setTheme(R.style.Theme_SherlockUb0r_Light);
 		super.onCreate(savedInstanceState);
 		ChangelogHelper.onCreate(this);
 		this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);

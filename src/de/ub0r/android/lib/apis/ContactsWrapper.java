@@ -35,6 +35,7 @@ import de.ub0r.android.lib.Utils;
  * 
  * @author flx
  */
+@Deprecated
 public abstract class ContactsWrapper {
 	/** Tag for output. */
 	private static final String TAG = "cw";

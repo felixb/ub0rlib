@@ -19,18 +19,16 @@
 <resources>
 	<string name="donate_paypal_">Donate (Paypal)</string>
 	<string name="donate_market_">Donate (Market)</string>
-	<string name="donate_bitcoin_">Donate (Bitcoin)</string>
-	<string name="donate_bitcoin">Just send some BTC to the address below and drop me a mail to notify me.</string>
-	<string name="donate_bitcoin_cb">Copy to clipboard</string>
-	<string name="donate_bitcoin_send">Send by App</string>
 	<string name="donate_remove_ads_">Donate/remove ads</string>
 	<string name="remove_ads_">Remove ads</string>
 	<string name="predonate">This is an open-source application released under the GPLv3 license. It is free and will remain free. If you really like it or if you are annoyed by the ads, please consider donating. I\'ll remove the ads for you as soon as possible.\nThank you!\n\nThe donation will remove the ads in all apps provided by me.</string>
 	<string name="predonate_market">This is an open-source application released under the GPLv3 license. It is free and will remain free. If you really like it or if you are annoyed by the ads, please consider donating.\nThank you!\n\nThe donation will remove the ads in all apps provided by me.</string>
 	<string name="did_paypal_donation">I already did a donation via Paypal</string>
 	<string name="postdonate">To remove ads, you need to load the <i>noads</i> code. It is available as soon the donation arrives. Please be patient and drop me a mail if it does not work within one day.</string>
-	<string name="donator_id_">To verify your donation your donation id (paypal mail address for paypal) is needed:</string>
+	<string name="google_id_">To verify your donation your google address is required:</string>
+	<string name="donator_id_">To verify your donation your paypal mail address is required:</string>
 	<string name="donator_id_hint">Paypal address</string>
+	<string name="donator_id_missing">Paypal address is missing</string>
 	<string name="load_hash_">Load <i>noads</i> code</string>
 	<string name="sig_loaded">Ads removed!</string>
 	<string name="sig_failed">Failed to remove ads!</string>

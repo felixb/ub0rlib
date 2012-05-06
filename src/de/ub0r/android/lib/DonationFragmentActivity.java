@@ -17,21 +17,21 @@
 package de.ub0r.android.lib;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.MenuItem;
+
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
 
 /**
- * Shows {@link FragmentActivity} to let people donate.
+ * Shows {@link SherlockActivity} to let people donate.
  * 
  * @author flx
  */
-public class DonationFragmentActivity extends FragmentActivity {
+public class DonationFragmentActivity extends SherlockActivity {
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public final void onCreate(final Bundle savedInstanceState) {
-		this.setTheme(R.style.Theme_SherlockUb0r_Light);
 		super.onCreate(savedInstanceState);
 		DonationHelper.onCreate(this);
 		this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
