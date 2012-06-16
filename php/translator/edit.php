@@ -486,6 +486,9 @@ if (!empty($file)) {
   $alltext = '';
   // show forms
   foreach ($sxml->string as $string) {
+    if ($string['translatable'] == 'false') {
+      continue;
+    }
     $k = $string['name'];
     $v = (string) $string;
 
@@ -543,6 +546,9 @@ if (!empty($file)) {
 
   // show array forms
   foreach ($sxml->{'string-array'} as $stringarray) {
+    if ($stringarray['translatable'] == 'false') {
+      continue;
+    }
     $k = $stringarray['name'];
     $tstringarrays = $txml->xpath('//string-array[@name="' . $k . '"]');
     if (is_array($tstringarrays) && array_key_exists(0, $tstringarrays)) {
