@@ -31,11 +31,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Activity;
-import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -45,7 +43,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
-import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -86,9 +83,6 @@ public final class DonationHelper {
 
 	/** URL for checking hash. */
 	public static final String URL = "http://www.ub0r.de/donation/";
-
-	/** Bitcoin address. */
-	private static final String DONATE_BITCOIN = "1LvQe3ARrdKeMrzxkFn1MW3YrvbQKZsq5P";
 
 	/** Donator package. */
 	private static final String DONATOR_PACKAGE = "de.ub0r.android.donator";
@@ -484,7 +478,7 @@ public final class DonationHelper {
 
 		Log.d(TAG, "TEST: match=" + match);
 		if (match != PackageManager.SIGNATURE_UNKNOWN_PACKAGE) {
-			if (Math.random() < CHECK_DONATOR_LIC * 100f) { // FIXME
+			if (Math.random() < CHECK_DONATOR_LIC) {
 				// verify donator license
 				ComponentName cn = context.startService(donationCheck);
 				Log.d(TAG, "Started service: " + cn);
