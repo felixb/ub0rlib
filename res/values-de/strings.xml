@@ -42,5 +42,5 @@
   <string name="never_show_again" formatted="false">Nie wieder das Changelog anziegen</string>
   <string name="notes_from_developer_" formatted="false">Notizen vom Entwickler</string>
   <string name="notes_from_developer_text" formatted="false">Klicke hier um die Notizen vom Entwickler zu sehen</string>
-  <string name="reset" formatted="false" username="Test " orig="Reset">Zurücksetzen</string>
+  <string name="reset" formatted="false" username="flx &lt;f+translator@ub0r.de&gt;" orig="Reset">Zurücksetzen</string>
 </resources>
