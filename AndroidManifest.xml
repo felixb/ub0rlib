@@ -19,26 +19,9 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-sdk android:minSdkVersion="7" />
+    <uses-sdk android:minSdkVersion="3" />
 
     <application>
-        <activity
-            android:name=".DonationActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".DonationFragmentActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".ChangelogActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".ChangelogFragmentActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:windowSoftInputMode="adjustResize" />
-
         <receiver android:name="DonationReceiver" >
             <intent-filter>
                 <action android:name="de.ub0r.android.donator.REGISTERED" />

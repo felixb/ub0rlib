@@ -38,7 +38,6 @@ import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
 import android.view.View;
 import de.ub0r.android.lib.Log;
-import de.ub0r.android.lib.R;
 
 /**
  * Implement {@link ContactsWrapper} for API 3 and 4.
@@ -142,8 +141,7 @@ public final class ContactsWrapper3 extends ContactsWrapper {
 			return null;
 		}
 		try {
-			return People
-					.loadContactPhoto(context, contactUri, R.drawable.ic_contact_picture, null);
+			return People.loadContactPhoto(context, contactUri, -1, null);
 		} catch (Exception e) {
 			Log.e(TAG, "error getting photo: " + contactUri, e);
 			return null;

@@ -333,23 +333,31 @@ public final class Log {
 	 * 
 	 * @param activity
 	 *            {@link Activity}.
+	 * @param titleInstall
+	 *            title for install sendlog dialog
+	 * @param titleRun
+	 *            title for run sendlog dialog
+	 * @param messageInstall
+	 *            message for install sendlog dialog
+	 * @param messageRun
+	 *            message for run sendlog dialog
 	 */
-	public static void collectAndSendLog(final Activity activity) {
+	public static void collectAndSendLog(final Activity activity, final String titleInstall,
+			final String messageInstall, final String titleRun, final String messageRun) {
 		final PackageManager packageManager = activity.getPackageManager();
 		Intent intent = packageManager.getLaunchIntentForPackage(SENDLOG_PACKAGE_NAME);
-		int title, message;
+		String title, message;
 		if (intent == null) {
 			intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=pname:"
 					+ SENDLOG_PACKAGE_NAME));
-			title = R.string.sendlog_install_;
-			message = R.string.sendlog_install;
+			title = titleInstall;
+			message = messageInstall;
 		} else {
 			intent.putExtra("filter", mTag + ":D *:W");
 			intent.setType("0||android@ub0r.de");
-			intent.putExtra(Intent.EXTRA_SUBJECT,
-					"SendLog: " + activity.getString(R.string.app_name));
-			title = R.string.sendlog_run_;
-			message = R.string.sendlog_run;
+			intent.putExtra(Intent.EXTRA_SUBJECT, "SendLog: " + activity.getApplicationInfo().name);
+			title = titleRun;
+			message = messageRun;
 		}
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		final AlertDialog.Builder b = new AlertDialog.Builder(activity);
