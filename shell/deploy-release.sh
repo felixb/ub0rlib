@@ -27,12 +27,12 @@ keyfile=../release.ks.pw
 preDeploy.sh
 ant clean
 ant debug || exit -1
-ant release < ${keyfile} 
+ant release 
 
 if [ ${doamazon} -eq 1 ] ; then
 	mv bin/*-release.apk bin/${fname}-${pversion}-amazon.apk
 else
-	adb -d install -r bin/*-debug.apk || adb -d install -r bin/*-release.apk
+	[ $(adb devices | grep -ve 'List of devices' -e '^$' | wc -l) -eq 0 ] || adb -d install -r bin/*-debug.apk || adb -d install -r bin/*-release.apk
 	mv bin/*-release.apk bin/${fname}-${pversion}.apk
 	[ -n "${gproject}" ] && \
 		googlecode_upload.py -u ${gcodelogin} -w ${gcodepassw} -p ${gproject}  -s "${sname}-${pversion}"  -l Featured,Type-Package,OpSys-Android${lextra}  bin/${fname}-${pversion}.apk

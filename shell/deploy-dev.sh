@@ -17,7 +17,7 @@ source deploy.inc.sh
 
 ant clean
 #ant debug
-ant release < ${rpath}release.ks.pw
+ant release
 #adb -d install -r bin/*-debug.apk || adb -d install -r bin/*-release.apk
 
 pversion=${pversion}-dev-$(date +%Y%m%d)
