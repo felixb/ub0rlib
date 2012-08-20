@@ -146,7 +146,7 @@ if (empty($lang)) {
 $files = array();
 $d = dir($location.'res/values/');
 while (false !== ($entry = $d->read())) {
-  if ($entry == '.' or $entry == '..' or $entry == 'base.xml' or $entry == 'attrs.xml' or $entry == 'update.xml' or $entry == 'cwac_touchlist_attrs.xml' or $entry == 'dimen.xml' or $entry == 'styles.xml') {
+  if ($entry == '.' or $entry == '..' or $entry == 'base.xml' or $entry == 'attrs.xml' or $entry == 'update.xml' or $entry == 'cwac_touchlist_attrs.xml' or strpos($entry, 'dimen') !== false or $entry == 'styles.xml') {
     continue;
   }
   $files[] = $entry;
@@ -405,8 +405,13 @@ if (!empty($file)) {
 	if ($k == 'action' or $k == 'lang' or $k == 'file') {
 	  continue;
 	}
-	list($arrayname, $i) = split(',', $k);
-	$arrayvalue[$i] = $v;
+        if (strpos($k, ',') !== false) {
+	  list($arrayname, $i) = split(',', $k);
+	  $arrayvalue[$i] = $v;
+        }
+      }
+      foreach ($arrayvalue as $k => $v) {
+        echo '<!-- ' . $k . ': ' . $v . ' -->'."\n";
       }
       $add = true;
       if (!empty($arrayname)) {
