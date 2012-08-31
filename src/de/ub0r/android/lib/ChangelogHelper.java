@@ -129,6 +129,7 @@ public final class ChangelogHelper {
 				ss.setSpan(new StyleSpan(Typeface.BOLD), 0, j, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 			}
 			sb.append(ss);
+			sb.append("\n");
 		}
 		sb.setSpan(new RelativeSizeSpan(0.75f), 0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 		changes = null;

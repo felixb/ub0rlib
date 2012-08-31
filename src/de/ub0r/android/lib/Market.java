@@ -69,6 +69,8 @@ public final class Market {
 
 	/** URL used for google market to install. */
 	private static final String GOOGLE_INSTALL = "market://details?id=";
+	/** URL used for google market website to install. */
+	private static final String GOOGLE_WEBINSTALL = "https://play.google.com/store/apps/details?id=";
 	/** URL used for amazon market to install. */
 	private static final String AMAZON_INSTALL = "http://www.amazon.com" + "/gp/mas/dl/android?p=";
 
@@ -140,6 +142,9 @@ public final class Market {
 				return i;
 			}
 			Log.w(TAG, "no handler installed: " + alternativeLink);
+		} else if (!GOOGLE_SKIP) {
+			i.setData(Uri.parse(GOOGLE_WEBINSTALL + packagename));
+			return i;
 		}
 
 		Log.w(TAG, "no handler found to install package: " + packagename);

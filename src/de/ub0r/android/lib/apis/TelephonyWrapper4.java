@@ -18,6 +18,7 @@ package de.ub0r.android.lib.apis;
 
 import java.util.ArrayList;
 
+import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
@@ -28,6 +29,7 @@ import android.telephony.SmsMessage;
  * @version 4
  * @author flx
  */
+@TargetApi(4)
 public final class TelephonyWrapper4 extends TelephonyWrapper {
 	/**
 	 * {@inheritDoc}

@@ -16,6 +16,7 @@
  */
 package de.ub0r.android.lib.apis;
 
+import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -290,6 +291,7 @@ public final class Contact {
 	 *            default {@link Drawable}
 	 * @return {@link Contact}'s avatar
 	 */
+	@TargetApi(4)
 	public Drawable getAvatar(final Context context, final Drawable defaultValue) {
 		Log.d(TAG, "getAvatar()");
 		if (this.mAvatar == null) {

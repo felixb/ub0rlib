@@ -19,6 +19,7 @@ package de.ub0r.android.lib.apis;
 import java.io.IOException;
 import java.io.InputStream;
 
+import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -43,6 +44,7 @@ import de.ub0r.android.lib.Log;
  * 
  * @author flx
  */
+@TargetApi(5)
 public final class ContactsWrapper5 extends ContactsWrapper {
 	/** Tag for output. */
 	private static final String TAG = "cw5";

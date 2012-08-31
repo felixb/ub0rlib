@@ -49,14 +49,7 @@ import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.TextUtils;
 import android.text.style.RelativeSizeSpan;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -347,15 +340,15 @@ public final class DonationHelper {
 		PackageManager pm = context.getPackageManager();
 		Intent donationCheck = new Intent(DONATOR_BROADCAST_CHECK);
 		ResolveInfo ri = pm.resolveService(donationCheck, 0);
-		Log.d(TAG, "ri: " + ri);
+		// Log.d(TAG, "ri: " + ri);
 		int match = PackageManager.SIGNATURE_UNKNOWN_PACKAGE;
 		if (ri != null) {
-			Log.d(TAG, "TEST: found package: " + ri.serviceInfo.packageName);
+			Log.d(TAG, "found package: " + ri.serviceInfo.packageName);
 			ComponentName cn = new ComponentName(ri.serviceInfo.packageName, ri.serviceInfo.name);
-			Log.d(TAG, "component name: " + cn);
+			// Log.d(TAG, "component name: " + cn);
 			int i = pm.getComponentEnabledSetting(cn);
-			Log.d(TAG, "component status: " + i);
-			Log.w(TAG, "package status: " + ri.serviceInfo.enabled);
+			// Log.d(TAG, "component status: " + i);
+			// Log.d(TAG, "package status: " + ri.serviceInfo.enabled);
 			if (i == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
 					|| i == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
 					&& ri.serviceInfo.enabled) {
@@ -365,7 +358,7 @@ public final class DonationHelper {
 			}
 		}
 
-		Log.d(TAG, "TEST: match=" + match);
+		Log.i(TAG, "signature match: " + match);
 		if (match != PackageManager.SIGNATURE_UNKNOWN_PACKAGE) {
 			if (Math.random() < CHECK_DONATOR_LIC) {
 				// verify donator license
@@ -375,29 +368,15 @@ public final class DonationHelper {
 					return false;
 				}
 			}
-			if (match == PackageManager.SIGNATURE_MATCH) {
-				return true;
-			}
-			return false;
+			return match == PackageManager.SIGNATURE_MATCH;
 		}
 		pm = null;
 
 		// no donator app installed, check donation traditionally
-		// TODO: remove this!
-		// TODO: return false;
-		final SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(context);
-		final boolean ret = p.getBoolean(PREFS_HIDEADS, false);
-		if (ret && p.getString(PREFS_DONATEMAIL, null) != null) {
-			final long period = p.getLong(PREFS_PERIOD, INIT_PERIOD);
-			final long lastCheck = p.getLong(PREFS_LASTCHECK, 0);
-			final long nextCheck = lastCheck + period - System.currentTimeMillis();
-			if (nextCheck < 0) {
-				Log.i(TAG, "recheck donation");
-				new InnerTask(context).execute((Void[]) null);
-			} else {
-				Log.d(TAG, "next recheck: " + nextCheck);
-			}
-		}
+		// do not drop legacy donators
+		boolean ret = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
+				PREFS_HIDEADS, false);
+		Log.d(TAG, "legacy donation check: " + ret);
 		return ret;
 	}
 
@@ -408,34 +387,18 @@ public final class DonationHelper {
 	 *            {@link Context}
 	 * @param title
 	 *            title
-	 * @param urlPaypal
-	 *            paypal URL
 	 * @param btnDonate
 	 *            button text for donate
 	 * @param btnNoads
 	 *            button text for "i did a donation"
-	 * @param titleNoads
-	 *            title for "remove ads" dialog
 	 * @param messages
 	 *            messages for dialog body
-	 * @param messagesPaypal
-	 *            messages for dialog body
-	 * @param messagesLoad
-	 *            {@link String}s for "loading", "loading completed" and "loading failed"
 	 */
 	public static void showDonationDialog(final Activity context, final String title,
-			final String urlPaypal, final String btnDonate, final String btnNoads,
-			final String titleNoads, final String[] messages, final String[] messagesPaypal,
-			final String[] messagesLoad) {
+			final String btnDonate, final String btnNoads, final String[] messages) {
 		final Intent marketIntent = Market.getInstallAppIntent(context, DONATOR_PACKAGE, null);
-		final boolean isMarketInstalled = marketIntent != null
-				&& marketIntent.getDataString().startsWith("market://");
-		String btnTitle;
-		if (isMarketInstalled) {
-			btnTitle = String.format(btnDonate, "Play Store");
-		} else {
-			btnTitle = String.format(btnDonate, "PayPal");
-		}
+
+		String btnTitle = String.format(btnDonate, "Play Store");
 
 		SpannableStringBuilder sb = new SpannableStringBuilder();
 		for (String m : messages) {
@@ -451,87 +414,27 @@ public final class DonationHelper {
 		b.setPositiveButton(btnTitle, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(final DialogInterface dialog, final int which) {
-				if (isMarketInstalled) {
-					Market.installApp(context, DONATOR_PACKAGE, null);
-				} else {
-					try {
-						context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(urlPaypal)));
-					} catch (ActivityNotFoundException e) {
-						Log.e(TAG, "activity not found", e);
-						Toast.makeText(context, "activity not found", Toast.LENGTH_LONG).show();
-					}
+				try {
+					context.startActivity(marketIntent);
+				} catch (ActivityNotFoundException e) {
+					Log.e(TAG, "activity not found", e);
+					Toast.makeText(context, "activity not found", Toast.LENGTH_LONG).show();
 				}
 			}
 		});
 		b.setNeutralButton(btnNoads, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(final DialogInterface dialog, final int which) {
-				showNoadsDialog(context, titleNoads, messagesPaypal, messagesLoad);
-			}
-		});
-		b.show();
-	}
-
-	/**
-	 * Show "remove ads" dialog.
-	 * 
-	 * @param context
-	 *            {@link Context}
-	 * @param title
-	 *            title
-	 * @param messagesPaypal
-	 *            messages for dialog body
-	 * @param messagesLoad
-	 *            {@link String}s for "loading", "loading completed" and "loading failed"
-	 */
-	private static void showNoadsDialog(final Activity context, final String title,
-			final String[] messagesPaypal, final String[] messagesLoad) {
-		SpannableStringBuilder sb = new SpannableStringBuilder();
-		for (String m : messagesPaypal) {
-			sb.append(m);
-			sb.append("\n\n");
-		}
-		sb.delete(sb.length() - 1, sb.length());
-		sb.setSpan(new RelativeSizeSpan(0.8f), 0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-		AlertDialog.Builder b = new AlertDialog.Builder(context);
-		b.setTitle(title);
-		ScrollView sv = new ScrollView(context);
-		LinearLayout l = new LinearLayout(context);
-		ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
-		sv.setLayoutParams(lp);
-		l.setLayoutParams(lp);
-		l.setPadding(10, 5, 10, 5);
-		l.setOrientation(LinearLayout.VERTICAL);
-		EditText et0 = new EditText(context);
-		et0.setVisibility(View.INVISIBLE);
-		et0.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1));
-		l.addView(et0);
-		TextView tv = new TextView(context);
-		tv.setText(sb);
-		l.addView(tv);
-		final String mail = PreferenceManager.getDefaultSharedPreferences(context).getString(
-				PREFS_DONATEMAIL, "");
-		final EditText et = new EditText(context);
-		et.setText(mail);
-		et.setHint("PayPal Id");
-		l.addView(et);
-		sv.addView(l);
-		b.setView(sv);
-		b.setCancelable(true);
-		b.setPositiveButton(title, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(final DialogInterface dialog, final int which) {
-				if (TextUtils.isEmpty((et).getText())) {
-					Toast.makeText(context, messagesPaypal[1], Toast.LENGTH_LONG).show();
-					return;
+				try {
+					context.startActivity(new Intent(Intent.ACTION_VIEW, Uri
+							.parse("http://code.google.com/p/ub0rapps/downloads/list?"
+									+ "can=3&q=Product%3DDonator")));
+				} catch (ActivityNotFoundException e) {
+					Log.e(TAG, "activity not found", e);
+					Toast.makeText(context, "activity not found", Toast.LENGTH_LONG).show();
 				}
-				new InnerTask(context, et.getText().toString(), messagesLoad)
-						.execute((Void[]) null);
 			}
 		});
 		b.show();
-		et0.requestFocus();
 	}
 }

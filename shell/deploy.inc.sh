@@ -3,32 +3,35 @@
 if [ "$(basename ${PWD})" == "websms" ] ; then
 	lextra="${lextra},Product-WebSMS"
 	pname=WebSMS
-fi
-if [ "$(basename ${PWD})" == "andGMXsms" ] ; then
+elif [ "$(basename ${PWD})" == "andGMXsms" ] ; then
 	lextra="${lextra},Product-WebSMS-2"
 	pname=WebSMS
-fi
-if [ "$(basename ${PWD})" == "smsdroid" ] ; then
+elif [ "$(basename ${PWD})" == "smsdroid" ] ; then
 	lextra="${lextra},Product-SMSdroid"
 	pname=SMSdroid
+elif [ "$(basename ${PWD})" == "donator-legacy" ] ; then
+	pname=Donator
 fi
 
 rpath="../"
 
 if echo "$(basename ${PWD})" | grep -q "connector" ; then
-	pname=$(fgrep app_name res/values/*.xml | cut -d\> -f2 | cut -d\< -f1)
+	pname=$(grep -F app_name res/values/*.xml | cut -d\> -f2 | cut -d\< -f1)
 	gproject=websmsdroid
-	pversion=$(fgrep app_version res/values/*.xml | head -n1 | cut -d\> -f2 | cut -d\< -f1)
+	pversion=$(grep -F app_version res/values/*.xml | head -n1 | cut -d\> -f2 | cut -d\< -f1)
 	lextra=,Connector,Product-WebSMS
 	cname=$(echo $pname | cut -d\  -f 3)
 	fname="Connector-${cname}"
 	tname="#WebSMS #Connector #${cname}"
 else
 	if [ -z "$pname" ] ; then
-		pname=$(fgrep app_name res/values/*.xml | cut -d\> -f2 | cut -d\< -f1 | tr -d \ )
+		pname=$(grep -F app_name res/values/*.xml | cut -d\> -f2 | cut -d\< -f1 | tr -d \ )
 	fi
-	gproject=$(fgrep $(basename ${PWD}) ${rpath}ub0rlib/shell/projects.list | head -n1 | cut -d\  -f2)
-	pversion=$(fgrep app_version res/values/*.xml | cut -d\> -f2 | cut -d\< -f1)
+	gproject=$(grep -F $(basename ${PWD}) ${rpath}ub0rlib/shell/projects.list | head -n1 | cut -d\  -f2)
+	pversion=$(grep -F app_version res/values/*.xml | cut -d\> -f2 | cut -d\< -f1)
+	if [ -z "${pversion}" ] ; then
+		pversion=$(grep -F 'android:versionName' AndroidManifest.xml | cut -d\" -f2)
+	fi
 	fname=$(echo $pname | tr -d ':' | tr ' ' '_')
 	tname="#${fname}"
 fi
