@@ -117,6 +117,7 @@ public final class ChangelogHelper {
 				}
 			}
 			sb.append(ss);
+			sb.append("\n");
 		}
 		if (notes != null && notes.length > 0) {
 			sb.append("\n");
