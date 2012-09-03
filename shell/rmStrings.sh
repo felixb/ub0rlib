@@ -2,7 +2,7 @@
 
 for p in $@ ; do
   echo "remove string: $p"
-  for f in $(grep -lF "$p" res/values*/*.xml) ; do
+  for f in $(grep -lF 'name="'$p'"' res/values*/*.xml) ; do
     echo "clean file: $f"
     if (grep -Fq '<string name="'$p'"' $f) ; then
       sed -e '/string name="'$p'"/d' -i $f
