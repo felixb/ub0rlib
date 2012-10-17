@@ -5,9 +5,8 @@
     This configuration file was written by the eclipse-cs plugin configuration editor
 -->
 <!--
-    Checkstyle-Configuration: Sun Checks (Eclipse/ub0r.de)
-    Description: 
-Slightly modified version of Sun Checks that better matches the default code formatter setting of Eclipse.
+    Checkstyle-Configuration: Sun Checks (Eclipse/ub0r.de/ub0rlib)
+    Description: none
 -->
 <module name="Checker">
   <property name="severity" value="warning"/>
@@ -58,7 +57,10 @@ Slightly modified version of Sun Checks that better matches the default code for
     <module name="LeftCurly"/>
     <module name="NeedBraces"/>
     <module name="RightCurly"/>
-    <module name="AvoidInlineConditionals"/>
+    <module name="AvoidInlineConditionals">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
     <module name="DoubleCheckedLocking"/>
     <module name="EmptyStatement"/>
     <module name="EqualsHashCode"/>
@@ -72,7 +74,10 @@ Slightly modified version of Sun Checks that better matches the default code for
     </module>
     <module name="SimplifyBooleanExpression"/>
     <module name="SimplifyBooleanReturn"/>
-    <module name="DesignForExtension"/>
+    <module name="DesignForExtension">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
     <module name="FinalClass"/>
     <module name="HideUtilityClassConstructor"/>
     <module name="InterfaceIsType"/>
