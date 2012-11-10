@@ -16,6 +16,11 @@
  */
 package de.ub0r.android.lib;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -23,6 +28,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.SystemClock;
 import android.widget.Toast;
 
@@ -37,6 +43,8 @@ public final class Log {
 
 	/** Packagename of SendLog. */
 	private static final String SENDLOG_PACKAGE_NAME = "org.l6n.sendlog";
+	/** Mail address sending the logs to. */
+	private static final String TARGET_ADDRESS = "android@ub0r.de";
 
 	/** Classname of SendLog. */
 	// private static final String SENDLOG_CLASS_NAME = ".SendLog";
@@ -329,6 +337,96 @@ public final class Log {
 	}
 
 	/**
+	 * Collect and send Log with SendLog app.
+	 * 
+	 * @param activity
+	 *            {@link Activity}
+	 * @param titleInstall
+	 *            title for install sendlog dialog
+	 * @param titleRun
+	 *            title for run sendlog dialog
+	 * @param messageInstall
+	 *            message for install sendlog dialog
+	 * @param messageRun
+	 *            message for run sendlog dialog
+	 */
+	private static void collectAndSendLogWithSendlog(final Activity activity,
+			final String titleInstall, final String messageInstall, final String titleRun,
+			final String messageRun) {
+		final PackageManager packageManager = activity.getPackageManager();
+		Intent intent = packageManager.getLaunchIntentForPackage(SENDLOG_PACKAGE_NAME);
+		String title, message;
+		if (intent == null) {
+			intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=pname:"
+					+ SENDLOG_PACKAGE_NAME));
+			title = titleInstall;
+			message = messageInstall;
+		} else {
+			intent.putExtra("filter", mTag + ":D *:W");
+			intent.setType("0||" + TARGET_ADDRESS);
+			intent.putExtra(Intent.EXTRA_SUBJECT, "SendLog: " + activity.getPackageName());
+			title = titleRun;
+			message = messageRun;
+		}
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		final AlertDialog.Builder b = new AlertDialog.Builder(activity);
+		b.setIcon(android.R.drawable.ic_dialog_info);
+		b.setTitle(title);
+		b.setMessage(message);
+		b.setPositiveButton(android.R.string.ok, new FireIntent(activity, intent));
+		b.setNegativeButton(android.R.string.cancel, null);
+		b.show();
+	}
+
+	/**
+	 * Send logs with android board tools.
+	 * 
+	 * @param activity
+	 *            {@link Activity}
+	 */
+	@TargetApi(4)
+	@SuppressWarnings("deprecation")
+	private static void collectAndSendLogPlain(final Activity activity) {
+		try {
+			Process p = Runtime.getRuntime().exec("logcat -d -v time");
+			BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			StringBuilder sb = new StringBuilder();
+			sb.append("Device: " + Build.DEVICE + "\n");
+			if (Utils.isApi(Build.VERSION_CODES.DONUT)) {
+				sb.append("Manufacturer: " + Build.MANUFACTURER + "\n");
+			}
+			sb.append("Product: " + Build.PRODUCT + "\n");
+			sb.append("Model: " + Build.MODEL + "\n");
+			sb.append("Android Release: " + Build.VERSION.RELEASE + "\n");
+			sb.append("SDK: " + Build.VERSION.SDK + "\n");
+			sb.append("\n");
+			String l;
+			while ((l = r.readLine()) != null) {
+				sb.append(l);
+				sb.append("\n");
+			}
+			r.close();
+			p.destroy();
+			Intent intent = new Intent(Intent.ACTION_SEND);
+			intent.setType("text/plain");
+			intent.putExtra(Intent.EXTRA_EMAIL, new String[] { TARGET_ADDRESS });
+			intent.putExtra(Intent.EXTRA_TEXT, sb.toString());
+			intent.putExtra(Intent.EXTRA_SUBJECT, "SendLog: " + activity.getPackageName());
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			try {
+				activity.startActivity(intent);
+			} catch (ActivityNotFoundException e) {
+				Log.e(TAG, "activity not found", e);
+				Toast.makeText(activity, "no activity found", Toast.LENGTH_LONG).show();
+			}
+		} catch (IOException e) {
+			String s = "IOException while reading logs";
+			Log.e(TAG, s, e);
+			Toast.makeText(activity, s, Toast.LENGTH_LONG).show();
+		}
+	}
+
+	/**
 	 * Collect and send Log.
 	 * 
 	 * @param activity
@@ -344,28 +442,11 @@ public final class Log {
 	 */
 	public static void collectAndSendLog(final Activity activity, final String titleInstall,
 			final String messageInstall, final String titleRun, final String messageRun) {
-		final PackageManager packageManager = activity.getPackageManager();
-		Intent intent = packageManager.getLaunchIntentForPackage(SENDLOG_PACKAGE_NAME);
-		String title, message;
-		if (intent == null) {
-			intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=pname:"
-					+ SENDLOG_PACKAGE_NAME));
-			title = titleInstall;
-			message = messageInstall;
+		if (Utils.isApi(Build.VERSION_CODES.JELLY_BEAN)) {
+			collectAndSendLogPlain(activity);
 		} else {
-			intent.putExtra("filter", mTag + ":D *:W");
-			intent.setType("0||android@ub0r.de");
-			intent.putExtra(Intent.EXTRA_SUBJECT, "SendLog: " + activity.getPackageName());
-			title = titleRun;
-			message = messageRun;
+			collectAndSendLogWithSendlog(activity, titleInstall, messageInstall, titleRun,
+					messageRun);
 		}
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		final AlertDialog.Builder b = new AlertDialog.Builder(activity);
-		b.setIcon(android.R.drawable.ic_dialog_info);
-		b.setTitle(title);
-		b.setMessage(message);
-		b.setPositiveButton(android.R.string.ok, new FireIntent(activity, intent));
-		b.setNegativeButton(android.R.string.cancel, null);
-		b.show();
 	}
 }

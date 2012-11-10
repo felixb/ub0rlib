@@ -41,7 +41,7 @@ public final class Market {
 	/** Search all apps. */
 	public static final String SEARCH_APPS = "Felix+Bechstein";
 	/** Alternative link to all apps. */
-	public static final String ALT_APPS = "http://code.google.com/u/felix.bechstein/";
+	public static final String ALT_APPS = "http://code.google.com/u/f@ub0r.de/";
 
 	/** Alternative link to SMSdroid. */
 	public static final String ALT_WEBSMS = "http://code.google.com/p"
