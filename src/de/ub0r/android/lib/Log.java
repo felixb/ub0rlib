@@ -16,14 +16,15 @@
  */
 package de.ub0r.android.lib;
 
-import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -387,47 +388,60 @@ public final class Log {
 	@TargetApi(4)
 	@SuppressWarnings("deprecation")
 	private static void collectAndSendLogPlain(final Activity activity) {
+		Intent intent = new Intent(Intent.ACTION_SEND);
+
+		StringBuilder sb = new StringBuilder();
+		if (Utils.isApi(Build.VERSION_CODES.DONUT)) {
+			sb.append("Manufacturer: " + Build.MANUFACTURER + "\n");
+		}
+		sb.append("Model: " + Build.MODEL + "\n");
+		sb.append("Device: " + Build.DEVICE + "\n");
+		sb.append("Product: " + Build.PRODUCT + "\n");
+		sb.append("Android Release: " + Build.VERSION.RELEASE + "\n");
+		sb.append("SDK: " + Build.VERSION.SDK + "\n");
+		sb.append("\n");
 		try {
 			Process p = Runtime.getRuntime().exec("logcat -d -v time");
-			BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			StringBuilder sb = new StringBuilder();
-			sb.append("Device: " + Build.DEVICE + "\n");
-			if (Utils.isApi(Build.VERSION_CODES.DONUT)) {
-				sb.append("Manufacturer: " + Build.MANUFACTURER + "\n");
+
+			String fn = LogProvider.getLogFile(activity);
+			activity.deleteFile(fn);
+			FileOutputStream os = activity.openFileOutput(fn, Context.MODE_PRIVATE);
+			InputStream is = p.getInputStream();
+
+			byte[] buf = new byte[1024];
+			int c;
+			while ((c = is.read(buf, 0, buf.length)) > 0) {
+				os.write(buf, 0, c);
 			}
-			sb.append("Product: " + Build.PRODUCT + "\n");
-			sb.append("Model: " + Build.MODEL + "\n");
-			sb.append("Android Release: " + Build.VERSION.RELEASE + "\n");
-			sb.append("SDK: " + Build.VERSION.SDK + "\n");
-			sb.append("\n");
-			String l;
-			while ((l = r.readLine()) != null) {
-				sb.append(l);
-				sb.append("\n");
-			}
-			r.close();
+			is.close();
+			os.close();
 			p.destroy();
-			Intent intent = new Intent(Intent.ACTION_SEND);
-			intent.setType("text/plain");
-			intent.putExtra(Intent.EXTRA_EMAIL, new String[] { TARGET_ADDRESS });
-			intent.putExtra(Intent.EXTRA_TEXT, sb.toString());
-			intent.putExtra(Intent.EXTRA_SUBJECT, "SendLog: " + activity.getPackageName());
-			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			try {
-				activity.startActivity(intent);
-			} catch (ActivityNotFoundException e) {
-				Log.e(TAG, "activity not found", e);
-				Toast.makeText(activity, "no activity found", Toast.LENGTH_LONG).show();
-			}
+			Uri u = Uri.parse("content://" + activity.getPackageName() + ".DEBUGLOG");
+			intent.putExtra(Intent.EXTRA_STREAM, u);
 		} catch (IOException e) {
 			String s = "IOException while reading logs";
 			Log.e(TAG, s, e);
 			Toast.makeText(activity, s, Toast.LENGTH_LONG).show();
+			sb.append(s);
+			sb.append("\n\n");
+		}
+		intent.setType("text/plain");
+		intent.putExtra(Intent.EXTRA_EMAIL, new String[] { TARGET_ADDRESS });
+		intent.putExtra(Intent.EXTRA_SUBJECT, "SendLog: " + activity.getPackageName());
+		intent.putExtra(Intent.EXTRA_TEXT, sb.toString());
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		try {
+			activity.startActivity(Intent.createChooser(intent, "SendLog"));
+		} catch (ActivityNotFoundException e) {
+			Log.e(TAG, "activity not found", e);
+			Toast.makeText(activity, "no activity found", Toast.LENGTH_LONG).show();
 		}
 	}
 
 	/**
-	 * Collect and send Log.
+	 * Collect and send Log. When using this method, make sure to add the LogProvider to your
+	 * AndroidManifest.xml: <provider android:name="de.ub0r.android.lib.LogProvider"
+	 * android:authorities="{Your app package}.DEBUGLOG" android:exported="true" />
 	 * 
 	 * @param activity
 	 *            {@link Activity}.
