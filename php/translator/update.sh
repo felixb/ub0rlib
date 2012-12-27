@@ -19,6 +19,9 @@ rm commit.log
 ret=0
 if [ $(git diff --shortstat | wc -l) != 0 ] ; then
 	/home/flx/dev/android/ub0rlib/shell/updatestats.sh > commit.log 2> commit.log
+	if (git remote -v | grep origin | grep -qv github.com) ; then
+		git diff | cat
+	fi
 	git commit -am "auto commit for translation" --author "ub0r bot <noreply@ub0r.de>" >> commit.log 2>> commit.log
 	rc=$?
 	if [ $rc != 0 ] ; then

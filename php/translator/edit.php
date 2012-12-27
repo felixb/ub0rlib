@@ -488,6 +488,7 @@ if (!empty($file)) {
     sxmle_writexml($txml, $location, $lang, $file);
   }
 
+  $allotext = '';
   $alltext = '';
   // show forms
   foreach ($sxml->string as $string) {
@@ -507,6 +508,7 @@ if (!empty($file)) {
       $tstring = $tstrings[0];
       $tv =  $tstring;
       $decodedtv = decode_string($tv);
+      $allotext = $allotext . "\n\n" . $decodedv;
       if (empty($decodedtv)) {
 	$color = $color_red;
 	$alltext = $alltext . "\n\n" . $decodedv;
@@ -627,10 +629,13 @@ if (!empty($file)) {
   
   // show $alltext if $file==market.xml
   if ($file == 'market.xml') {
-    $numlines = count(split("\n", $alltext));
-    $numlines += strlen($alltext) / 80;
+    $allotext = trim($allotext);
+    $alltext = trim($alltext);
+    $numlines = count(split("\n", $allotext));
+    $numlines += strlen($allotext) / 80;
     $form = '<form>';
     $form = $form."<b>Merged text:</b><br/>\n";
+    $form = $form.'<textarea disabled="disabled" cols="80" rows="'.$numlines.'">' . $allotext . '</textarea></form>';
     $form = $form.'<textarea disabled="disabled" cols="80" rows="'.$numlines.'">' . $alltext . '</textarea></form>';
     $form = $form."<hr/>\n";
     echo $form;
