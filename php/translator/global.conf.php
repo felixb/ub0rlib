@@ -4,6 +4,7 @@ $langnames = array(
   'ar' => 'Arabic',
   'bg' => 'Bulgarian',
   'cs' => 'Czech',
+  'ca' => 'Catalan',
   'da' => 'Danish',
   'de' => 'German',
   'en' => 'English',
