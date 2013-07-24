@@ -46,7 +46,7 @@ public final class DonationHelper {
 	private static final String PREFS_HIDEADS = "hideads";
 
 	/** Threshold for chacking donator app license. */
-	private static final double CHECK_DONATOR_LIC = 0.05;
+	private static final double CHECK_DONATOR_LIC = 0.1;
 
 	/** Donator package. */
 	private static final String DONATOR_PACKAGE = "de.ub0r.android.donator";
@@ -121,7 +121,9 @@ public final class DonationHelper {
 
 		Log.i(TAG, "signature match: " + match);
 		if (match != PackageManager.SIGNATURE_UNKNOWN_PACKAGE) {
-			if (Math.random() < CHECK_DONATOR_LIC) {
+			double r = Math.random();
+			// Log.d(TAG, "r=" + r);
+			if (r < CHECK_DONATOR_LIC) {
 				// verify donator license
 				ComponentName cn = context.startService(donationCheck);
 				Log.d(TAG, "Started service: " + cn);
