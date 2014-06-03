@@ -108,18 +108,19 @@ public final class ChangelogHelper {
 		String[] notes = resNotes > 0 ? context.getResources().getStringArray(resNotes) : null;
 
 		final SpannableStringBuilder sb = new SpannableStringBuilder();
-		for (String s : notes) {
-			SpannableString ss = new SpannableString(s + "\n");
-			int j = s.indexOf(":");
-			if (j > 0) {
-				if (!TextUtils.isEmpty(s)) {
-					ss.setSpan(new StyleSpan(Typeface.BOLD), 0, j, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-				}
-			}
-			sb.append(ss);
-			sb.append("\n");
-		}
+
 		if (notes != null && notes.length > 0) {
+			for (String s : notes) {
+				SpannableString ss = new SpannableString(s + "\n");
+				int j = s.indexOf(":");
+				if (j > 0) {
+					if (!TextUtils.isEmpty(s)) {
+						ss.setSpan(new StyleSpan(Typeface.BOLD), 0, j, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+					}
+				}
+				sb.append(ss);
+				sb.append("\n");
+			}
 			sb.append("\n");
 		}
 		for (String s : changes) {
