@@ -22,30 +22,30 @@ import android.preference.Preference;
 
 /**
  * Switch between PreferenceActivity and PreferenceFragment.
- * 
+ *
  * @author flx
  */
 public interface IPreferenceContainer {
-	/**
-	 * Get a {@link Preference}.
-	 * 
-	 * @param key
-	 *            key
-	 * @return {@link Preference}
-	 */
-	Preference findPreference(CharSequence key);
 
-	/**
-	 * Get {@link Context}.
-	 * 
-	 * @return {@link Context}
-	 */
-	Context getContext();
+    /**
+     * Get a {@link Preference}.
+     *
+     * @param key key
+     * @return {@link Preference}
+     */
+    Preference findPreference(CharSequence key);
 
-	/**
-	 * Get {@link Activity}.
-	 * 
-	 * @return {@link Activity}
-	 */
-	Activity getActivity();
+    /**
+     * Get {@link Context}.
+     *
+     * @return {@link Context}
+     */
+    Context getContext();
+
+    /**
+     * Get {@link Activity}.
+     *
+     * @return {@link Activity}
+     */
+    Activity getActivity();
 }

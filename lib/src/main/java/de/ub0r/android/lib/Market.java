@@ -16,8 +16,6 @@
  */
 package de.ub0r.android.lib;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -29,291 +27,320 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import java.util.List;
+
 /**
  * Make intents market aware. Currently google and amazon is supported.
- * 
+ *
  * @author flx
  */
 public final class Market {
-	/** Tag for output. */
-	private static final String TAG = "ub0rlib";
 
-	/** Search all apps. */
-	public static final String SEARCH_APPS = "Felix+Bechstein";
-	/** Alternative link to all apps. */
-	public static final String ALT_APPS = "http://code.google.com/u/f@ub0r.de/";
+    /**
+     * Tag for output.
+     */
+    private static final String TAG = "ub0rlib";
 
-	/** Alternative link to SMSdroid. */
-	public static final String ALT_WEBSMS = "http://code.google.com/p"
-			+ "/websmsdroid/downloads/list?can=2&q=Product%3DSMSdroid";
-	/** Alternative link to WebSMS. */
-	public static final String ALT_SMSDROID = "http://code.google.com/p"
-			+ "/websmsdroid/downloads/list?can=2&q=Product%3WebSMS";
+    /**
+     * Search all apps.
+     */
+    public static final String SEARCH_APPS = "Felix+Bechstein";
 
-	/** Alternative link to Call Meter. */
-	public static final String ALT_CALLMETER = "http://code.google.com/p"
-			+ "/callmeter/downloads/list";
+    /**
+     * Alternative link to all apps.
+     */
+    public static final String ALT_APPS = "http://code.google.com/u/f@ub0r.de/";
 
-	/** Alternative link to TravelLog. */
-	public static final String ALT_TRAVELLOG = "http://code.google.com/p"
-			+ "/ub0rapps/downloads/list?can=2&q=Product%3DTravelLog";
-	/** Alternative link to OTPdroid. */
-	public static final String ALT_OTPDROID = "http://code.google.com/p"
-			+ "/ub0rapps/downloads/list?can=2&q=Product%3DOTPdroid";
-	/** Alternative link to MissingKeys. */
-	public static final String ALT_MISSINGKEYS = "http://code.google.com/p"
-			+ "/ub0rapps/downloads/list?can=2&q=Product%3DMissingKeys";
-	/** Alternative link to RingRing. */
-	public static final String ALT_RINGRING = "http://code.google.com/p"
-			+ "/ub0rapps/downloads/list?can=2&q=Product%3DRingRing";
+    /**
+     * Alternative link to SMSdroid.
+     */
+    public static final String ALT_WEBSMS = "http://code.google.com/p"
+            + "/websmsdroid/downloads/list?can=2&q=Product%3DSMSdroid";
 
-	/** URL used for google market to install. */
-	private static final String GOOGLE_INSTALL = "market://details?id=";
-	/** URL used for google market website to install. */
-	private static final String GOOGLE_WEBINSTALL = "https://play.google.com/store/apps/details?id=";
-	/** URL used for amazon market to install. */
-	private static final String AMAZON_INSTALL = "http://www.amazon.com" + "/gp/mas/dl/android?p=";
+    /**
+     * Alternative link to WebSMS.
+     */
+    public static final String ALT_SMSDROID = "http://code.google.com/p"
+            + "/websmsdroid/downloads/list?can=2&q=Product%3WebSMS";
 
-	/** URL used for google market to search. */
-	private static final String GOOGLE_SEARCH = "market://search?q=";
-	/** URL used for amazon market to search. */
-	private static final String AMAZON_SEARCH = "http://www.amazon.com" + "/gp/mas/dl/android?s=";
+    /**
+     * Alternative link to Call Meter.
+     */
+    public static final String ALT_CALLMETER = "http://code.google.com/p"
+            + "/callmeter/downloads/list";
 
-	/** Skip google market. */
-	private static final boolean GOOGLE_SKIP = false;
-	/** Skip amazon market. */
-	private static final boolean AMAZON_SKIP = false;
+    /**
+     * Alternative link to TravelLog.
+     */
+    public static final String ALT_TRAVELLOG = "http://code.google.com/p"
+            + "/ub0rapps/downloads/list?can=2&q=Product%3DTravelLog";
 
-	/**
-	 * Hide default constructor.
-	 */
-	private Market() {
-	}
+    /**
+     * Alternative link to OTPdroid.
+     */
+    public static final String ALT_OTPDROID = "http://code.google.com/p"
+            + "/ub0rapps/downloads/list?can=2&q=Product%3DOTPdroid";
 
-	/**
-	 * get {@link Intent} to any market app to load an app.
-	 * 
-	 * @param context
-	 *            {@link Context} used to launch the intent
-	 * @param packagename
-	 *            package name of target app
-	 * @param alternativeLink
-	 *            link to some alternative source, if no market is available
-	 * @return {@link Intent} which should be launched
-	 */
-	public static Intent getInstallAppIntent(final Context context, final String packagename,
-			final String alternativeLink) {
-		Log.i(TAG, "getInstallAppIntent(" + context + ", " + packagename + ", " + alternativeLink
-				+ ")");
-		final Intent i = new Intent(Intent.ACTION_VIEW);
+    /**
+     * Alternative link to MissingKeys.
+     */
+    public static final String ALT_MISSINGKEYS = "http://code.google.com/p"
+            + "/ub0rapps/downloads/list?can=2&q=Product%3DMissingKeys";
 
-		if (!GOOGLE_SKIP) {
-			// try google market
-			i.setData(Uri.parse(GOOGLE_INSTALL + packagename));
-			if (i.resolveActivity(context.getPackageManager()) != null) {
-				return i;
-			}
-			Log.w(TAG, "no google market installed");
-		} else {
-			Log.i(TAG, "skip google market");
-		}
+    /**
+     * Alternative link to RingRing.
+     */
+    public static final String ALT_RINGRING = "http://code.google.com/p"
+            + "/ub0rapps/downloads/list?can=2&q=Product%3DRingRing";
 
-		if (!AMAZON_SKIP) {
-			// try amazon market
-			i.setData(Uri.parse(AMAZON_INSTALL + packagename));
-			final List<ResolveInfo> l = context.getPackageManager().queryIntentActivities(i, 0);
-			for (ResolveInfo r : l) {
-				if (r.activityInfo.packageName.contains("amazon")) {
-					Log.i(TAG, "use app: " + r.activityInfo.packageName);
-					return i;
-				} else {
-					Log.i(TAG, "skipp app: " + r.activityInfo.packageName);
-				}
-			}
-			Log.w(TAG, "no amazon market installed");
-		} else {
-			Log.i(TAG, "skip amazon market");
-		}
+    /**
+     * URL used for google market to install.
+     */
+    private static final String GOOGLE_INSTALL = "market://details?id=";
 
-		if (!TextUtils.isEmpty(alternativeLink)) {
-			// try alternative link
-			i.setData(Uri.parse(alternativeLink));
-			if (i.resolveActivity(context.getPackageManager()) != null) {
-				return i;
-			}
-			Log.w(TAG, "no handler installed: " + alternativeLink);
-		} else if (!GOOGLE_SKIP) {
-			i.setData(Uri.parse(GOOGLE_WEBINSTALL + packagename));
-			return i;
-		}
+    /**
+     * URL used for google market website to install.
+     */
+    private static final String GOOGLE_WEBINSTALL
+            = "https://play.google.com/store/apps/details?id=";
 
-		Log.w(TAG, "no handler found to install package: " + packagename);
-		return null;
-	}
+    /**
+     * URL used for amazon market to install.
+     */
+    private static final String AMAZON_INSTALL = "http://www.amazon.com" + "/gp/mas/dl/android?p=";
 
-	/**
-	 * Open any market app to load an app.
-	 * 
-	 * @param activity
-	 *            {@link Activity} used to launch the intent
-	 * @param packagename
-	 *            package name of target app
-	 * @param alternativeLink
-	 *            link to some alternative source, if no market is available
-	 * @return true if any intent was launched successfully
-	 */
-	public static boolean installApp(final Activity activity, final String packagename,
-			final String alternativeLink) {
-		Log.i(TAG, "installApp(" + activity + ", " + packagename + ", " + alternativeLink + ")");
-		final Intent i = getInstallAppIntent(activity, packagename, alternativeLink);
-		if (i != null) {
-			try {
-				activity.startActivity(i);
-				return true;
-			} catch (ActivityNotFoundException e) {
-				Log.e(TAG, "activity not found", e);
-				Toast.makeText(activity, "activity not found", Toast.LENGTH_LONG).show();
-			}
-		} else {
-			Toast.makeText(activity, "no handler found to install package: " + packagename,
-					Toast.LENGTH_LONG).show();
-		}
-		return false;
-	}
+    /**
+     * URL used for google market to search.
+     */
+    private static final String GOOGLE_SEARCH = "market://search?q=";
 
-	/**
-	 * Get {@link Intent} to market app to search for an app.
-	 * 
-	 * @param context
-	 *            {@link Context} used to launch the intent
-	 * @param search
-	 *            search string
-	 * @param alternativeLink
-	 *            link to some alternative source, if no market is available
-	 * @return intent to content
-	 */
-	public static Intent getSearchAppIntent(final Context context, final String search,
-			final String alternativeLink) {
-		Log.i(TAG, "getSearchAppIntent(" + context + ", " + search + ", " + alternativeLink + ")");
-		final Intent i = new Intent(Intent.ACTION_VIEW);
+    /**
+     * URL used for amazon market to search.
+     */
+    private static final String AMAZON_SEARCH = "http://www.amazon.com" + "/gp/mas/dl/android?s=";
 
-		if (!GOOGLE_SKIP) {
-			// try google market
-			i.setData(Uri.parse(GOOGLE_SEARCH + search));
-			if (i.resolveActivity(context.getPackageManager()) != null) {
-				return i;
-			}
-			Log.w(TAG, "no google market installed");
-		} else {
-			Log.i(TAG, "skip google market");
-		}
+    /**
+     * Skip google market.
+     */
+    private static final boolean GOOGLE_SKIP = false;
 
-		if (!AMAZON_SKIP) {
-			// try amazon market
-			i.setData(Uri.parse(AMAZON_SEARCH + search));
-			// TODO: launch amazon app explicitly?
-			final List<ResolveInfo> l = context.getPackageManager().queryIntentActivities(i, 0);
-			for (ResolveInfo r : l) {
-				if (r.activityInfo.packageName.contains("amazon")) {
-					Log.i(TAG, "use app: " + r.activityInfo.packageName);
-					return i;
-				} else {
-					Log.i(TAG, "skipp app: " + r.activityInfo.packageName);
-				}
-			}
-			Log.w(TAG, "no amazon market installed");
-		} else {
-			Log.i(TAG, "skip amazon market");
-		}
+    /**
+     * Skip amazon market.
+     */
+    private static final boolean AMAZON_SKIP = false;
 
-		if (!TextUtils.isEmpty(alternativeLink)) {
-			// try alternative link
-			i.setData(Uri.parse(alternativeLink));
-			if (i.resolveActivity(context.getPackageManager()) != null) {
-				return i;
-			}
-			Log.e(TAG, "no handler installed: " + alternativeLink);
-		}
+    /**
+     * Hide default constructor.
+     */
+    private Market() {
+    }
 
-		Log.w(TAG, "no handler found to search app: " + search);
-		return null;
-	}
+    /**
+     * get {@link Intent} to any market app to load an app.
+     *
+     * @param context         {@link Context} used to launch the intent
+     * @param packagename     package name of target app
+     * @param alternativeLink link to some alternative source, if no market is available
+     * @return {@link Intent} which should be launched
+     */
+    public static Intent getInstallAppIntent(final Context context, final String packagename,
+            final String alternativeLink) {
+        Log.i(TAG, "getInstallAppIntent(" + context + ", " + packagename + ", " + alternativeLink
+                + ")");
+        final Intent i = new Intent(Intent.ACTION_VIEW);
 
-	/**
-	 * Open any market app to search for an app.
-	 * 
-	 * @param activity
-	 *            {@link Activity} used to launch the intent
-	 * @param search
-	 *            search string
-	 * @param alternativeLink
-	 *            link to some alternative source, if no market is available
-	 * @return true if any intent was launched successfully
-	 */
-	public static boolean searchApp(final Activity activity, final String search,
-			final String alternativeLink) {
-		Log.i(TAG, "searchApp(" + activity + ", " + search + ", " + alternativeLink + ")");
-		final Intent i = getSearchAppIntent(activity, search, alternativeLink);
-		if (i != null) {
-			try {
-				activity.startActivity(i);
-				return true;
-			} catch (ActivityNotFoundException e) {
-				Log.e(TAG, "activity not found", e);
-				Toast.makeText(activity, "activity not found", Toast.LENGTH_LONG).show();
-			}
-		} else {
-			Toast.makeText(activity, "no handler found to search app: " + search, Toast.LENGTH_LONG)
-					.show();
-		}
-		return false;
-	}
+        if (!GOOGLE_SKIP) {
+            // try google market
+            i.setData(Uri.parse(GOOGLE_INSTALL + packagename));
+            if (i.resolveActivity(context.getPackageManager()) != null) {
+                return i;
+            }
+            Log.w(TAG, "no google market installed");
+        } else {
+            Log.i(TAG, "skip google market");
+        }
 
-	/**
-	 * Open any market app to search for all my app.
-	 * 
-	 * @param activity
-	 *            {@link Activity} used to launch the intent
-	 * @return true if any intent was launched successfully
-	 */
-	public static boolean searchMoreApps(final Activity activity) {
-		Log.i(TAG, "searchMoreApps(" + activity + ")");
-		return searchApp(activity, SEARCH_APPS, ALT_APPS);
-	}
+        if (!AMAZON_SKIP) {
+            // try amazon market
+            i.setData(Uri.parse(AMAZON_INSTALL + packagename));
+            final List<ResolveInfo> l = context.getPackageManager().queryIntentActivities(i, 0);
+            for (ResolveInfo r : l) {
+                if (r.activityInfo.packageName.contains("amazon")) {
+                    Log.i(TAG, "use app: " + r.activityInfo.packageName);
+                    return i;
+                } else {
+                    Log.i(TAG, "skipp app: " + r.activityInfo.packageName);
+                }
+            }
+            Log.w(TAG, "no amazon market installed");
+        } else {
+            Log.i(TAG, "skip amazon market");
+        }
 
-	/**
-	 * Set a {@link OnPreferenceClickListener} to preference to launch any market app.
-	 * 
-	 * @param activity
-	 *            {@link Activity} to launch the {@link Intent}
-	 * @param preference
-	 *            {@link Preference} to set the {@link OnPreferenceClickListener} to
-	 * @param packagename
-	 *            package name to install
-	 * @param search
-	 *            search to look for; ignored if packagename is not null
-	 * @param alternativeLink
-	 *            alternative source to get the content
-	 */
-	public static void setOnPreferenceClickListener(final Activity activity,
-			final Preference preference, final String packagename, final String search,
-			final String alternativeLink) {
-		if (preference == null) {
-			return;
-		}
-		preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-			@Override
-			public boolean onPreferenceClick(final Preference preference) {
-				if (!TextUtils.isEmpty(packagename)) {
-					installApp(activity, packagename, alternativeLink);
-					return true;
-				}
-				if (!TextUtils.isEmpty(search)) {
-					searchApp(activity, search, alternativeLink);
-					return true;
-				}
-				return false;
-			}
-		});
-	}
+        if (!TextUtils.isEmpty(alternativeLink)) {
+            // try alternative link
+            i.setData(Uri.parse(alternativeLink));
+            if (i.resolveActivity(context.getPackageManager()) != null) {
+                return i;
+            }
+            Log.w(TAG, "no handler installed: " + alternativeLink);
+        } else if (!GOOGLE_SKIP) {
+            i.setData(Uri.parse(GOOGLE_WEBINSTALL + packagename));
+            return i;
+        }
+
+        Log.w(TAG, "no handler found to install package: " + packagename);
+        return null;
+    }
+
+    /**
+     * Open any market app to load an app.
+     *
+     * @param activity        {@link Activity} used to launch the intent
+     * @param packagename     package name of target app
+     * @param alternativeLink link to some alternative source, if no market is available
+     * @return true if any intent was launched successfully
+     */
+    public static boolean installApp(final Activity activity, final String packagename,
+            final String alternativeLink) {
+        Log.i(TAG, "installApp(" + activity + ", " + packagename + ", " + alternativeLink + ")");
+        final Intent i = getInstallAppIntent(activity, packagename, alternativeLink);
+        if (i != null) {
+            try {
+                activity.startActivity(i);
+                return true;
+            } catch (ActivityNotFoundException e) {
+                Log.e(TAG, "activity not found", e);
+                Toast.makeText(activity, "activity not found", Toast.LENGTH_LONG).show();
+            }
+        } else {
+            Toast.makeText(activity, "no handler found to install package: " + packagename,
+                    Toast.LENGTH_LONG).show();
+        }
+        return false;
+    }
+
+    /**
+     * Get {@link Intent} to market app to search for an app.
+     *
+     * @param context         {@link Context} used to launch the intent
+     * @param search          search string
+     * @param alternativeLink link to some alternative source, if no market is available
+     * @return intent to content
+     */
+    public static Intent getSearchAppIntent(final Context context, final String search,
+            final String alternativeLink) {
+        Log.i(TAG, "getSearchAppIntent(" + context + ", " + search + ", " + alternativeLink + ")");
+        final Intent i = new Intent(Intent.ACTION_VIEW);
+
+        if (!GOOGLE_SKIP) {
+            // try google market
+            i.setData(Uri.parse(GOOGLE_SEARCH + search));
+            if (i.resolveActivity(context.getPackageManager()) != null) {
+                return i;
+            }
+            Log.w(TAG, "no google market installed");
+        } else {
+            Log.i(TAG, "skip google market");
+        }
+
+        if (!AMAZON_SKIP) {
+            // try amazon market
+            i.setData(Uri.parse(AMAZON_SEARCH + search));
+            // TODO: launch amazon app explicitly?
+            final List<ResolveInfo> l = context.getPackageManager().queryIntentActivities(i, 0);
+            for (ResolveInfo r : l) {
+                if (r.activityInfo.packageName.contains("amazon")) {
+                    Log.i(TAG, "use app: " + r.activityInfo.packageName);
+                    return i;
+                } else {
+                    Log.i(TAG, "skipp app: " + r.activityInfo.packageName);
+                }
+            }
+            Log.w(TAG, "no amazon market installed");
+        } else {
+            Log.i(TAG, "skip amazon market");
+        }
+
+        if (!TextUtils.isEmpty(alternativeLink)) {
+            // try alternative link
+            i.setData(Uri.parse(alternativeLink));
+            if (i.resolveActivity(context.getPackageManager()) != null) {
+                return i;
+            }
+            Log.e(TAG, "no handler installed: " + alternativeLink);
+        }
+
+        Log.w(TAG, "no handler found to search app: " + search);
+        return null;
+    }
+
+    /**
+     * Open any market app to search for an app.
+     *
+     * @param activity        {@link Activity} used to launch the intent
+     * @param search          search string
+     * @param alternativeLink link to some alternative source, if no market is available
+     * @return true if any intent was launched successfully
+     */
+    public static boolean searchApp(final Activity activity, final String search,
+            final String alternativeLink) {
+        Log.i(TAG, "searchApp(" + activity + ", " + search + ", " + alternativeLink + ")");
+        final Intent i = getSearchAppIntent(activity, search, alternativeLink);
+        if (i != null) {
+            try {
+                activity.startActivity(i);
+                return true;
+            } catch (ActivityNotFoundException e) {
+                Log.e(TAG, "activity not found", e);
+                Toast.makeText(activity, "activity not found", Toast.LENGTH_LONG).show();
+            }
+        } else {
+            Toast.makeText(activity, "no handler found to search app: " + search, Toast.LENGTH_LONG)
+                    .show();
+        }
+        return false;
+    }
+
+    /**
+     * Open any market app to search for all my app.
+     *
+     * @param activity {@link Activity} used to launch the intent
+     * @return true if any intent was launched successfully
+     */
+    public static boolean searchMoreApps(final Activity activity) {
+        Log.i(TAG, "searchMoreApps(" + activity + ")");
+        return searchApp(activity, SEARCH_APPS, ALT_APPS);
+    }
+
+    /**
+     * Set a {@link OnPreferenceClickListener} to preference to launch any market app.
+     *
+     * @param activity        {@link Activity} to launch the {@link Intent}
+     * @param preference      {@link Preference} to set the {@link OnPreferenceClickListener} to
+     * @param packagename     package name to install
+     * @param search          search to look for; ignored if packagename is not null
+     * @param alternativeLink alternative source to get the content
+     */
+    public static void setOnPreferenceClickListener(final Activity activity,
+            final Preference preference, final String packagename, final String search,
+            final String alternativeLink) {
+        if (preference == null) {
+            return;
+        }
+        preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(final Preference preference) {
+                if (!TextUtils.isEmpty(packagename)) {
+                    installApp(activity, packagename, alternativeLink);
+                    return true;
+                }
+                if (!TextUtils.isEmpty(search)) {
+                    searchApp(activity, search, alternativeLink);
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
 }
