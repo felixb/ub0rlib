@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="de.ub0r.android.lib.test" >
+
+    <uses-sdk
+        android:minSdkVersion="3"
+        android:targetSdkVersion="3" />
+
+    <instrumentation
+        android:name="android.test.InstrumentationTestRunner"
+        android:functionalTest="false"
+        android:handleProfiling="false"
+        android:label="Tests for de.ub0r.android.lib.test"
+        android:targetPackage="de.ub0r.android.lib.test" />
+
+    <application>
+        <uses-library android:name="android.test.runner" />
+
+        <receiver android:name="de.ub0r.android.lib.DonationReceiver" >
+            <intent-filter>
+                <action android:name="de.ub0r.android.donator.REGISTERED" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>
