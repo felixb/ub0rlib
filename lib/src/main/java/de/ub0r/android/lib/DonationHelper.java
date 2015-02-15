@@ -26,7 +26,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -121,8 +120,9 @@ public final class DonationHelper {
         Intent donationCheck = new Intent(DONATOR_BROADCAST_CHECK);
         ResolveInfo ri = pm.resolveService(donationCheck, 0);
         // Log.d(TAG, "ri: " + ri);
-        int match = PackageManager.SIGNATURE_UNKNOWN_PACKAGE;
-        if (ri != null) {
+        if (ri == null) {
+            return false;
+        } else {
             Log.d(TAG, "found package: " + ri.serviceInfo.packageName);
             ComponentName cn = new ComponentName(ri.serviceInfo.packageName, ri.serviceInfo.name);
             // Log.d(TAG, "component name: " + cn);
@@ -132,34 +132,29 @@ public final class DonationHelper {
             if (i == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
                     || i == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
                     && ri.serviceInfo.enabled) {
-                match = pm.checkSignatures(context.getPackageName(), ri.serviceInfo.packageName);
-            } else {
-                Log.w(TAG, ri.serviceInfo.packageName + ": " + ri.serviceInfo.enabled);
-            }
-        }
-
-        Log.i(TAG, "signature match: " + match);
-        if (match != PackageManager.SIGNATURE_UNKNOWN_PACKAGE) {
-            double r = Math.random();
-            // Log.d(TAG, "r=" + r);
-            if (r < CHECK_DONATOR_LIC) {
-                // verify donator license
-                ComponentName cn = context.startService(donationCheck);
-                Log.d(TAG, "Started service: " + cn);
-                if (cn == null) {
+                int match = pm
+                        .checkSignatures(context.getPackageName(), ri.serviceInfo.packageName);
+                if (match != PackageManager.SIGNATURE_MATCH) {
+                    Log.e(TAG, "signatures do not match: " + match);
                     return false;
                 }
+                donationCheck.setComponent(cn);
+            } else {
+                Log.w(TAG, ri.serviceInfo.packageName + ": " + ri.serviceInfo.enabled);
+                return false;
             }
-            return match == PackageManager.SIGNATURE_MATCH;
         }
-        pm = null;
 
-        // no donator app installed, check donation traditionally
-        // do not drop legacy donators
-        boolean ret = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
-                PREFS_HIDEADS, false);
-        Log.d(TAG, "legacy donation check: " + ret);
-        return ret;
+        double r = Math.random();
+        // Log.d(TAG, "r=" + r);
+        if (r < CHECK_DONATOR_LIC) {
+            // verify donator license
+            ComponentName cn = context.startService(donationCheck);
+            // Log.d(TAG, "Started service: " + cn);
+            return cn != null;
+        } else {
+            return true;
+        }
     }
 
     /**
