@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2009-2012 Felix Bechstein -->
+<!-- Copyright (C) 2009-2015 Felix Bechstein -->
 <!--
 		This file is part of ub0rlib. This program is free software; you can
 		redistribute it and/or modify it under the terms of the GNU General
@@ -22,11 +22,7 @@
     <uses-sdk android:minSdkVersion="3" />
 
     <application>
-        <receiver android:name="DonationReceiver" >
-            <intent-filter>
-                <action android:name="de.ub0r.android.donator.REGISTERED" />
-            </intent-filter>
-        </receiver>
+
     </application>
 
 </manifest>

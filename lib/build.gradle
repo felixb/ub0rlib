@@ -1,0 +1,104 @@
+apply plugin: 'com.android.library'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        minSdkVersion 3
+        targetSdkVersion 3
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+configurations {
+    archives {
+        extendsFrom configurations.default
+    }
+}
+
+signing {
+    required { has("release") && gradle.taskGraph.hasTask("uploadArchives") }
+    sign configurations.archives
+}
+
+android.libraryVariants.all { variant ->
+    def name = variant.buildType.name
+    def task = project.tasks.create "jar${name.capitalize()}", Jar
+    task.dependsOn variant.javaCompile
+    task.from variant.javaCompile.destinationDir
+    artifacts.add('archives', task);
+}
+
+
+afterEvaluate { project ->
+
+    uploadArchives {
+        def user = null
+        def repo = null
+        'git remote -v'.execute(null, project.projectDir).getText().find('.*?git@github.com[:/](.*?)/(.*?)(.git)? .*?') {
+            match ->
+                user = match[1]
+                repo = match[2]
+        }
+
+        def githubUrl = 'https://api.github.com/repos/' + user + '/' + repo;
+        if (System.getenv().GITHUB_TOKEN) {
+            githubUrl += '?access_token=' + System.getenv().GITHUB_TOKEN
+        }
+        def repoInfo = new groovy.json.JsonSlurper().parseText(new URL(githubUrl).getText())
+
+        def android_manifest = new XmlParser(false, false).
+                parseText(new File(project.projectDir, 'src/main/AndroidManifest.xml').getText())
+        def versionName = android_manifest.'@android:versionName'
+        def package_name = android_manifest.'@package'
+        def artifact_id = repo.toLowerCase()
+        project.version = versionName
+        project.group = package_name
+
+        configuration = configurations.archives
+        repositories.mavenDeployer {
+            // beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "file:///tmp/ub0rlib/")
+
+            pom.project {
+                name repo
+                packaging 'jar'
+                description repoInfo.description
+                url repoInfo.html_url
+
+                scm {
+                    url repoInfo.git_url
+                    connection repoInfo.git_url
+                    developerConnection repoInfo.ssh_url
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id user
+                        name 'Felix Bechstein'
+                        email 'f@ub0r.de'
+                    }
+                }
+            }
+        }
+    }
+}
+
