@@ -1,14 +1,16 @@
+import groovy.json.JsonSlurper
+
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
 
     defaultConfig {
         minSdkVersion 3
-        targetSdkVersion 21
+        targetSdkVersion 22
     }
 
     buildTypes {
@@ -54,7 +56,7 @@ afterEvaluate { project ->
         if (System.getenv().GITHUB_TOKEN) {
             githubUrl += '?access_token=' + System.getenv().GITHUB_TOKEN
         }
-        def repoInfo = new groovy.json.JsonSlurper().parseText(new URL(githubUrl).getText())
+        def repoInfo = new JsonSlurper().parseText(new URL(githubUrl).getText())
 
         def android_manifest = new XmlParser(false, false).
                 parseText(new File(project.projectDir, 'src/main/AndroidManifest.xml').getText())

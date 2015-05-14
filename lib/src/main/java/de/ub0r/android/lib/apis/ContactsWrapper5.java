@@ -33,12 +33,11 @@ import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
 import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 
 import java.io.IOException;
 import java.io.InputStream;
-
-import de.ub0r.android.lib.Log;
 
 /**
  * Helper class to set/unset background for api5 systems.
@@ -144,7 +143,6 @@ public final class ContactsWrapper5 extends ContactsWrapper {
      */
     @Override
     public Bitmap loadContactPhoto(final Context context, final Uri contactUri) {
-        Log.d(TAG, "loadContactPhoto(ctx, " + contactUri + ")");
         if (contactUri == null) {
             return null;
         }
@@ -152,7 +150,6 @@ public final class ContactsWrapper5 extends ContactsWrapper {
             final ContentResolver cr = context.getContentResolver();
             InputStream is = Contacts.openContactPhotoInputStream(cr, contactUri);
             if (is == null) {
-                Log.d(TAG, "no photo for: " + contactUri);
                 return null;
             }
             return BitmapFactory.decodeStream(is);
@@ -178,12 +175,9 @@ public final class ContactsWrapper5 extends ContactsWrapper {
         if (id == null) {
             return null;
         }
-        Log.d(TAG, "getContactUri(cr, " + id + ")");
         try {
-            final Uri ret = Contacts.lookupContact(cr,
+            return Contacts.lookupContact(cr,
                     Uri.withAppendedPath(Contacts.CONTENT_LOOKUP_URI, id));
-            Log.d(TAG, "found uri: " + ret);
-            return ret;
         } catch (IllegalArgumentException e) {
             Log.e(TAG, "unable to get uri for id: " + id, e);
             return null;
@@ -195,7 +189,6 @@ public final class ContactsWrapper5 extends ContactsWrapper {
      */
     @Override
     public Uri getLookupUri(final ContentResolver cr, final String id) {
-        Log.d(TAG, "getLookupUri(cr, " + id + ")");
         if (TextUtils.isEmpty(id)) {
             return null;
         }
@@ -212,7 +205,6 @@ public final class ContactsWrapper5 extends ContactsWrapper {
         if (ret == null) {
             ret = Uri.withAppendedPath(Contacts.CONTENT_LOOKUP_URI, id);
         }
-        Log.d(TAG, "found uri: " + ret);
         return ret;
     }
 
@@ -227,7 +219,6 @@ public final class ContactsWrapper5 extends ContactsWrapper {
         }
         Uri uri = Uri.withAppendedPath(Phone.CONTENT_FILTER_URI, n);
         // FIXME: this is broken in android os; issue #8255
-        Log.d(TAG, "query: " + uri);
         Cursor c = cr.query(uri, PROJECTION_FILTER, null, null, null);
         if (c != null && c.moveToFirst()) {
             return c;
@@ -238,12 +229,8 @@ public final class ContactsWrapper5 extends ContactsWrapper {
             // get orig API5 cursor for the real number
             final String where = PROJECTION_FILTER[FILTER_INDEX_NUMBER] + " = '"
                     + c.getString(FILTER_INDEX_NUMBER) + "'";
-            Log.d(TAG, "query: " + Phone.CONTENT_URI + " # " + where);
             Cursor c0 = cr.query(Phone.CONTENT_URI, PROJECTION_FILTER, where, null, null);
             if (c0 != null && c0.moveToFirst()) {
-                Log.d(TAG, "id: " + c0.getString(FILTER_INDEX_ID));
-                Log.d(TAG, "name: " + c0.getString(FILTER_INDEX_NAME));
-                Log.d(TAG, "number: " + c0.getString(FILTER_INDEX_NUMBER));
                 return c0;
             }
         }
@@ -256,7 +243,6 @@ public final class ContactsWrapper5 extends ContactsWrapper {
     @Override
     protected Cursor getContact(final ContentResolver cr, final Uri uri) {
         // FIXME: this is broken in android os; issue #8255
-        Log.d(TAG, "query: " + uri);
         try {
             final Cursor c = cr.query(uri, PROJECTION_FILTER, null, null, null);
             if (c != null && c.moveToFirst()) {
@@ -302,7 +288,7 @@ public final class ContactsWrapper5 extends ContactsWrapper {
 
     @Override
     public String getContentWhere(final String filter) {
-        String f = DatabaseUtils.sqlEscapeString('%' + filter.toString() + '%');
+        String f = DatabaseUtils.sqlEscapeString('%' + filter + '%');
         StringBuilder s = new StringBuilder();
         s.append("(" + ContactsContract.Data.DISPLAY_NAME + " LIKE ");
         s.append(f);
@@ -354,10 +340,6 @@ public final class ContactsWrapper5 extends ContactsWrapper {
             Log.w(TAG, "updateContactDetails(null)");
             return false;
         }
-        Log.d(TAG, "updateContactDetails(" + contact.mRecipientId + ")");
-        Log.d(TAG, "id: " + contact.mPersonId);
-        Log.d(TAG, "number: " + contact.mNumber);
-        Log.d(TAG, "name: " + contact.mName);
         boolean changed = false;
         final long rid = contact.mRecipientId;
         final ContentResolver cr = context.getContentResolver();
@@ -373,7 +355,6 @@ public final class ContactsWrapper5 extends ContactsWrapper {
                 if (number != null && !number.startsWith("000") && number.startsWith("00")) {
                     number = number.replaceFirst("^00", "+");
                 }
-                Log.d(TAG, "found address for " + rid + ": " + number);
                 contact.mNumber = number;
                 changedNameAndNumber = true;
                 changed = true;
@@ -386,23 +367,15 @@ public final class ContactsWrapper5 extends ContactsWrapper {
             final String n = PhoneNumberUtils.toCallerIDMinMatch(number);
             if (!TextUtils.isEmpty(n)) {
                 final String selection = CALLER_ID_SELECTION.replace("+", n);
-                Log.d(TAG, "sel: " + selection);
                 final Cursor cursor = cr.query(PHONES_WITH_PRESENCE_URI, CALLER_ID_PROJECTION,
                         selection, new String[]{number}, null);
-                Log.d(TAG, "result: " + cursor.getCount());
 
                 if (cursor.moveToFirst()) {
                     final long pid = cursor.getLong(INDEX_CALLER_ID_CONTACTID);
                     final String lookup = cursor.getString(INDEX_CALLER_ID_LOOKUP_KEY);
                     final String na = cursor.getString(INDEX_CALLER_ID_NAME);
-                    final String nu = cursor.getString(INDEX_CALLER_ID_NUMBER);
                     final int prs = cursor.getInt(INDEX_CALLER_ID_PRESENCE);
                     final String prt = cursor.getString(INDEX_CALLER_ID_STATUS);
-                    Log.d(TAG, "id: " + pid);
-                    Log.d(TAG, "name: " + na);
-                    Log.d(TAG, "number: " + nu);
-                    Log.d(TAG, "presence state: " + prs);
-                    Log.d(TAG, "presence text: " + prt);
                     if (pid != contact.mPersonId) {
                         contact.mPersonId = pid;
                         changed = true;

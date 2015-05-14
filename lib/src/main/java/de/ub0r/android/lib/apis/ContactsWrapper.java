@@ -25,11 +25,9 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-
-import de.ub0r.android.lib.Log;
-import de.ub0r.android.lib.Utils;
 
 /**
  * Wrap around contacts API.
@@ -134,14 +132,13 @@ public abstract class ContactsWrapper {
      *
      * @return {@link ContactsWrapper}
      */
-    public static final ContactsWrapper getInstance() {
+    public static ContactsWrapper getInstance() {
         if (sInstance == null) {
-            if (Utils.isApi(Build.VERSION_CODES.ECLAIR)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR) {
                 sInstance = new ContactsWrapper5();
             } else {
                 sInstance = new ContactsWrapper3();
             }
-            Log.d(TAG, "getInstance(): " + sInstance.getClass().getName());
         }
         return sInstance;
     }
@@ -416,7 +413,6 @@ public abstract class ContactsWrapper {
      * @return {@link Uri} to contact
      */
     public final Uri getLookupKeyForNumber(final ContentResolver cr, final String number) {
-        Log.d(TAG, "getLookupKeyForNumber(cr, " + number + ")");
         Uri ret = null;
         final Cursor c = this.getContact(cr, number);
         if (c != null) {
@@ -424,7 +420,6 @@ public abstract class ContactsWrapper {
             c.close();
             ret = this.getLookupUri(cr, id);
         }
-        Log.d(TAG, "return: " + ret);
         return ret;
     }
 

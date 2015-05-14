@@ -16,21 +16,15 @@
  */
 package de.ub0r.android.lib;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.telephony.TelephonyManager;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.RelativeSizeSpan;
-import android.widget.Toast;
+import android.util.Log;
 
 /**
  * Display send IMEI hash, read signature..
@@ -45,11 +39,6 @@ public final class DonationHelper {
     private static final String TAG = "dh";
 
     /**
-     * Preference's name: hide ads.
-     */
-    private static final String PREFS_HIDEADS = "hideads";
-
-    /**
      * Threshold for chacking donator app license.
      */
     private static final double CHECK_DONATOR_LIC = 0.1;
@@ -57,19 +46,10 @@ public final class DonationHelper {
     /**
      * Donator package.
      */
-    private static final String DONATOR_PACKAGE = "de.ub0r.android.donator";
+    public static final String DONATOR_PACKAGE = "de.ub0r.android.donator";
 
-    /**
-     * Donator legacy package.
-     */
-    private static final String DONATOR_PACKAGE_LEGACY = "de.ub0r.android.donatorlegacy";
-
-    /**
-     * Donator legacy alternate URL.
-     */
-    private static final String DONATOR_ALTURL_LEGACY =
-            "http://code.google.com/p/ub0rapps/downloads/list?"
-                    + "can=3&q=Product%3DDonator";
+    public static final Uri DONATOR_URI = Uri
+            .parse("https://play.google.com/store/apps/details?" + DONATOR_PACKAGE);
 
     /**
      * Check dontor Broadcast.
@@ -119,16 +99,11 @@ public final class DonationHelper {
         PackageManager pm = context.getPackageManager();
         Intent donationCheck = new Intent(DONATOR_BROADCAST_CHECK);
         ResolveInfo ri = pm.resolveService(donationCheck, 0);
-        // Log.d(TAG, "ri: " + ri);
         if (ri == null) {
             return false;
         } else {
-            Log.d(TAG, "found package: " + ri.serviceInfo.packageName);
             ComponentName cn = new ComponentName(ri.serviceInfo.packageName, ri.serviceInfo.name);
-            // Log.d(TAG, "component name: " + cn);
             int i = pm.getComponentEnabledSetting(cn);
-            // Log.d(TAG, "component status: " + i);
-            // Log.d(TAG, "package status: " + ri.serviceInfo.enabled);
             if (i == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
                     || i == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
                     && ri.serviceInfo.enabled) {
@@ -146,66 +121,13 @@ public final class DonationHelper {
         }
 
         double r = Math.random();
-        // Log.d(TAG, "r=" + r);
         if (r < CHECK_DONATOR_LIC) {
             // verify donator license
             ComponentName cn = context.startService(donationCheck);
-            // Log.d(TAG, "Started service: " + cn);
             return cn != null;
         } else {
             return true;
         }
     }
 
-    /**
-     * Show "donate" dialog.
-     *
-     * @param context   {@link Context}
-     * @param title     title
-     * @param btnDonate button text for donate
-     * @param btnNoads  button text for "i did a donation"
-     * @param messages  messages for dialog body
-     */
-    public static void showDonationDialog(final Activity context, final String title,
-            final String btnDonate, final String btnNoads, final String[] messages) {
-        final Intent marketIntent = Market.getInstallAppIntent(context, DONATOR_PACKAGE, null);
-
-        String btnTitle = String.format(btnDonate, "Play Store");
-
-        SpannableStringBuilder sb = new SpannableStringBuilder();
-        for (String m : messages) {
-            sb.append(m);
-            sb.append("\n");
-        }
-        sb.delete(sb.length() - 1, sb.length());
-        sb.setSpan(new RelativeSizeSpan(0.75f), 0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        AlertDialog.Builder b = new AlertDialog.Builder(context);
-        b.setTitle(title);
-        b.setMessage(sb);
-        b.setCancelable(true);
-        b.setPositiveButton(btnTitle, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(final DialogInterface dialog, final int which) {
-                try {
-                    context.startActivity(marketIntent);
-                } catch (ActivityNotFoundException e) {
-                    Log.e(TAG, "activity not found", e);
-                    Toast.makeText(context, "activity not found", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        b.setNeutralButton(btnNoads, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(final DialogInterface dialog, final int which) {
-                try {
-                    context.startActivity(Market.getInstallAppIntent(context,
-                            DONATOR_PACKAGE_LEGACY, DONATOR_ALTURL_LEGACY));
-                } catch (ActivityNotFoundException e) {
-                    Log.e(TAG, "activity not found", e);
-                    Toast.makeText(context, "activity not found", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        b.show();
-    }
 }

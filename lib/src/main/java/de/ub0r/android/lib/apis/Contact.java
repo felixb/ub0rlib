@@ -27,8 +27,6 @@ import android.net.Uri;
 import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
 
-import de.ub0r.android.lib.Log;
-
 /**
  * Information about a {@link Contact}.
  *
@@ -168,7 +166,6 @@ public final class Contact {
      * @return true if {@link Contact}'s details where changed
      */
     public boolean update(final Context context, final boolean loadOnly, final boolean loadAvatar) {
-        Log.d(TAG, "update()");
         return ContactsWrapper.getInstance().updateContactDetails(context, loadOnly, loadAvatar,
                 this);
     }
@@ -315,7 +312,6 @@ public final class Contact {
      */
     @TargetApi(4)
     public Drawable getAvatar(final Context context, final Drawable defaultValue) {
-        Log.d(TAG, "getAvatar()");
         if (this.mAvatar == null) {
             if (this.mAvatarData != null) {
                 Bitmap b = BitmapFactory.decodeByteArray(this.mAvatarData, 0,

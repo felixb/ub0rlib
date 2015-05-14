@@ -23,9 +23,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.FileInputStream;
@@ -106,11 +106,6 @@ public final class Utils {
      * M aka 1024 * 1024.
      */
     public static final int M = K * K;
-
-    /**
-     * API level.
-     */
-    private static int iApi = -1;
 
     /**
      * Default Constructor.
@@ -214,10 +209,10 @@ public final class Utils {
             // Create Hex String
             StringBuilder hexString = new StringBuilder(32);
             int b;
-            for (int i = 0; i < messageDigest.length; i++) {
-                b = 0xFF & messageDigest[i];
+            for (byte aMessageDigest : messageDigest) {
+                b = 0xFF & aMessageDigest;
                 if (b < 0x10) {
-                    hexString.append('0' + Integer.toHexString(b));
+                    hexString.append('0').append(Integer.toHexString(b));
                 } else {
                     hexString.append(Integer.toHexString(b));
                 }
@@ -297,47 +292,18 @@ public final class Utils {
      * @return byte array
      */
     public static byte[] concatByteArrays(final byte[][] bytes) {
-        final int l = bytes.length;
         int rl = 0;
-        for (int i = 0; i < l; i++) {
-            rl += bytes[i].length;
+        for (byte[] aByte : bytes) {
+            rl += aByte.length;
         }
         final byte[] ret = new byte[rl];
         int pos = 0;
-        for (int i = 0; i < l; i++) {
-            byte[] b = bytes[i];
+        for (byte[] b : bytes) {
             int bl = b.length;
             System.arraycopy(b, 0, ret, pos, bl);
             pos += bl;
         }
         return ret;
-    }
-
-    /**
-     * Get Android's API version.
-     *
-     * @return API version
-     */
-    @SuppressWarnings("deprecation")
-    public static int getApiVersion() {
-        if (iApi < 0) {
-            iApi = Integer.parseInt(Build.VERSION.SDK);
-        }
-        return iApi;
-    }
-
-    /**
-     * Is API supported?
-     *
-     * @param api Android's API version
-     * @return true, if api <= current API version
-     */
-    @SuppressWarnings("deprecation")
-    public static boolean isApi(final int api) {
-        if (iApi < 0) {
-            iApi = Integer.parseInt(Build.VERSION.SDK);
-        }
-        return iApi >= api;
     }
 
     /**
