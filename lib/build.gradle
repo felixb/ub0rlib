@@ -70,7 +70,7 @@ afterEvaluate { project ->
         repositories.mavenDeployer {
             // beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-            repository(url: "file:///tmp/ub0rlib/")
+            repository(url: "file://" + new File(".").getAbsolutePath() + "/../mvn-repo/")
 
             pom.project {
                 name repo
