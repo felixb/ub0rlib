@@ -49,7 +49,7 @@ public final class DonationHelper {
     public static final String DONATOR_PACKAGE = "de.ub0r.android.donator";
 
     public static final Uri DONATOR_URI = Uri
-            .parse("https://play.google.com/store/apps/details?" + DONATOR_PACKAGE);
+            .parse("https://play.google.com/store/apps/details?id=" + DONATOR_PACKAGE);
 
     /**
      * Check dontor Broadcast.
